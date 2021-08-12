@@ -1,0 +1,22 @@
+name: qr_code_dart_scan
+description: A QR code scanner that works on both iOS and Android using dart decoder.
+version: 0.0.1
+homepage: https://github.com/RafaelBarbosatec
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  camera: ^0.8.1+7
+  zxing2: ^0.1.0
+  image: ^3.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
