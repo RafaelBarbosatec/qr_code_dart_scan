@@ -2,7 +2,7 @@
 
 # QRCodeDartScan
 
-A QR code scanner that works on both iOS and Android using dart decoder.
+A QR code scanner that works on both iOS and Android using [dart decoder](https://github.com/xvrh/zxing-dart).
 
 Scanning normal Qr code             |  Scanning invert Qr code 
 :-------------------------:|:-------------------------:
@@ -45,3 +45,26 @@ minSdkVersion 21
 ```
 
 It's important to note that the `MediaRecorder` class is not working properly on emulators, as stated in the documentation: https://developer.android.com/reference/android/media/MediaRecorder. Specifically, when recording a video with sound enabled and trying to play it back, the duration won't be correct and you will only see the first frame.
+
+
+### Using
+
+```dart
+
+    return Scaffold(
+      body: QRCodeDartScanView(
+        scanQRCodeInverted: true, // enable scan invert qr code ( default = false)
+        onCapture: (Result result) {
+          // do anything with result
+          // result.text
+          // result.rawBytes
+          // result.resultPoints
+          // result.format
+          // result.numBits
+          // result.resultMetadata
+          // result.time
+        },
+      ),
+    );
+    
+```
