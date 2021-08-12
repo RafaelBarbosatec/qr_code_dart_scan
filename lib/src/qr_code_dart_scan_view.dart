@@ -24,14 +24,12 @@ enum TypeCamera { back, front }
 class QRCodeDartScanView extends StatefulWidget {
   final TypeCamera typeCamera;
   final ValueChanged<Result>? onCapture;
-  final int intervalScan;
   final bool scanQRCodeInverted;
   final QRCodeDartScanController? controller;
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
     this.onCapture,
-    this.intervalScan = 250,
     this.scanQRCodeInverted = false,
     this.controller,
   }) : super(key: key);
@@ -43,15 +41,11 @@ class QRCodeDartScanView extends StatefulWidget {
 class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
   late CameraController controller;
   late QRCodeDartScanController qrCodeDartScanController;
-  late IntervalTimer timer;
   bool initialized = false;
   bool processingImg = false;
 
   @override
   void initState() {
-    timer = IntervalTimer(
-      Duration(milliseconds: widget.intervalScan),
-    );
     _initController();
     super.initState();
   }
@@ -93,35 +87,37 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
     });
   }
 
-  void _imageStream(CameraImage image) {
+  void _imageStream(CameraImage image) async {
     if (!processingImg) {
-      timer.call(() async {
-        processingImg = true;
-        var imgData = image.toPlatformData();
-        var decoded = await compute(
-          decode,
-          {
-            'image': imgData,
-            'invert': false,
-          },
-        );
-
-        if (widget.scanQRCodeInverted) {
-          decoded = decoded ??
-              await compute(
-                decode,
-                {
-                  'image': imgData,
-                  'invert': true,
-                },
-              );
-        }
-
-        if (decoded != null && mounted) {
-          widget.onCapture?.call(decoded);
-        }
-        processingImg = false;
-      });
+      processingImg = true;
+      Future.microtask(() => _processImage(image));
     }
+  }
+
+  void _processImage(CameraImage image) async {
+    var imgData = image.toPlatformData();
+    var decoded = await compute(
+      decode,
+      {
+        'image': imgData,
+        'invert': false,
+      },
+    );
+
+    if (widget.scanQRCodeInverted) {
+      decoded = decoded ??
+          await compute(
+            decode,
+            {
+              'image': imgData,
+              'invert': true,
+            },
+          );
+    }
+
+    if (decoded != null && mounted) {
+      widget.onCapture?.call(decoded);
+    }
+    processingImg = false;
   }
 }

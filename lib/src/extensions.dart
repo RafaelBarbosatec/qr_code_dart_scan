@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 
@@ -65,19 +63,5 @@ extension CameraImageExtension on CameraImage {
         'width': e.width,
       };
     }).toList();
-  }
-}
-
-class IntervalTimer {
-  final Duration delay;
-  Timer? _timer;
-
-  /// IntervalTimer constructor
-  IntervalTimer(this.delay);
-
-  /// Method used to call method and reset time if it is not finished
-  void call(VoidCallback action) {
-    if (_timer?.isActive == true) return;
-    _timer = Timer(delay, action);
   }
 }
