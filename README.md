@@ -4,11 +4,15 @@
 
 A QR code scanner that works on both iOS and Android using dart decoder.
 
+Scanning normal Qr code             |  Scanning invert Qr code 
+:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/RafaelBarbosatec/qr_code_dart_scan/main/img/normal.jpg)  |  ![](https://raw.githubusercontent.com/RafaelBarbosatec/qr_code_dart_scan/main/img/inverted.jpg)
+
 ## Features
 
 - Camera scan preview in a widget
 - Scan QRCode
-- Scan QRCode inverted
+- Scan invert QRCode
 
 ## Installation
 
