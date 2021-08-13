@@ -8,6 +8,8 @@ Scanning normal Qr code             |  Scanning invert Qr code
 :-------------------------:|:-------------------------:
 ![](https://raw.githubusercontent.com/RafaelBarbosatec/qr_code_dart_scan/main/img/normal.jpg)  |  ![](https://raw.githubusercontent.com/RafaelBarbosatec/qr_code_dart_scan/main/img/inverted.jpg)
 
+[APK DEMO](https://github.com/RafaelBarbosatec/qr_code_dart_scan/raw/main/apk/demo.apk)
+
 ## Features
 
 - Camera scan preview in a widget
