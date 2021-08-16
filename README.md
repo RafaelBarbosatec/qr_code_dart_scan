@@ -2,7 +2,7 @@
 
 # QRCodeDartScan
 
-A QR code scanner that works on both iOS and Android using [dart decoder](https://github.com/xvrh/zxing-dart).
+A QR code scanner that works on both iOS and Android using [dart decoder](https://github.com/shirne/zxing-dart).
 
 Scanning normal Qr code             |  Scanning invert Qr code 
 :-------------------------:|:-------------------------:
@@ -15,6 +15,18 @@ Scanning normal Qr code             |  Scanning invert Qr code
 - Camera scan preview in a widget
 - Scan QRCode
 - Scan invert QRCode
+
+## Supported Formats
+
+- QR_CODE
+- AZTEC
+- DATA_MATRIX
+- PDF_417
+- CODE_39
+- CODE_93
+- CODE_128
+- EAN_8
+- EAN_13
 
 ## Installation
 

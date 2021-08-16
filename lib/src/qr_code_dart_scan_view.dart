@@ -2,9 +2,9 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
-import 'package:zxing2/zxing2.dart';
+import 'package:zxing_lib/zxing.dart';
 
-import 'qr_code_decoder.dart';
+import 'qr_code_dart_scan_decoder.dart';
 
 ///
 /// Created by
@@ -24,6 +24,10 @@ class QRCodeDartScanView extends StatefulWidget {
   final TypeCamera typeCamera;
   final ValueChanged<Result>? onCapture;
   final bool scanQRCodeInverted;
+
+  /// Use to limit a specific format
+  /// If null use all accepted formats
+  final List<BarcodeFormat>? formats;
   final QRCodeDartScanController? controller;
   const QRCodeDartScanView({
     Key? key,
@@ -31,6 +35,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.onCapture,
     this.scanQRCodeInverted = false,
     this.controller,
+    this.formats,
   }) : super(key: key);
 
   @override
@@ -45,6 +50,7 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
 
   @override
   void initState() {
+    _verifyFormats();
     _initController();
     super.initState();
   }
@@ -95,7 +101,10 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
   }
 
   void _processImage(CameraImage image) async {
-    final event = DecodeEvent(cameraImage: image);
+    final event = DecodeEvent(
+      cameraImage: image,
+      formats: widget.formats,
+    );
     Result? decoded = await compute(
       decode,
       event.toMap(),
@@ -112,5 +121,15 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
       widget.onCapture?.call(decoded);
     }
     processingImg = false;
+  }
+
+  void _verifyFormats() {
+    if (widget.formats?.isNotEmpty == true) {
+      widget.formats!.forEach((element) {
+        if (!acceptedFormats.contains(element)) {
+          throw Exception('$element format not supported in the moment');
+        }
+      });
+    }
   }
 }

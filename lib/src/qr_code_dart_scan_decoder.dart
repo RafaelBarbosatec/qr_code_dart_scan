@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:image/image.dart' as imglib;
+import 'package:qr_code_dart_scan/src/qr_code_dart_scan_multi_reader.dart';
 import 'package:zxing_lib/common.dart';
-import 'package:zxing_lib/qrcode.dart';
 import 'package:zxing_lib/zxing.dart';
 
 import 'extensions.dart';
@@ -20,16 +20,28 @@ import 'extensions.dart';
 /// Rafaelbarbosatec
 /// on 12/08/21
 
+final acceptedFormats = [
+  BarcodeFormat.QR_CODE,
+  BarcodeFormat.AZTEC,
+  BarcodeFormat.DATA_MATRIX,
+  BarcodeFormat.PDF_417,
+  BarcodeFormat.CODE_39,
+  BarcodeFormat.CODE_93,
+  BarcodeFormat.CODE_128,
+  BarcodeFormat.EAN_8,
+  BarcodeFormat.EAN_13,
+];
+
 class DecodeEvent {
   final bool invert;
   final CameraImage cameraImage;
   final List<BarcodeFormat> formats;
 
-  DecodeEvent(
-      {required this.cameraImage,
-      this.invert = false,
-      List<BarcodeFormat>? formats})
-      : this.formats = formats ?? [BarcodeFormat.QR_CODE];
+  DecodeEvent({
+    required this.cameraImage,
+    this.invert = false,
+    List<BarcodeFormat>? formats,
+  }) : this.formats = formats ?? acceptedFormats;
   DecodeEvent.fromMap(Map map)
       : invert = map['invert'] as bool,
         cameraImage = CameraImage.fromPlatformData(
@@ -47,13 +59,12 @@ class DecodeEvent {
     };
   }
 
-  DecodeEvent copyWith({
-    bool? invert,
-    CameraImage? cameraImage,
-  }) {
+  DecodeEvent copyWith(
+      {bool? invert, CameraImage? cameraImage, List<BarcodeFormat>? formats}) {
     return DecodeEvent(
       invert: invert ?? this.invert,
       cameraImage: cameraImage ?? this.cameraImage,
+      formats: formats ?? this.formats,
     );
   }
 }
@@ -79,7 +90,7 @@ Result? decode(Map<dynamic, dynamic> data) {
       HybridBinarizer(event.invert ? source.invert() : source),
     );
 
-    var reader = QRCodeReader();
+    var reader = QRCodeDartScanMultiReader(event.formats);
     try {
       return reader.decode(bitmap);
     } catch (_) {

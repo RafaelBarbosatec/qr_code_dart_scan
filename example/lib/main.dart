@@ -52,7 +52,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Text('${currentResult?.text ?? 'Not found'}'),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Text: ${currentResult?.text ?? 'Not found'}'),
+                  Text(
+                      'Format: ${currentResult?.barcodeFormat ?? 'Not found'}'),
+                ],
+              ),
             ),
           ),
         ],
