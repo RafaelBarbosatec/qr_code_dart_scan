@@ -12,6 +12,7 @@ import 'package:camera/camera.dart';
 /// Rafaelbarbosatec
 /// on 12/08/21
 class QRCodeDartScanController {
+  bool _scanEnabled = true;
   CameraController? _cameraController;
 
   void configure(CameraController controller) {
@@ -29,4 +30,10 @@ class QRCodeDartScanController {
   Future<void>? setFocusMode(FocusMode mode) {
     return _cameraController?.setFocusMode(mode);
   }
+
+  void setScanEnabled(bool enable) {
+    _scanEnabled = enable;
+  }
+
+  bool get scanEnable => _scanEnabled;
 }

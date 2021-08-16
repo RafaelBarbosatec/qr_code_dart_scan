@@ -3,6 +3,8 @@ import 'package:image/image.dart' as imglib;
 import 'package:zxing2/qrcode.dart';
 import 'package:zxing2/zxing2.dart';
 
+import 'extensions.dart';
+
 ///
 /// Created by
 ///
@@ -14,16 +16,44 @@ import 'package:zxing2/zxing2.dart';
 ///
 /// Rafaelbarbosatec
 /// on 12/08/21
+
+class DecodeEvent {
+  final bool invert;
+  final CameraImage cameraImage;
+
+  DecodeEvent({required this.cameraImage, this.invert = false});
+  DecodeEvent.fromMap(Map map)
+      : invert = map['invert'] as bool,
+        cameraImage = CameraImage.fromPlatformData(
+          map['image'] as Map<dynamic, dynamic>,
+        );
+
+  Map toMap() {
+    return {
+      'invert': invert,
+      'image': cameraImage.toPlatformData(),
+    };
+  }
+
+  DecodeEvent copyWith({
+    bool? invert,
+    CameraImage? cameraImage,
+  }) {
+    return DecodeEvent(
+      invert: invert ?? this.invert,
+      cameraImage: cameraImage ?? this.cameraImage,
+    );
+  }
+}
+
 Result? decode(Map<dynamic, dynamic> data) {
   try {
-    var invert = data['invert'] as bool;
-    var image =
-        CameraImage.fromPlatformData(data['image'] as Map<dynamic, dynamic>);
+    final DecodeEvent event = DecodeEvent.fromMap(data);
     imglib.Image img;
-    if (image.format.group == ImageFormatGroup.yuv420) {
-      img = _convertYUV420(image);
-    } else if (image.format.group == ImageFormatGroup.bgra8888) {
-      img = _convertBGRA8888(image);
+    if (event.cameraImage.format.group == ImageFormatGroup.yuv420) {
+      img = _convertYUV420(event.cameraImage);
+    } else if (event.cameraImage.format.group == ImageFormatGroup.bgra8888) {
+      img = _convertBGRA8888(event.cameraImage);
     } else {
       return null;
     }
@@ -34,7 +64,7 @@ Result? decode(Map<dynamic, dynamic> data) {
       img.getBytes().buffer.asInt32List(),
     );
     var bitmap = BinaryBitmap(
-      HybridBinarizer(invert ? source.invert() : source),
+      HybridBinarizer(event.invert ? source.invert() : source),
     );
 
     var reader = QRCodeReader();

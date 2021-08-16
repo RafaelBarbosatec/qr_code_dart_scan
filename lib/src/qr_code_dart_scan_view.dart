@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
 import 'package:zxing2/zxing2.dart';
 
-import 'extensions.dart';
 import 'qr_code_decoder.dart';
 
 ///
@@ -71,14 +70,14 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
 
   void _initController() async {
     final cameras = await availableCameras();
-    var camera = cameras[0];
+    var camera = cameras.first;
     if (widget.typeCamera == TypeCamera.front && cameras.length > 1) {
       camera = cameras[1];
     }
     controller = CameraController(camera, ResolutionPreset.high);
     qrCodeDartScanController = widget.controller ?? QRCodeDartScanController();
-    qrCodeDartScanController.configure(controller);
     await controller.initialize();
+    qrCodeDartScanController.configure(controller);
     controller.startImageStream(_imageStream);
     Future.delayed(Duration.zero, () {
       setState(() {
@@ -88,6 +87,7 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
   }
 
   void _imageStream(CameraImage image) async {
+    if (!qrCodeDartScanController.scanEnable) return;
     if (!processingImg) {
       processingImg = true;
       Future.microtask(() => _processImage(image));
@@ -95,24 +95,17 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
   }
 
   void _processImage(CameraImage image) async {
-    var imgData = image.toPlatformData();
-    var decoded = await compute(
+    final event = DecodeEvent(cameraImage: image);
+    Result? decoded = await compute(
       decode,
-      {
-        'image': imgData,
-        'invert': false,
-      },
+      event.toMap(),
     );
 
-    if (widget.scanQRCodeInverted) {
-      decoded = decoded ??
-          await compute(
-            decode,
-            {
-              'image': imgData,
-              'invert': true,
-            },
-          );
+    if (widget.scanQRCodeInverted && decoded == null) {
+      decoded = await compute(
+        decode,
+        event.copyWith(invert: true).toMap(),
+      );
     }
 
     if (decoded != null && mounted) {

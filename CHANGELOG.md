@@ -1,3 +1,7 @@
+## 0.1.0
+
+* add `setScanEnabled` in controller.
+
 ## 0.0.2
 
 * Improvements performance
