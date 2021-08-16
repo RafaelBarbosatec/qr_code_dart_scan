@@ -1,4 +1,4 @@
-## 0.1.0
+## next
 
 * add `setScanEnabled` in controller.
 
