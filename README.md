@@ -67,7 +67,7 @@ It's important to note that the `MediaRecorder` class is not working properly on
 
     return Scaffold(
       body: QRCodeDartScanView(
-        scanQRCodeInverted: true, // enable scan invert qr code ( default = false)
+        scanInvertedQRCode: true, // enable scan invert qr code ( default = false)
         onCapture: (Result result) {
           // do anything with result
           // result.text

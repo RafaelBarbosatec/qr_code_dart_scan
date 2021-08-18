@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
         fit: StackFit.expand,
         children: [
           QRCodeDartScanView(
-            scanQRCodeInverted: true,
+            scanInvertedQRCode: true,
             onCapture: (Result result) {
               setState(() {
                 currentResult = result;

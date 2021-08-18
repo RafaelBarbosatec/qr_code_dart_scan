@@ -23,7 +23,7 @@ enum TypeCamera { back, front }
 class QRCodeDartScanView extends StatefulWidget {
   final TypeCamera typeCamera;
   final ValueChanged<Result>? onCapture;
-  final bool scanQRCodeInverted;
+  final bool scanInvertedQRCode;
 
   /// Use to limit a specific format
   /// If null use all accepted formats
@@ -33,7 +33,7 @@ class QRCodeDartScanView extends StatefulWidget {
     Key? key,
     this.typeCamera = TypeCamera.back,
     this.onCapture,
-    this.scanQRCodeInverted = false,
+    this.scanInvertedQRCode = false,
     this.controller,
     this.formats,
   }) : super(key: key);
@@ -110,7 +110,7 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
       event.toMap(),
     );
 
-    if (widget.scanQRCodeInverted && decoded == null) {
+    if (widget.scanInvertedQRCode && decoded == null) {
       decoded = await compute(
         decode,
         event.copyWith(invert: true).toMap(),
