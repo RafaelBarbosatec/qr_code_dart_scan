@@ -1,3 +1,7 @@
+## next
+
+- rename `scanQRCodeInverted` to `scanInvertedQRCode`
+
 ## 0.1.0
 
 * add `setScanEnabled` in controller.
