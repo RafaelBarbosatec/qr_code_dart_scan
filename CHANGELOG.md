@@ -1,6 +1,7 @@
-## next
+## 0.1.1
 
 - rename `scanQRCodeInverted` to `scanInvertedQRCode`
+- improvements aspectRatio.
 
 ## 0.1.0
 

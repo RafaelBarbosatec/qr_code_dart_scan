@@ -70,7 +70,11 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
               width: double.maxFinite,
               height: double.maxFinite,
             )
-          : CameraPreview(controller),
+          : Container(
+              width: double.maxFinite,
+              height: double.maxFinite,
+              child: CameraPreview(controller),
+            ),
     );
   }
 
