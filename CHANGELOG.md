@@ -1,3 +1,8 @@
+## 0.2.0
+
+- update `camera`
+- update `image`.
+
 ## 0.1.1
 
 - rename `scanQRCodeInverted` to `scanInvertedQRCode`
