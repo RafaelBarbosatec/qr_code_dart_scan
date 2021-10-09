@@ -90,9 +90,11 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
     qrCodeDartScanController.configure(controller);
     controller.startImageStream(_imageStream);
     Future.delayed(Duration.zero, () {
-      setState(() {
-        initialized = true;
-      });
+      if (mounted) {
+        setState(() {
+          initialized = true;
+        });
+      }
     });
   }
 
