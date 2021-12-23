@@ -1,3 +1,6 @@
+## 0.3.0
+- update `camera` to 0.9.4+5
+
 ## 0.2.1
 
 - downgrade `camera`. Awaiting fix issue [#90070](https://github.com/flutter/flutter/issues/90070).
