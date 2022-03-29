@@ -29,11 +29,9 @@ class QRCodeDartScanView extends StatefulWidget {
   /// If null use all accepted formats
   final List<BarcodeFormat>? formats;
   final QRCodeDartScanController? controller;
-  final ResolutionPreset? resolutionPreset;
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
-    this.resolutionPreset,
     this.onCapture,
     this.scanInvertedQRCode = false,
     this.controller,
@@ -88,7 +86,7 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
     }
     controller = CameraController(
       camera,
-      widget.resolutionPreset ?? ResolutionPreset.high,
+      ResolutionPreset.high,
     );
     qrCodeDartScanController = widget.controller ?? QRCodeDartScanController();
     await controller.initialize();
