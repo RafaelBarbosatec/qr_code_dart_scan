@@ -1,3 +1,6 @@
+## 0.4.0
+- update `camera`, `zxing_lib` and `image`
+
 ## 0.3.0
 - update `camera` to 0.9.4+5
 
