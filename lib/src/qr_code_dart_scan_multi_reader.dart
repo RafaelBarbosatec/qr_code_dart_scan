@@ -4,6 +4,7 @@ import 'package:zxing_lib/maxicode.dart';
 import 'package:zxing_lib/oned.dart';
 import 'package:zxing_lib/pdf417.dart';
 import 'package:zxing_lib/qrcode.dart';
+import 'package:zxing_lib/src/result.dart' as otherResult;
 import 'package:zxing_lib/zxing.dart';
 
 ///
@@ -80,15 +81,12 @@ class QRCodeDartScanMultiReader {
     });
   }
 
-  Result? decode(BinaryBitmap image) {
+  otherResult.Result? decode(BinaryBitmap image) {
     for (final reader in _readers) {
-      Result? result;
       try {
-        result = reader.decode(image);
+        return reader.decode(image);
       } catch (e) {}
-      if (result != null) {
-        return result;
-      }
     }
+    return null;
   }
 }
