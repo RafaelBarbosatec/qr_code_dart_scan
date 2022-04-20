@@ -28,7 +28,7 @@ packages:
       name: camera
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.9.4+18"
+    version: "0.9.4+19"
   camera_platform_interface:
     dependency: transitive
     description:

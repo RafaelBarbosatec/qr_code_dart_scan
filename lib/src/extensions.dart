@@ -14,20 +14,20 @@ import 'package:qr_code_dart_scan/src/util.dart';
 /// Rafaelbarbosatec
 /// on 12/08/21
 extension QrCodeDartScanResolutionPresetExtension
-    on QrCodeDartScanResolutionPreset {
+    on QRCodeDartScanResolutionPreset {
   ResolutionPreset toResolutionPreset() {
     switch (this) {
-      case QrCodeDartScanResolutionPreset.low:
+      case QRCodeDartScanResolutionPreset.low:
         return ResolutionPreset.low;
-      case QrCodeDartScanResolutionPreset.medium:
+      case QRCodeDartScanResolutionPreset.medium:
         return ResolutionPreset.medium;
-      case QrCodeDartScanResolutionPreset.high:
+      case QRCodeDartScanResolutionPreset.high:
         return ResolutionPreset.high;
-      case QrCodeDartScanResolutionPreset.veryHigh:
+      case QRCodeDartScanResolutionPreset.veryHigh:
         return ResolutionPreset.veryHigh;
-      case QrCodeDartScanResolutionPreset.ultraHigh:
+      case QRCodeDartScanResolutionPreset.ultraHigh:
         return ResolutionPreset.ultraHigh;
-      case QrCodeDartScanResolutionPreset.max:
+      case QRCodeDartScanResolutionPreset.max:
         return ResolutionPreset.max;
     }
   }

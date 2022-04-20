@@ -9,7 +9,7 @@
 ///
 /// Rafaelbarbosatec
 /// on 20/04/22
-enum QrCodeDartScanResolutionPreset {
+enum QRCodeDartScanResolutionPreset {
   /// 352x288 on iOS, 240p (320x240) on Android
   low,
 

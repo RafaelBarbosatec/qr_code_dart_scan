@@ -32,37 +32,32 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          QRCodeDartScanView(
-            scanInvertedQRCode: true,
-            onCapture: (Result result) {
-              setState(() {
-                currentResult = result;
-              });
-            },
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              margin: EdgeInsets.all(20),
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Text: ${currentResult?.text ?? 'Not found'}'),
-                  Text(
-                      'Format: ${currentResult?.barcodeFormat ?? 'Not found'}'),
-                ],
-              ),
+      body: QRCodeDartScanView(
+        scanInvertedQRCode: true,
+        onCapture: (Result result) {
+          setState(() {
+            currentResult = result;
+          });
+        },
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            margin: EdgeInsets.all(20),
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Text: ${currentResult?.text ?? 'Not found'}'),
+                Text('Format: ${currentResult?.barcodeFormat ?? 'Not found'}'),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

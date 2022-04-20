@@ -1,3 +1,7 @@
+## 0.4.1
+- update `camera`
+- Adds param `resolutionPreset` and `child` in `QRCodeDartScanView`.
+
 ## 0.4.0
 - update `camera`, `zxing_lib` and `image`
 
