@@ -1,7 +1,9 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_code_dart_scan/src/extensions.dart';
 import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
+import 'package:qr_code_dart_scan/src/util.dart';
 import 'package:zxing_lib/zxing.dart';
 
 import 'qr_code_dart_scan_decoder.dart';
@@ -29,11 +31,13 @@ class QRCodeDartScanView extends StatefulWidget {
   /// If null use all accepted formats
   final List<BarcodeFormat>? formats;
   final QRCodeDartScanController? controller;
+  final QrCodeDartScanResolutionPreset resolutionPreset;
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
     this.onCapture,
     this.scanInvertedQRCode = false,
+    this.resolutionPreset = QrCodeDartScanResolutionPreset.high,
     this.controller,
     this.formats,
   }) : super(key: key);
@@ -86,7 +90,7 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
     }
     controller = CameraController(
       camera,
-      ResolutionPreset.high,
+      widget.resolutionPreset.toResolutionPreset(),
     );
     qrCodeDartScanController = widget.controller ?? QRCodeDartScanController();
     await controller.initialize();

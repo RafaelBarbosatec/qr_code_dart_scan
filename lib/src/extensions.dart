@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
+import 'package:qr_code_dart_scan/src/util.dart';
 
 ///
 /// Created by
@@ -12,6 +13,26 @@ import 'package:flutter/foundation.dart';
 ///
 /// Rafaelbarbosatec
 /// on 12/08/21
+extension QrCodeDartScanResolutionPresetExtension
+    on QrCodeDartScanResolutionPreset {
+  ResolutionPreset toResolutionPreset() {
+    switch (this) {
+      case QrCodeDartScanResolutionPreset.low:
+        return ResolutionPreset.low;
+      case QrCodeDartScanResolutionPreset.medium:
+        return ResolutionPreset.medium;
+      case QrCodeDartScanResolutionPreset.high:
+        return ResolutionPreset.high;
+      case QrCodeDartScanResolutionPreset.veryHigh:
+        return ResolutionPreset.veryHigh;
+      case QrCodeDartScanResolutionPreset.ultraHigh:
+        return ResolutionPreset.ultraHigh;
+      case QrCodeDartScanResolutionPreset.max:
+        return ResolutionPreset.max;
+    }
+  }
+}
+
 extension CameraImageExtension on CameraImage {
   Map toPlatformData() {
     return <dynamic, dynamic>{
