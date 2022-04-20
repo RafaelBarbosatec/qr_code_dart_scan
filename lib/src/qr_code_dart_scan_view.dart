@@ -33,6 +33,8 @@ class QRCodeDartScanView extends StatefulWidget {
   final QRCodeDartScanController? controller;
   final QRCodeDartScanResolutionPreset resolutionPreset;
   final Widget? child;
+  final double? widthPreview;
+  final double? heightPreview;
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
@@ -42,6 +44,8 @@ class QRCodeDartScanView extends StatefulWidget {
     this.controller,
     this.formats,
     this.child,
+    this.widthPreview = double.maxFinite,
+    this.heightPreview = double.maxFinite,
   }) : super(key: key);
 
   @override
@@ -57,7 +61,7 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
   @override
   void initState() {
     _verifyFormats();
-    Future.delayed(Duration.zero, _initController);
+    _initController();
     super.initState();
   }
 
@@ -71,17 +75,13 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 300),
-      child: !initialized
-          ? Container(
-              width: double.maxFinite,
-              height: double.maxFinite,
-              child: widget.child,
-            )
-          : Container(
-              width: double.maxFinite,
-              height: double.maxFinite,
+      child: initialized
+          ? SizedBox(
+              width: widget.widthPreview,
+              height: widget.heightPreview,
               child: CameraPreview(controller, child: widget.child),
-            ),
+            )
+          : widget.child,
     );
   }
 
