@@ -1,3 +1,6 @@
+## next
+- improvements in `QRCodeDartScanView`
+
 ## 0.4.1
 - update `camera`
 - Adds param `resolutionPreset` and `child` in `QRCodeDartScanView`.
