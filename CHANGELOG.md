@@ -1,5 +1,6 @@
-## next
-- improvements in `QRCodeDartScanView`
+## 0.4.2
+- update `camera`.
+- improvements in `QRCodeDartScanView`.
 
 ## 0.4.1
 - update `camera`
