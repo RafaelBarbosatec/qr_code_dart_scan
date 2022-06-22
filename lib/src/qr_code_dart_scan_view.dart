@@ -67,7 +67,6 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
 
   @override
   void dispose() {
-    controller?.stopImageStream();
     controller?.dispose();
     super.dispose();
   }

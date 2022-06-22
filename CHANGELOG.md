@@ -1,3 +1,6 @@
+## 0.5.1
+- fix problem camera dispose.
+
 ## 0.5.0
 - update `camera`.
 - update `zxing_lib`.
