@@ -1,6 +1,7 @@
-## 0.4.2
+## 0.5.0
 - update `camera`.
-- improvements in `QRCodeDartScanView`.
+- update `zxing_lib`.
+- update `image`.
 
 ## 0.4.1
 - update `camera`

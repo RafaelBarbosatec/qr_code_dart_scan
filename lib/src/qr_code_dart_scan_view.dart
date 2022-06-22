@@ -53,7 +53,7 @@ class QRCodeDartScanView extends StatefulWidget {
 }
 
 class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
-  late CameraController controller;
+  CameraController? controller;
   late QRCodeDartScanController qrCodeDartScanController;
   bool initialized = false;
   bool processingImg = false;
@@ -67,8 +67,8 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
 
   @override
   void dispose() {
-    controller.stopImageStream();
-    controller.dispose();
+    controller?.stopImageStream();
+    controller?.dispose();
     super.dispose();
   }
 
@@ -80,7 +80,7 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
           ? SizedBox(
               width: widget.widthPreview,
               height: widget.heightPreview,
-              child: CameraPreview(controller, child: widget.child),
+              child: CameraPreview(controller!, child: widget.child),
             )
           : widget.child,
     );
@@ -98,9 +98,9 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
       enableAudio: false,
     );
     qrCodeDartScanController = widget.controller ?? QRCodeDartScanController();
-    await controller.initialize();
-    qrCodeDartScanController.configure(controller);
-    controller.startImageStream(_imageStream);
+    await controller!.initialize();
+    qrCodeDartScanController.configure(controller!);
+    controller?.startImageStream(_imageStream);
     Future.delayed(Duration.zero, () {
       if (mounted) {
         setState(() {
