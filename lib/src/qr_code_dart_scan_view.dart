@@ -167,8 +167,11 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
   }
 
   Widget _buildButton() {
-    return widget.takePictureButtonBuilder
-            ?.call(context, _takePicture, processingImg) ??
+    return widget.takePictureButtonBuilder?.call(
+          context,
+          _takePicture,
+          processingImg,
+        ) ??
         Align(
           alignment: Alignment.bottomCenter,
           child: Container(
