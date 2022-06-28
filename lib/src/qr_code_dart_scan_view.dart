@@ -1,12 +1,13 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_code_dart_scan/src/extensions.dart';
 import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
-import 'package:qr_code_dart_scan/src/util.dart';
+import 'package:qr_code_dart_scan/src/util/extensions.dart';
+import 'package:qr_code_dart_scan/src/util/qr_code_dart_scan_resolution_preset.dart';
 import 'package:zxing_lib/zxing.dart';
 
-import 'qr_code_dart_scan_decoder.dart';
+import 'decoder/qr_code_dart_scan_decoder.dart';
 
 ///
 /// Created by
@@ -22,8 +23,11 @@ import 'qr_code_dart_scan_decoder.dart';
 
 enum TypeCamera { back, front }
 
+enum TypeScan { live, takePicture }
+
 class QRCodeDartScanView extends StatefulWidget {
   final TypeCamera typeCamera;
+  final TypeScan typeScan;
   final ValueChanged<Result>? onCapture;
   final bool scanInvertedQRCode;
 
@@ -38,6 +42,7 @@ class QRCodeDartScanView extends StatefulWidget {
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
+    this.typeScan = TypeScan.live,
     this.onCapture,
     this.scanInvertedQRCode = false,
     this.resolutionPreset = QRCodeDartScanResolutionPreset.high,
@@ -55,12 +60,13 @@ class QRCodeDartScanView extends StatefulWidget {
 class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
   CameraController? controller;
   late QRCodeDartScanController qrCodeDartScanController;
+  late QRCodeDartScanDecoder dartScanDecoder;
   bool initialized = false;
   bool processingImg = false;
 
   @override
   void initState() {
-    _verifyFormats();
+    dartScanDecoder = QRCodeDartScanDecoder(formats: widget.formats);
     _initController();
     super.initState();
   }
@@ -76,10 +82,15 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 300),
       child: initialized
-          ? SizedBox(
-              width: widget.widthPreview,
-              height: widget.heightPreview,
-              child: CameraPreview(controller!, child: widget.child),
+          ? Stack(
+              children: [
+                SizedBox(
+                  width: widget.widthPreview,
+                  height: widget.heightPreview,
+                  child: CameraPreview(controller!, child: widget.child),
+                ),
+                if (widget.typeScan == TypeScan.takePicture) _buildButton(),
+              ],
             )
           : widget.child,
     );
@@ -99,7 +110,9 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
     qrCodeDartScanController = widget.controller ?? QRCodeDartScanController();
     await controller!.initialize();
     qrCodeDartScanController.configure(controller!);
-    controller?.startImageStream(_imageStream);
+    if (widget.typeScan == TypeScan.live) {
+      controller?.startImageStream(_imageStream);
+    }
     Future.delayed(Duration.zero, () {
       if (mounted) {
         setState(() {
@@ -111,42 +124,67 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
 
   void _imageStream(CameraImage image) async {
     if (!qrCodeDartScanController.scanEnable) return;
-    if (!processingImg) {
-      processingImg = true;
-      Future.microtask(() => _processImage(image));
-    }
+    if (processingImg) return;
+    processingImg = true;
+    _processImage(image);
   }
 
   void _processImage(CameraImage image) async {
-    final event = DecodeEvent(
-      cameraImage: image,
-      formats: widget.formats,
+    final decoded = await dartScanDecoder.decodeCameraImage(
+      image,
+      scanInvertedQRCode: widget.scanInvertedQRCode,
     );
-    Result? decoded = await compute(
-      decode,
-      event.toMap(),
-    );
-
-    if (widget.scanInvertedQRCode && decoded == null) {
-      decoded = await compute(
-        decode,
-        event.copyWith(invert: true).toMap(),
-      );
-    }
 
     if (decoded != null && mounted) {
       widget.onCapture?.call(decoded);
     }
+
     processingImg = false;
   }
 
-  void _verifyFormats() {
-    if (widget.formats?.isNotEmpty == true) {
-      widget.formats!.forEach((element) {
-        if (!acceptedFormats.contains(element)) {
-          throw Exception('$element format not supported in the moment');
-        }
-      });
+  void _takePicture() async {
+    if (processingImg) return;
+    setState(() {
+      processingImg = true;
+    });
+    final xFile = await controller?.takePicture();
+
+    if (xFile != null) {
+      final decoded = await dartScanDecoder.decodeFile(
+        File(xFile.path),
+        scanInvertedQRCode: widget.scanInvertedQRCode,
+      );
+
+      if (decoded != null && mounted) {
+        widget.onCapture?.call(decoded);
+      }
     }
+
+    setState(() {
+      processingImg = false;
+    });
+  }
+
+  Widget _buildButton() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        height: 200,
+        color: Colors.black,
+        child: Center(
+          child: InkWell(
+            onTap: _takePicture,
+            child: Container(
+              width: 50,
+              height: 50,
+              color: Colors.red,
+              child: processingImg
+                  ? CircularProgressIndicator()
+                  : SizedBox.shrink(),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

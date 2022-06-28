@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
-import 'package:qr_code_dart_scan/src/util.dart';
+import 'package:qr_code_dart_scan/src/util/qr_code_dart_scan_resolution_preset.dart';
 
 ///
 /// Created by
