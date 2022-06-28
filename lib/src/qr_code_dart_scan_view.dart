@@ -39,6 +39,7 @@ class QRCodeDartScanView extends StatefulWidget {
   final Widget? child;
   final double? widthPreview;
   final double? heightPreview;
+  final TakePictureButtonBuilder? takePictureButtonBuilder;
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
@@ -49,6 +50,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.controller,
     this.formats,
     this.child,
+    this.takePictureButtonBuilder,
     this.widthPreview = double.maxFinite,
     this.heightPreview = double.maxFinite,
   }) : super(key: key);
@@ -82,15 +84,14 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 300),
       child: initialized
-          ? Stack(
-              children: [
-                SizedBox(
-                  width: widget.widthPreview,
-                  height: widget.heightPreview,
-                  child: CameraPreview(controller!, child: widget.child),
-                ),
-                if (widget.typeScan == TypeScan.takePicture) _buildButton(),
-              ],
+          ? SizedBox(
+              width: widget.widthPreview,
+              height: widget.heightPreview,
+              child: CameraPreview(controller!,
+                  child: Stack(children: [
+                    if (widget.typeScan == TypeScan.takePicture) _buildButton(),
+                    widget.child ?? SizedBox.shrink(),
+                  ])),
             )
           : widget.child,
     );
@@ -166,25 +167,52 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
   }
 
   Widget _buildButton() {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Container(
-        height: 200,
-        color: Colors.black,
-        child: Center(
-          child: InkWell(
-            onTap: _takePicture,
-            child: Container(
-              width: 50,
-              height: 50,
-              color: Colors.red,
-              child: processingImg
-                  ? CircularProgressIndicator()
-                  : SizedBox.shrink(),
+    return widget.takePictureButtonBuilder
+            ?.call(context, _takePicture, processingImg) ??
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            height: 150,
+            color: Colors.black,
+            child: Center(
+              child: InkWell(
+                onTap: _takePicture,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: Container(
+                    margin: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: processingImg
+                        ? Center(
+                            child: SizedBox(
+                              child: CircularProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                              width: 40,
+                              height: 40,
+                            ),
+                          )
+                        : SizedBox.shrink(),
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        );
   }
 }
+
+typedef TakePictureButtonBuilder = Widget Function(
+  BuildContext context,
+  VoidCallback onShot,
+  bool loading,
+);

@@ -42,7 +42,7 @@ class _PictureDecodeState extends State<PictureDecode> {
         child: Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            margin: EdgeInsets.all(20),
+            margin: EdgeInsets.only(left: 20, right: 20, bottom: 200),
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
