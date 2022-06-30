@@ -25,6 +25,12 @@ enum TypeCamera { back, front }
 
 enum TypeScan { live, takePicture }
 
+typedef TakePictureButtonBuilder = Widget Function(
+  BuildContext context,
+  QRCodeDartScanController controller,
+  bool loading,
+);
+
 class QRCodeDartScanView extends StatefulWidget {
   final TypeCamera typeCamera;
   final TypeScan typeScan;
@@ -59,7 +65,8 @@ class QRCodeDartScanView extends StatefulWidget {
   _QRCodeDartScanViewState createState() => _QRCodeDartScanViewState();
 }
 
-class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
+class _QRCodeDartScanViewState extends State<QRCodeDartScanView>
+    implements DartScanInterface {
   CameraController? controller;
   late QRCodeDartScanController qrCodeDartScanController;
   late QRCodeDartScanDecoder dartScanDecoder;
@@ -110,21 +117,19 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
     );
     qrCodeDartScanController = widget.controller ?? QRCodeDartScanController();
     await controller!.initialize();
-    qrCodeDartScanController.configure(controller!);
+    qrCodeDartScanController.configure(controller!, this);
     if (widget.typeScan == TypeScan.live) {
       controller?.startImageStream(_imageStream);
     }
-    Future.delayed(Duration.zero, () {
-      if (mounted) {
-        setState(() {
-          initialized = true;
-        });
-      }
+    postFrame(() {
+      setState(() {
+        initialized = true;
+      });
     });
   }
 
   void _imageStream(CameraImage image) async {
-    if (!qrCodeDartScanController.scanEnable) return;
+    if (!qrCodeDartScanController.scanEnabled) return;
     if (processingImg) return;
     processingImg = true;
     _processImage(image);
@@ -143,7 +148,8 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
     processingImg = false;
   }
 
-  void _takePicture() async {
+  @override
+  void takePictureAndDecode() async {
     if (processingImg) return;
     setState(() {
       processingImg = true;
@@ -169,53 +175,63 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
   Widget _buildButton() {
     return widget.takePictureButtonBuilder?.call(
           context,
-          _takePicture,
+          qrCodeDartScanController,
           processingImg,
         ) ??
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            height: 150,
-            color: Colors.black,
-            child: Center(
-              child: InkWell(
-                onTap: _takePicture,
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: Container(
-                    margin: EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    child: processingImg
-                        ? Center(
-                            child: SizedBox(
-                              child: CircularProgressIndicator(
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                              width: 40,
-                              height: 40,
-                            ),
-                          )
-                        : SizedBox.shrink(),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        _ButtonTakePicture(
+          onTakePicture: () => qrCodeDartScanController.takePictureAndDecode(),
+          isLoading: processingImg,
         );
   }
 }
 
-typedef TakePictureButtonBuilder = Widget Function(
-  BuildContext context,
-  VoidCallback onShot,
-  bool loading,
-);
+class _ButtonTakePicture extends StatelessWidget {
+  final VoidCallback onTakePicture;
+  final bool isLoading;
+  const _ButtonTakePicture(
+      {Key? key, required this.onTakePicture, this.isLoading = false})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        height: 150,
+        color: Colors.black,
+        child: Center(
+          child: InkWell(
+            onTap: onTakePicture,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: Container(
+                margin: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: isLoading
+                    ? Center(
+                        child: SizedBox(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                          width: 40,
+                          height: 40,
+                        ),
+                      )
+                    : SizedBox.shrink(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

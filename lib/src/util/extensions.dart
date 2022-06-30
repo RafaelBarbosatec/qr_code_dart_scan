@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:qr_code_dart_scan/src/util/qr_code_dart_scan_resolution_preset.dart';
 
 ///
@@ -84,5 +85,15 @@ extension CameraImageExtension on CameraImage {
         'width': e.width,
       };
     }).toList();
+  }
+}
+
+extension StateExt on State {
+  void postFrame(VoidCallback execute) {
+    Future.delayed(Duration.zero, () {
+      if (mounted) {
+        execute();
+      }
+    });
   }
 }

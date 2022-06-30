@@ -55,11 +55,11 @@ Result? decodeImage(Map<dynamic, dynamic> map) {
   try {
     final DecodeImageEvent event = DecodeImageEvent.fromMap(map);
 
-    final image = imgLib.decodeImage(event.image)!;
+    final image = imgLib.decodeImage(event.image);
     final source = RGBLuminanceSource(
-      image.width,
-      image.height,
-      image.getBytes().buffer.asInt32List(),
+      image?.width ?? 0,
+      image?.height ?? 0,
+      image?.getBytes().buffer.asInt32List() ?? [],
     );
     var bitmap = BinaryBitmap(
       HybridBinarizer(event.invert ? source.invert() : source),
