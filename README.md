@@ -16,6 +16,17 @@ Scanning normal Qr code             |  Scanning invert Qr code
 - Scan QRCode
 - Scan invert QRCode
 
+## Supported platforms
+
+Platform            |  Scan live   | Scan take picture
+:-------------------------:|:-------------------------:|:-------------------------:
+Android  |  :white_check_mark:  |  :white_check_mark: |
+IOS  |  :white_check_mark:  |  :white_check_mark: |
+WEB  |    |  :white_check_mark: |
+Windows  |    |   |
+MacOS  |    | |
+Linux |    | |
+
 ## Supported Formats
 
 - QR_CODE
