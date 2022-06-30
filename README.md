@@ -16,6 +16,19 @@ Scanning normal Qr code             |  Scanning invert Qr code
 - Scan QRCode
 - Scan invert QRCode
 
+## Supported platforms
+
+This package is limited per `camera` pluggin support.
+
+Platform            |  Scan live   | Scan take picture
+:-------------------------:|:-------------------------:|:-------------------------:
+Android  |  :white_check_mark:  |  :white_check_mark: |
+IOS  |  :white_check_mark:  |  :white_check_mark: |
+WEB  |    |  :white_check_mark: |
+Windows  |    |   |
+MacOS  |    | |
+Linux |    | |
+
 ## Supported Formats
 
 - QR_CODE
@@ -68,6 +81,14 @@ It's important to note that the `MediaRecorder` class is not working properly on
     return Scaffold(
       body: QRCodeDartScanView(
         scanInvertedQRCode: true, // enable scan invert qr code ( default = false)
+        typeScan: TypeScan.live, // if TypeScan.takePicture will try decode when click to take a picture (default TypeScan.live)
+        // takePictureButtonBuilder: (context,controller,isLoading){ // if typeScan == TypeScan.takePicture you can customize the button.
+        //    if(loading) return CircularProgressIndicator();
+        //    return ElevatedButton(
+        //       onPressed:controller.takePictureAndDecode,
+        //       child:Text('Take a picture'),
+        //    );
+        // }
         // resolutionPreset: = QrCodeDartScanResolutionPreset.high,
         // formats: [ // You can restrict specific formats.
         //   BarcodeFormat.QR_CODE,
@@ -93,4 +114,32 @@ It's important to note that the `MediaRecorder` class is not working properly on
       ),
     );
     
+```
+
+### Decoder
+
+You may use only the our decoder if you want:
+
+``` dart
+
+  final decoder = QRCodeDartScanDecoder(
+    // formats: [ // You can restrict specific formats.
+    //   BarcodeFormat.QR_CODE,
+    //   BarcodeFormat.AZTEC,
+    //   BarcodeFormat.DATA_MATRIX,
+    //   BarcodeFormat.PDF_417,
+    //   BarcodeFormat.CODE_39,
+    //   BarcodeFormat.CODE_93,
+    //   BarcodeFormat.CODE_128,
+    //  BarcodeFormat.EAN_8,
+    //   BarcodeFormat.EAN_13,
+    // ],
+  );
+
+  Result? result = await decoder.decodeCameraImage(CameraImage());
+
+  // or
+
+  Result? result = await decoder.decodeFile(XFile());
+
 ```

@@ -1,12 +1,11 @@
 import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_code_dart_scan/src/extensions.dart';
 import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
-import 'package:qr_code_dart_scan/src/util.dart';
+import 'package:qr_code_dart_scan/src/util/extensions.dart';
+import 'package:qr_code_dart_scan/src/util/qr_code_dart_scan_resolution_preset.dart';
 import 'package:zxing_lib/zxing.dart';
 
-import 'qr_code_dart_scan_decoder.dart';
+import 'decoder/qr_code_dart_scan_decoder.dart';
 
 ///
 /// Created by
@@ -22,8 +21,17 @@ import 'qr_code_dart_scan_decoder.dart';
 
 enum TypeCamera { back, front }
 
+enum TypeScan { live, takePicture }
+
+typedef TakePictureButtonBuilder = Widget Function(
+  BuildContext context,
+  QRCodeDartScanController controller,
+  bool loading,
+);
+
 class QRCodeDartScanView extends StatefulWidget {
   final TypeCamera typeCamera;
+  final TypeScan typeScan;
   final ValueChanged<Result>? onCapture;
   final bool scanInvertedQRCode;
 
@@ -35,15 +43,18 @@ class QRCodeDartScanView extends StatefulWidget {
   final Widget? child;
   final double? widthPreview;
   final double? heightPreview;
+  final TakePictureButtonBuilder? takePictureButtonBuilder;
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
+    this.typeScan = TypeScan.live,
     this.onCapture,
     this.scanInvertedQRCode = false,
     this.resolutionPreset = QRCodeDartScanResolutionPreset.high,
     this.controller,
     this.formats,
     this.child,
+    this.takePictureButtonBuilder,
     this.widthPreview = double.maxFinite,
     this.heightPreview = double.maxFinite,
   }) : super(key: key);
@@ -52,15 +63,21 @@ class QRCodeDartScanView extends StatefulWidget {
   _QRCodeDartScanViewState createState() => _QRCodeDartScanViewState();
 }
 
-class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
+class _QRCodeDartScanViewState extends State<QRCodeDartScanView>
+    implements DartScanInterface {
   CameraController? controller;
   late QRCodeDartScanController qrCodeDartScanController;
+  late QRCodeDartScanDecoder dartScanDecoder;
   bool initialized = false;
   bool processingImg = false;
 
   @override
+  TypeScan typeScan = TypeScan.live;
+
+  @override
   void initState() {
-    _verifyFormats();
+    typeScan = widget.typeScan;
+    dartScanDecoder = QRCodeDartScanDecoder(formats: widget.formats);
     _initController();
     super.initState();
   }
@@ -79,7 +96,11 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
           ? SizedBox(
               width: widget.widthPreview,
               height: widget.heightPreview,
-              child: CameraPreview(controller!, child: widget.child),
+              child: CameraPreview(controller!,
+                  child: Stack(children: [
+                    if (typeScan == TypeScan.takePicture) _buildButton(),
+                    widget.child ?? SizedBox.shrink(),
+                  ])),
             )
           : widget.child,
     );
@@ -98,55 +119,141 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView> {
     );
     qrCodeDartScanController = widget.controller ?? QRCodeDartScanController();
     await controller!.initialize();
-    qrCodeDartScanController.configure(controller!);
-    controller?.startImageStream(_imageStream);
-    Future.delayed(Duration.zero, () {
-      if (mounted) {
-        setState(() {
-          initialized = true;
-        });
-      }
+    qrCodeDartScanController.configure(controller!, this);
+    if (typeScan == TypeScan.live) {
+      _startImageStream();
+    }
+    postFrame(() {
+      setState(() {
+        initialized = true;
+      });
     });
   }
 
+  void _startImageStream() {
+    controller?.startImageStream(_imageStream);
+  }
+
   void _imageStream(CameraImage image) async {
-    if (!qrCodeDartScanController.scanEnable) return;
-    if (!processingImg) {
-      processingImg = true;
-      Future.microtask(() => _processImage(image));
-    }
+    if (!qrCodeDartScanController.scanEnabled) return;
+    if (processingImg) return;
+    processingImg = true;
+    _processImage(image);
   }
 
   void _processImage(CameraImage image) async {
-    final event = DecodeEvent(
-      cameraImage: image,
-      formats: widget.formats,
+    final decoded = await dartScanDecoder.decodeCameraImage(
+      image,
+      scanInvertedQRCode: widget.scanInvertedQRCode,
     );
-    Result? decoded = await compute(
-      decode,
-      event.toMap(),
-    );
-
-    if (widget.scanInvertedQRCode && decoded == null) {
-      decoded = await compute(
-        decode,
-        event.copyWith(invert: true).toMap(),
-      );
-    }
 
     if (decoded != null && mounted) {
       widget.onCapture?.call(decoded);
     }
+
     processingImg = false;
   }
 
-  void _verifyFormats() {
-    if (widget.formats?.isNotEmpty == true) {
-      widget.formats!.forEach((element) {
-        if (!acceptedFormats.contains(element)) {
-          throw Exception('$element format not supported in the moment');
-        }
-      });
+  @override
+  Future<void> takePictureAndDecode() async {
+    if (processingImg) return;
+    setState(() {
+      processingImg = true;
+    });
+    final xFile = await controller?.takePicture();
+
+    if (xFile != null) {
+      final decoded = await dartScanDecoder.decodeFile(
+        xFile,
+        scanInvertedQRCode: widget.scanInvertedQRCode,
+      );
+
+      if (decoded != null && mounted) {
+        widget.onCapture?.call(decoded);
+      }
     }
+
+    setState(() {
+      processingImg = false;
+    });
+  }
+
+  Widget _buildButton() {
+    return widget.takePictureButtonBuilder?.call(
+          context,
+          qrCodeDartScanController,
+          processingImg,
+        ) ??
+        _ButtonTakePicture(
+          onTakePicture: takePictureAndDecode,
+          isLoading: processingImg,
+        );
+  }
+
+  @override
+  Future<void> changeTypeScan(TypeScan type) async {
+    if (this.typeScan == type) {
+      return;
+    }
+    if (this.typeScan == TypeScan.takePicture) {
+      _startImageStream();
+    } else {
+      await controller?.stopImageStream();
+      processingImg = false;
+    }
+    setState(() {
+      this.typeScan = type;
+    });
+  }
+}
+
+class _ButtonTakePicture extends StatelessWidget {
+  final VoidCallback onTakePicture;
+  final bool isLoading;
+  const _ButtonTakePicture(
+      {Key? key, required this.onTakePicture, this.isLoading = false})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        height: 150,
+        color: Colors.black,
+        child: Center(
+          child: InkWell(
+            onTap: onTakePicture,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: Container(
+                margin: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: isLoading
+                    ? Center(
+                        child: SizedBox(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                          width: 40,
+                          height: 40,
+                        ),
+                      )
+                    : SizedBox.shrink(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

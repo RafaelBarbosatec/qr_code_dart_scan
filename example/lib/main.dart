@@ -1,5 +1,6 @@
+import 'package:example/live_decode.dart';
+import 'package:example/picture_decode.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,49 +15,40 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      routes: {
+        ...HomePage.route,
+        ...LiveDecodePage.route,
+        ...PictureDecode.route,
+      },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key}) : super(key: key);
+class HomePage extends StatelessWidget {
+  static const routeName = '/';
+  static get route => {routeName: (BuildContext context) => HomePage()};
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  Result? currentResult;
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: QRCodeDartScanView(
-        scanInvertedQRCode: true,
-        onCapture: (Result result) {
-          setState(() {
-            currentResult = result;
-          });
-        },
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            margin: EdgeInsets.all(20),
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+      appBar: AppBar(
+        title: Text('QRCodeDartScan'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: () => LiveDecodePage.open(context),
+              child: Text('Live decode'),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Text: ${currentResult?.text ?? 'Not found'}'),
-                Text('Format: ${currentResult?.barcodeFormat ?? 'Not found'}'),
-              ],
-            ),
-          ),
+            ElevatedButton(
+              onPressed: () => PictureDecode.open(context),
+              child: Text('Picture decode'),
+            )
+          ],
         ),
       ),
     );

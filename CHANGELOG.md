@@ -1,3 +1,9 @@
+## 0.6.0
+- Adds scan by picture
+- Export decoder
+- Improvements in `QRCodeDartScanController`
+- Improvements in project structure
+
 ## 0.5.1
 - fix problem camera dispose.
 
