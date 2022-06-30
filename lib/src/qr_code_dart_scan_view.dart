@@ -74,7 +74,11 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView>
   bool processingImg = false;
 
   @override
+  TypeScan typeScan = TypeScan.live;
+
+  @override
   void initState() {
+    typeScan = widget.typeScan;
     dartScanDecoder = QRCodeDartScanDecoder(formats: widget.formats);
     _initController();
     super.initState();
@@ -96,7 +100,7 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView>
               height: widget.heightPreview,
               child: CameraPreview(controller!,
                   child: Stack(children: [
-                    if (widget.typeScan == TypeScan.takePicture) _buildButton(),
+                    if (typeScan == TypeScan.takePicture) _buildButton(),
                     widget.child ?? SizedBox.shrink(),
                   ])),
             )
@@ -118,14 +122,18 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView>
     qrCodeDartScanController = widget.controller ?? QRCodeDartScanController();
     await controller!.initialize();
     qrCodeDartScanController.configure(controller!, this);
-    if (widget.typeScan == TypeScan.live) {
-      controller?.startImageStream(_imageStream);
+    if (typeScan == TypeScan.live) {
+      _startImageStream();
     }
     postFrame(() {
       setState(() {
         initialized = true;
       });
     });
+  }
+
+  void _startImageStream() {
+    controller?.startImageStream(_imageStream);
   }
 
   void _imageStream(CameraImage image) async {
@@ -149,7 +157,7 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView>
   }
 
   @override
-  void takePictureAndDecode() async {
+  Future<void> takePictureAndDecode() async {
     if (processingImg) return;
     setState(() {
       processingImg = true;
@@ -179,9 +187,25 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView>
           processingImg,
         ) ??
         _ButtonTakePicture(
-          onTakePicture: () => qrCodeDartScanController.takePictureAndDecode(),
+          onTakePicture: takePictureAndDecode,
           isLoading: processingImg,
         );
+  }
+
+  @override
+  Future<void> changeTypeScan(TypeScan type) async {
+    if (this.typeScan == type) {
+      return;
+    }
+    if (this.typeScan == TypeScan.takePicture) {
+      _startImageStream();
+    } else {
+      await controller?.stopImageStream();
+      processingImg = false;
+    }
+    setState(() {
+      this.typeScan = type;
+    });
   }
 }
 
