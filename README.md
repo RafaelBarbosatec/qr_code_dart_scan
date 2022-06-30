@@ -18,6 +18,8 @@ Scanning normal Qr code             |  Scanning invert Qr code
 
 ## Supported platforms
 
+This package is limited per `camera` pluggin support.
+
 Platform            |  Scan live   | Scan take picture
 :-------------------------:|:-------------------------:|:-------------------------:
 Android  |  :white_check_mark:  |  :white_check_mark: |
