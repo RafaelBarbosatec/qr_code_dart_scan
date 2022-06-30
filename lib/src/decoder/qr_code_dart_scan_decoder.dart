@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:zxing_lib/zxing.dart';
@@ -66,10 +64,10 @@ class QRCodeDartScanDecoder {
   }
 
   Future<Result?> decodeFile(
-    File file, {
+    XFile file, {
     bool scanInvertedQRCode = false,
   }) async {
-    final bytes = await file.readAsBytes();
+    final bytes = await  file.readAsBytes();
     final event = DecodeImageEvent(
       image: bytes,
       formats: formats,

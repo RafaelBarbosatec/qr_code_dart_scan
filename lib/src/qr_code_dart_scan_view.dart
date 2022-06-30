@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
@@ -166,7 +164,7 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView>
 
     if (xFile != null) {
       final decoded = await dartScanDecoder.decodeFile(
-        File(xFile.path),
+        xFile,
         scanInvertedQRCode: widget.scanInvertedQRCode,
       );
 

@@ -127,6 +127,6 @@ You may use only the our decoder if you want:
 
   // or
 
-  Result? result = await decoder.decodeFile(File());
+  Result? result = await decoder.decodeFile(XFile());
 
 ```
