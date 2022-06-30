@@ -74,8 +74,10 @@ class QRCodeDartScanController {
     _scanEnabled = enable;
   }
 
-  Future<void>? takePictureAndDecode() =>
-      _dartScanInterface?.takePictureAndDecode();
+  Future<void>? takePictureAndDecode() {
+    return _dartScanInterface?.takePictureAndDecode();
+  }
+
   Future<void>? changeTypeScan(TypeScan type) {
     return _dartScanInterface?.changeTypeScan(type);
   }
