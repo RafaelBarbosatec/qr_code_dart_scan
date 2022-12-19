@@ -60,10 +60,10 @@ class QRCodeDartScanView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _QRCodeDartScanViewState createState() => _QRCodeDartScanViewState();
+  QRCodeDartScanViewState createState() => QRCodeDartScanViewState();
 }
 
-class _QRCodeDartScanViewState extends State<QRCodeDartScanView>
+class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     implements DartScanInterface {
   CameraController? controller;
   late QRCodeDartScanController qrCodeDartScanController;
@@ -91,18 +91,8 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView>
   @override
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: 300),
-      child: initialized
-          ? SizedBox(
-              width: widget.widthPreview,
-              height: widget.heightPreview,
-              child: CameraPreview(controller!,
-                  child: Stack(children: [
-                    if (typeScan == TypeScan.takePicture) _buildButton(),
-                    widget.child ?? SizedBox.shrink(),
-                  ])),
-            )
-          : widget.child,
+      duration: const Duration(milliseconds: 300),
+      child: initialized ? _getCameraWidget(context) : widget.child,
     );
   }
 
@@ -192,18 +182,34 @@ class _QRCodeDartScanViewState extends State<QRCodeDartScanView>
 
   @override
   Future<void> changeTypeScan(TypeScan type) async {
-    if (this.typeScan == type) {
+    if (typeScan == type) {
       return;
     }
-    if (this.typeScan == TypeScan.takePicture) {
+    if (typeScan == TypeScan.takePicture) {
       _startImageStream();
     } else {
       await controller?.stopImageStream();
       processingImg = false;
     }
     setState(() {
-      this.typeScan = type;
+      typeScan = type;
     });
+  }
+
+  Widget _getCameraWidget(BuildContext context) {
+    return SizedBox(
+      width: widget.widthPreview,
+      height: widget.heightPreview,
+      child: CameraPreview(
+        controller!,
+        child: Stack(
+          children: [
+            if (typeScan == TypeScan.takePicture) _buildButton(),
+            widget.child ?? const SizedBox.shrink(),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -232,23 +238,23 @@ class _ButtonTakePicture extends StatelessWidget {
                 borderRadius: BorderRadius.circular(40),
               ),
               child: Container(
-                margin: EdgeInsets.all(4),
+                margin: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(40),
                 ),
                 child: isLoading
-                    ? Center(
+                    ? const Center(
                         child: SizedBox(
+                          width: 40,
+                          height: 40,
                           child: CircularProgressIndicator(
                             valueColor:
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
-                          width: 40,
-                          height: 40,
                         ),
                       )
-                    : SizedBox.shrink(),
+                    : const SizedBox.shrink(),
               ),
             ),
           ),

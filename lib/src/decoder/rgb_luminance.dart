@@ -20,7 +20,7 @@ import 'package:zxing_lib/zxing.dart';
 /// @author dswitkin@google.com (Daniel Switkin)
 /// @author Betaminos
 class RGBLuminanceSource extends LuminanceSource {
-  late final Int8List _luminances;
+  late final Uint8List _luminances;
   final int _dataWidth;
   final int _dataHeight;
   final int _left;
@@ -35,7 +35,7 @@ class RGBLuminanceSource extends LuminanceSource {
     //
     // Total number of pixels suffices, can ignore shape
     var size = _dataWidth * _dataHeight;
-    _luminances = Int8List(size);
+    _luminances = Uint8List(size);
     for (var offset = 0; offset < size; offset++) {
       var pixel = pixels[offset];
       var r = (pixel >> 16) & 0xff; // red
@@ -46,7 +46,7 @@ class RGBLuminanceSource extends LuminanceSource {
     }
   }
 
-  RGBLuminanceSource.crop(Int8List pixels, this._dataWidth, this._dataHeight,
+  RGBLuminanceSource.crop(Uint8List pixels, this._dataWidth, this._dataHeight,
       this._left, this._top, int width, int height)
       : _luminances = pixels,
         super(width, height) {
@@ -56,21 +56,7 @@ class RGBLuminanceSource extends LuminanceSource {
   }
 
   @override
-  Int8List getRow(int y, Int8List? row) {
-    if (y < 0 || y >= height) {
-      throw ArgumentError('Requested row is outside the image: $y');
-    }
-    var width = this.width;
-    if (row == null || row.length < width) {
-      row = Int8List(width);
-    }
-    var offset = (y + _top) * _dataWidth + _left;
-    arraycopy(_luminances, offset, row, 0, width);
-    return row;
-  }
-
-  @override
-  Int8List get matrix {
+  Uint8List get matrix {
     var width = this.width;
     var height = this.height;
 
@@ -81,7 +67,7 @@ class RGBLuminanceSource extends LuminanceSource {
     }
 
     var area = width * height;
-    var matrix = Int8List(area);
+    var matrix = Uint8List(area);
     var inputOffset = _top * _dataWidth + _left;
 
     // If the width matches the full width of the underlying data, perform a single copy.
@@ -112,5 +98,19 @@ class RGBLuminanceSource extends LuminanceSource {
 
   void arraycopy(List src, int srcPos, List dest, int destPos, int length) {
     dest.setRange(destPos, destPos + length, src, srcPos);
+  }
+
+  @override
+  Uint8List getRow(int y, Uint8List? row) {
+    if (y < 0 || y >= height) {
+      throw ArgumentError('Requested row is outside the image: $y');
+    }
+    var width = this.width;
+    if (row == null || row.length < width) {
+      row = Int8List(width) as Uint8List?;
+    }
+    var offset = (y + _top) * _dataWidth + _left;
+    arraycopy(_luminances, offset, row!, 0, width);
+    return row;
   }
 }

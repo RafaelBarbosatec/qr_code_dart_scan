@@ -11,12 +11,14 @@ dependencies:
   flutter:
     sdk: flutter
 
-  camera: ^0.9.8+1
-  zxing_lib: ^0.7.1
-  image: ^3.2.0
+  camera: ^0.10.0+5
+  zxing_lib: ^0.8.2
+  image: ^3.2.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_lints: ^2.0.0
 
 flutter:

@@ -32,7 +32,7 @@ class QRCodeDartScanDecoder {
   final List<BarcodeFormat> formats;
 
   QRCodeDartScanDecoder({List<BarcodeFormat>? formats})
-      : this.formats = formats ?? acceptedFormats {
+      : formats = formats ?? acceptedFormats {
     formats?.forEach((element) {
       if (!acceptedFormats.contains(element)) {
         throw Exception('$element format not supported in the moment');
@@ -67,7 +67,7 @@ class QRCodeDartScanDecoder {
     XFile file, {
     bool scanInvertedQRCode = false,
   }) async {
-    final bytes = await  file.readAsBytes();
+    final bytes = await file.readAsBytes();
     final event = DecodeImageEvent(
       image: bytes,
       formats: formats,

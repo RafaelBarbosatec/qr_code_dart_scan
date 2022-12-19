@@ -4,7 +4,8 @@ import 'package:zxing_lib/maxicode.dart';
 import 'package:zxing_lib/oned.dart';
 import 'package:zxing_lib/pdf417.dart';
 import 'package:zxing_lib/qrcode.dart';
-import 'package:zxing_lib/src/result.dart' as otherResult;
+// ignore: implementation_imports
+import 'package:zxing_lib/src/result.dart' as other_result;
 import 'package:zxing_lib/zxing.dart';
 
 ///
@@ -21,10 +22,10 @@ import 'package:zxing_lib/zxing.dart';
 class QRCodeDartScanMultiReader {
   final List<BarcodeFormat> formats;
 
-  List<Reader> _readers = [];
+  final List<Reader> _readers = [];
 
   QRCodeDartScanMultiReader(this.formats) {
-    formats.forEach((format) {
+    for (var format in formats) {
       switch (format) {
         case BarcodeFormat.AZTEC:
           _readers.add(AztecReader());
@@ -69,22 +70,17 @@ class QRCodeDartScanMultiReader {
           _readers.add(RSSExpandedReader());
           break;
         case BarcodeFormat.UPC_A:
-          // TODO: Handle this case.
-          break;
         case BarcodeFormat.UPC_E:
-          // TODO: Handle this case.
-          break;
         case BarcodeFormat.UPC_EAN_EXTENSION:
-          // TODO: Handle this case.
-          break;
       }
-    });
+    }
   }
 
-  otherResult.Result? decode(BinaryBitmap image) {
+  other_result.Result? decode(BinaryBitmap image) {
     for (final reader in _readers) {
       try {
         return reader.decode(image);
+        // ignore: empty_catches
       } catch (e) {}
     }
     return null;

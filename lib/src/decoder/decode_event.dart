@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
+// ignore: depend_on_referenced_packages
+import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
 import 'package:zxing_lib/zxing.dart';
 
@@ -67,12 +69,32 @@ class DecodeCameraImageEvent {
 
   DecodeCameraImageEvent.fromMap(Map map)
       : invert = map['invert'] as bool,
-        cameraImage = CameraImage.fromPlatformData(
-          map['image'] as Map<dynamic, dynamic>,
-        ),
+        cameraImage = _fromPlateformData(map),
         formats = map['formats']
             .map<BarcodeFormat>((f) => BarcodeFormat.values[f])
             .toList();
+
+  static CameraImage _fromPlateformData(Map<dynamic, dynamic> map) {
+    return CameraImage.fromPlatformInterface(
+      CameraImageData(
+        format: CameraImageFormat(
+          map['image']['format']['group'],
+          raw: map['image']['format']['raw'],
+        ),
+        height: map['image']['height'],
+        width: map['image']['width'],
+        planes: (map['image']?['planes'] as List? ?? []).map((e) {
+          return CameraImagePlane(
+            bytes: e['bytes'],
+            bytesPerRow: e['bytesPerRow'],
+            bytesPerPixel: e['bytesPerPixel'],
+            height: e['height'],
+            width: e['width'],
+          );
+        }).toList(),
+      ),
+    );
+  }
 
   Map toMap() {
     return {
