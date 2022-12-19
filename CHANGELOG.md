@@ -1,3 +1,6 @@
+## NEXT
+- Update dependencies.
+
 ## 0.6.0
 - Adds scan by picture
 - Export decoder
