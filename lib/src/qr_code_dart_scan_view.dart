@@ -50,7 +50,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.typeScan = TypeScan.live,
     this.onCapture,
     this.scanInvertedQRCode = false,
-    this.resolutionPreset = QRCodeDartScanResolutionPreset.high,
+    this.resolutionPreset = QRCodeDartScanResolutionPreset.low,
     this.controller,
     this.formats = const [BarcodeFormat.QR_CODE],
     this.child,
