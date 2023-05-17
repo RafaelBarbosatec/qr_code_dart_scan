@@ -81,7 +81,10 @@ class QRCodeDartScanMultiReader {
       try {
         return reader.decode(image);
         // ignore: empty_catches
-      } catch (e) {}
+      } catch (e) {
+        // ignore: avoid_print
+        print(e);
+      }
     }
     return null;
   }

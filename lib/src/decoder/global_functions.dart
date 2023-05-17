@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:camera/camera.dart';
 import 'package:image/image.dart' as img_lib;
 import 'package:qr_code_dart_scan/src/decoder/qr_code_dart_scan_multi_reader.dart';
@@ -18,28 +20,20 @@ import 'decode_event.dart';
 /// Rafaelbarbosatec
 /// on 28/06/22
 
-Result? decode(Map<dynamic, dynamic> data) {
+Result? decode(Map<dynamic, dynamic> msg) {
   try {
-    final DecodeCameraImageEvent event = DecodeCameraImageEvent.fromMap(data);
-    img_lib.Image img;
-    if (event.cameraImage.format.group == ImageFormatGroup.yuv420) {
-      img = _convertYUV420(event.cameraImage);
-    } else if (event.cameraImage.format.group == ImageFormatGroup.bgra8888) {
-      img = _convertBGRA8888(event.cameraImage);
-    } else {
-      return null;
-    }
+    DecodeCameraImageEvent event = DecodeCameraImageEvent.fromMap(msg);
 
-    final source = RGBLuminanceSource(
-      img.width,
-      img.height,
-      img.getBytes().buffer.asInt32List(),
+    LuminanceSource source = transformToLuminanceSource(
+      event.cameraImage.planes,
     );
+
     var bitmap = BinaryBitmap(
       HybridBinarizer(event.invert ? source.invert() : source),
     );
 
     final reader = QRCodeDartScanMultiReader(event.formats);
+    // final reader = GenericMultipleBarcodeReader(MultiFormatReader());
     try {
       return reader.decode(bitmap);
     } catch (_) {
@@ -57,10 +51,11 @@ Result? decodeImage(Map<dynamic, dynamic> map) {
     final DecodeImageEvent event = DecodeImageEvent.fromMap(map);
 
     final image = img_lib.decodeImage(event.image);
+
     final source = RGBLuminanceSource(
-      image?.width ?? 0,
-      image?.height ?? 0,
-      image?.getBytes().buffer.asInt32List() ?? [],
+      image!.width,
+      image.height,
+      event.image,
     );
     var bitmap = BinaryBitmap(
       HybridBinarizer(event.invert ? source.invert() : source),
@@ -79,39 +74,35 @@ Result? decodeImage(Map<dynamic, dynamic> map) {
   return null;
 }
 
-// CameraImage BGRA8888 -> PNG
-// Color
-img_lib.Image _convertBGRA8888(CameraImage image) {
-  return img_lib.Image.fromBytes(
-    image.width,
-    image.height,
-    image.planes[0].bytes,
-    format: img_lib.Format.bgra,
-  );
+int _getLuminanceSourcePixel(List<int> byte, int index) {
+  if (byte.length <= index + 3) {
+    return 0xff;
+  }
+  final r = byte[index] & 0xff; // red
+  final g2 = (byte[index + 1] << 1) & 0x1fe; // 2 * green
+  final b = byte[index + 2]; // blue
+  // Calculate green-favouring average cheaply
+  return ((r + g2 + b) ~/ 4);
 }
 
-// CameraImage YUV420_888 -> PNG -> Image (compresion:0, filter: none)
-// Black
-img_lib.Image _convertYUV420(CameraImage image) {
-  var img = img_lib.Image(image.width, image.height); // Create Image buffer
-
-  var plane = image.planes.first;
-  const shift = 0xFF << 24;
-
-  // Fill image buffer with plane[0] from YUV420_888
-  for (var x = 0; x < image.width; x++) {
-    for (var planeOffset = 0;
-        planeOffset < image.height * image.width;
-        planeOffset += image.width) {
-      final pixelColor = plane.bytes[planeOffset + x];
-      // color: 0x FF  FF  FF  FF
-      //           A   B   G   R
-      // Calculate pixel color
-      var newVal = shift | (pixelColor << 16) | (pixelColor << 8) | pixelColor;
-
-      img.data[planeOffset + x] = newVal;
-    }
+LuminanceSource transformToLuminanceSource(List<Plane> planes) {
+  final e = planes.first;
+  final width = e.bytesPerRow;
+  final height = (e.bytes.length / width).round();
+  final total = planes
+      .map<double>((p) => p.bytesPerPixel!.toDouble())
+      .reduce((value, element) => value + 1 / element)
+      .toInt();
+  final data = Uint8List(width * height * total);
+  int startIndex = 0;
+  for (var p in planes) {
+    List.copyRange(data, startIndex, p.bytes);
+    startIndex += width * height ~/ p.bytesPerPixel!;
   }
 
-  return img;
+  return PlanarYUVLuminanceSource(
+    data,
+    width,
+    height,
+  );
 }

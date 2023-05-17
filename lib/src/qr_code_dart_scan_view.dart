@@ -37,7 +37,7 @@ class QRCodeDartScanView extends StatefulWidget {
 
   /// Use to limit a specific format
   /// If null use all accepted formats
-  final List<BarcodeFormat>? formats;
+  final List<BarcodeFormat> formats;
   final QRCodeDartScanController? controller;
   final QRCodeDartScanResolutionPreset resolutionPreset;
   final Widget? child;
@@ -52,7 +52,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.scanInvertedQRCode = false,
     this.resolutionPreset = QRCodeDartScanResolutionPreset.high,
     this.controller,
-    this.formats,
+    this.formats = const [BarcodeFormat.QR_CODE],
     this.child,
     this.takePictureButtonBuilder,
     this.widthPreview = double.maxFinite,
@@ -106,6 +106,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
       camera,
       widget.resolutionPreset.toResolutionPreset(),
       enableAudio: false,
+      imageFormatGroup: ImageFormatGroup.yuv420,
     );
     qrCodeDartScanController = widget.controller ?? QRCodeDartScanController();
     await controller!.initialize();

@@ -31,13 +31,12 @@ class QRCodeDartScanDecoder {
   ];
   final List<BarcodeFormat> formats;
 
-  QRCodeDartScanDecoder({List<BarcodeFormat>? formats})
-      : formats = formats ?? acceptedFormats {
-    formats?.forEach((element) {
-      if (!acceptedFormats.contains(element)) {
-        throw Exception('$element format not supported in the moment');
+  QRCodeDartScanDecoder({required this.formats}) {
+    for (var format in formats) {
+      if (!acceptedFormats.contains(format)) {
+        throw Exception('$format format not supported in the moment');
       }
-    });
+    }
   }
 
   Future<Result?> decodeCameraImage(
