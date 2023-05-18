@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:camera/camera.dart';
-import 'package:image/image.dart' as img_lib;
 import 'package:qr_code_dart_scan/src/decoder/qr_code_dart_scan_multi_reader.dart';
 import 'package:zxing_lib/common.dart';
 import 'package:zxing_lib/zxing.dart';
@@ -46,17 +47,22 @@ Result? decode(Map<dynamic, dynamic> msg) {
   return null;
 }
 
-Result? decodeImage(Map<dynamic, dynamic> map) {
+Future<Result?> decodeImage(Map<dynamic, dynamic> map) async {
   try {
     final DecodeImageEvent event = DecodeImageEvent.fromMap(map);
 
-    final image = img_lib.decodeImage(event.image);
+    var pixels = Uint8List(event.width * event.height);
 
-    final source = RGBLuminanceSource(
-      image!.width,
-      image.height,
-      event.image,
+    for (int i = 0; i < pixels.length; i++) {
+      pixels[i] = _getLuminanceSourcePixel(event.image, i * 4);
+    }
+
+    final source = RGBLuminanceSource.orig(
+      event.width,
+      event.height,
+      pixels,
     );
+
     var bitmap = BinaryBitmap(
       HybridBinarizer(event.invert ? source.invert() : source),
     );
@@ -72,6 +78,12 @@ Result? decodeImage(Map<dynamic, dynamic> map) {
     print('ERROR:$e');
   }
   return null;
+}
+
+Future<ui.Image> decodeImageFromList(Uint8List bytes) {
+  Completer<ui.Image> completer = Completer();
+  ui.decodeImageFromList(bytes, (image) => completer.complete(image));
+  return completer.future;
 }
 
 int _getLuminanceSourcePixel(List<int> byte, int index) {

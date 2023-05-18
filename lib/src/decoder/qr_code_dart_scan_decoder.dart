@@ -41,7 +41,7 @@ class QRCodeDartScanDecoder {
 
   Future<Result?> decodeCameraImage(
     CameraImage image, {
-    bool scanInvertedQRCode = false,
+    bool scanInverted = false,
   }) async {
     final event = DecodeCameraImageEvent(
       cameraImage: image,
@@ -52,7 +52,7 @@ class QRCodeDartScanDecoder {
       event.toMap(),
     );
 
-    if (scanInvertedQRCode && decoded == null) {
+    if (scanInverted && decoded == null) {
       decoded = await compute(
         decode,
         event.copyWith(invert: true).toMap(),
@@ -64,11 +64,15 @@ class QRCodeDartScanDecoder {
 
   Future<Result?> decodeFile(
     XFile file, {
-    bool scanInvertedQRCode = false,
+    bool scanInverted = false,
   }) async {
     final bytes = await file.readAsBytes();
+
+    final image = await decodeImageFromList(bytes);
     final event = DecodeImageEvent(
-      image: bytes,
+      image: (await image.toByteData())!.buffer.asUint8List(),
+      width: image.width,
+      height: image.height,
       formats: formats,
     );
     Result? decoded = await compute(
@@ -76,7 +80,7 @@ class QRCodeDartScanDecoder {
       event.toMap(),
     );
 
-    if (scanInvertedQRCode && decoded == null) {
+    if (scanInverted && decoded == null) {
       decoded = await compute(
         decodeImage,
         event.copyWith(invert: true).toMap(),

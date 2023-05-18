@@ -20,17 +20,23 @@ import 'package:zxing_lib/zxing.dart';
 class DecodeImageEvent {
   final bool invert;
   final Uint8List image;
+  final int width;
+  final int height;
   final List<BarcodeFormat> formats;
 
   DecodeImageEvent({
     required this.image,
     this.invert = false,
     this.formats = const [],
+    this.width = 0,
+    this.height = 0,
   });
 
   DecodeImageEvent.fromMap(Map map)
       : invert = map['invert'] as bool,
         image = map['image'] as Uint8List,
+        width = map['width'] as int,
+        height = map['height'] as int,
         formats = map['formats']
             .map<BarcodeFormat>((f) => BarcodeFormat.values[f])
             .toList();
@@ -39,6 +45,8 @@ class DecodeImageEvent {
     return {
       'invert': invert,
       'image': image,
+      'width': width,
+      'height': height,
       'formats': formats.map((e) => e.index).toList(),
     };
   }
@@ -46,12 +54,16 @@ class DecodeImageEvent {
   DecodeImageEvent copyWith({
     bool? invert,
     Uint8List? image,
+    int? width,
+    int? height,
     List<BarcodeFormat>? formats,
   }) {
     return DecodeImageEvent(
       invert: invert ?? this.invert,
       image: image ?? this.image,
       formats: formats ?? this.formats,
+      width: width ?? this.width,
+      height: height ?? this.height,
     );
   }
 }

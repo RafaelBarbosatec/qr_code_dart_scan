@@ -52,7 +52,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.scanInvertedQRCode = false,
     this.resolutionPreset = QRCodeDartScanResolutionPreset.low,
     this.controller,
-    this.formats = const [BarcodeFormat.QR_CODE],
+    this.formats = QRCodeDartScanDecoder.acceptedFormats,
     this.child,
     this.takePictureButtonBuilder,
     this.widthPreview = double.maxFinite,
@@ -135,7 +135,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   void _processImage(CameraImage image) async {
     final decoded = await dartScanDecoder.decodeCameraImage(
       image,
-      scanInvertedQRCode: widget.scanInvertedQRCode,
+      scanInverted: widget.scanInvertedQRCode,
     );
 
     if (decoded != null && mounted) {
@@ -156,7 +156,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     if (xFile != null) {
       final decoded = await dartScanDecoder.decodeFile(
         xFile,
-        scanInvertedQRCode: widget.scanInvertedQRCode,
+        scanInverted: widget.scanInvertedQRCode,
       );
 
       if (decoded != null && mounted) {
