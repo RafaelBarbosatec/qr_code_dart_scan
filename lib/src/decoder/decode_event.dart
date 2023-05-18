@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
-// ignore: depend_on_referenced_packages
 import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
 import 'package:zxing_lib/zxing.dart';
