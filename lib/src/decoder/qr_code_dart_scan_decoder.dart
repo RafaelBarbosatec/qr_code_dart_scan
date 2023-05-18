@@ -1,9 +1,6 @@
 import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
+import 'package:qr_code_dart_scan/src/decoder/isolate_decoder.dart';
 import 'package:zxing_lib/zxing.dart';
-
-import 'decode_event.dart';
-import 'global_functions.dart';
 
 ///
 /// Created by
@@ -30,33 +27,27 @@ class QRCodeDartScanDecoder {
     BarcodeFormat.EAN_13,
   ];
   final List<BarcodeFormat> formats;
+  late IsolateDecoder _isolateDecoder;
 
-  QRCodeDartScanDecoder({List<BarcodeFormat>? formats})
-      : this.formats = formats ?? acceptedFormats {
-    formats?.forEach((element) {
-      if (!acceptedFormats.contains(element)) {
-        throw Exception('$element format not supported in the moment');
+  QRCodeDartScanDecoder({required this.formats}) {
+    for (var format in formats) {
+      if (!acceptedFormats.contains(format)) {
+        throw Exception('$format format not supported in the moment');
       }
-    });
+    }
+    _isolateDecoder = IsolateDecoder(formats: formats);
   }
 
   Future<Result?> decodeCameraImage(
     CameraImage image, {
-    bool scanInvertedQRCode = false,
+    bool scanInverted = false,
   }) async {
-    final event = DecodeCameraImageEvent(
-      cameraImage: image,
-      formats: formats,
-    );
-    Result? decoded = await compute(
-      decode,
-      event.toMap(),
-    );
+    Result? decoded = await _isolateDecoder.decodeCameraImage(image);
 
-    if (scanInvertedQRCode && decoded == null) {
-      decoded = await compute(
-        decode,
-        event.copyWith(invert: true).toMap(),
+    if (scanInverted && decoded == null) {
+      decoded = await _isolateDecoder.decodeCameraImage(
+        image,
+        insverted: scanInverted,
       );
     }
 
@@ -65,23 +56,12 @@ class QRCodeDartScanDecoder {
 
   Future<Result?> decodeFile(
     XFile file, {
-    bool scanInvertedQRCode = false,
+    bool scanInverted = false,
   }) async {
-    final bytes = await  file.readAsBytes();
-    final event = DecodeImageEvent(
-      image: bytes,
-      formats: formats,
-    );
-    Result? decoded = await compute(
-      decodeImage,
-      event.toMap(),
-    );
+    Result? decoded = await _isolateDecoder.decodeFileImage(file);
 
-    if (scanInvertedQRCode && decoded == null) {
-      decoded = await compute(
-        decodeImage,
-        event.copyWith(invert: true).toMap(),
-      );
+    if (scanInverted && decoded == null) {
+      decoded = await _isolateDecoder.decodeFileImage(file, insverted: true);
     }
 
     return decoded;

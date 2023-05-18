@@ -1,5 +1,4 @@
 import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:qr_code_dart_scan/src/util/qr_code_dart_scan_resolution_preset.dart';
 
@@ -44,35 +43,40 @@ extension CameraImageExtension on CameraImage {
     };
   }
 
-  int _getFormat() {
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      switch (format.group) {
-        // android.graphics.ImageFormat.YUV_420_888
-        case ImageFormatGroup.yuv420:
-          return 35;
-        // android.graphics.ImageFormat.JPEG
-        case ImageFormatGroup.jpeg:
-          return 256;
-        case ImageFormatGroup.unknown:
-        case ImageFormatGroup.bgra8888:
-      }
-    }
+  Map<String, dynamic> _getFormat() {
+    return {
+      'group': format.group,
+      'raw': format.raw,
+    };
 
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      switch (format.group) {
-        // kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
-        case ImageFormatGroup.yuv420:
-          return 875704438;
-        // kCVPixelFormatType_32BGRA
-        case ImageFormatGroup.bgra8888:
-          return 1111970369;
-        case ImageFormatGroup.unknown:
-          break;
-        case ImageFormatGroup.jpeg:
-          break;
-      }
-    }
-    return 0;
+    // if (defaultTargetPlatform == TargetPlatform.android) {
+    //   switch (format.group) {
+    //     // android.graphics.ImageFormat.YUV_420_888
+    //     case ImageFormatGroup.yuv420:
+    //       return 35;
+    //     // android.graphics.ImageFormat.JPEG
+    //     case ImageFormatGroup.jpeg:
+    //       return 256;
+    //     case ImageFormatGroup.unknown:
+    //     case ImageFormatGroup.bgra8888:
+    //   }
+    // }
+
+    // if (defaultTargetPlatform == TargetPlatform.iOS) {
+    //   switch (format.group) {
+    //     // kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
+    //     case ImageFormatGroup.yuv420:
+    //       return 875704438;
+    //     // kCVPixelFormatType_32BGRA
+    //     case ImageFormatGroup.bgra8888:
+    //       return 1111970369;
+    //     case ImageFormatGroup.unknown:
+    //       break;
+    //     case ImageFormatGroup.jpeg:
+    //       break;
+    //   }
+    // }
+    // return 0;
   }
 
   List<Map<dynamic, dynamic>> _getPlanes() {
