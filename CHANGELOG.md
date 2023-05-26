@@ -1,3 +1,6 @@
+## next
+- return `resolutionPreset` default to `QRCodeDartScanResolutionPreset.medium`
+
 ## 0.7.0
 - Update dependencies.
 

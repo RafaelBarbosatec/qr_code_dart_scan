@@ -59,8 +59,9 @@ Result? decodePlanes(Map<dynamic, dynamic> msg) {
       return null;
     }
   } catch (e) {
-    // ignore: avoid_print
-    print('ERROR:$e');
+    if (kDebugMode) {
+      print('ERROR(decodePlanes):$e');
+    }
   }
   return null;
 }
@@ -92,8 +93,9 @@ Future<Result?> _decodeImage(Map<dynamic, dynamic> map) async {
       return null;
     }
   } catch (e) {
-    // ignore: avoid_print
-    print('ERROR:$e');
+    if (kDebugMode) {
+      print('ERROR(_decodeImage):$e');
+    }
   }
   return null;
 }
