@@ -1,5 +1,6 @@
-## next
+## 0.7.1
 - return `resolutionPreset` default to `QRCodeDartScanResolutionPreset.medium`
+- removre debug prints.
 
 ## 0.7.0
 - Update dependencies.
