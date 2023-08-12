@@ -28,14 +28,14 @@ LuminanceSource transformToLuminanceSource(List<Plane> planes) {
   final width = e.bytesPerRow;
   final height = (e.bytes.length / width).round();
   final total = planes
-      .map<double>((p) => p.bytesPerPixel!.toDouble())
+      .map<double>((p) => (p.bytesPerPixel??1).toDouble())
       .reduce((value, element) => value + 1 / element)
       .toInt();
   final data = Uint8List(width * height * total);
   int startIndex = 0;
   for (var p in planes) {
     List.copyRange(data, startIndex, p.bytes);
-    startIndex += width * height ~/ p.bytesPerPixel!;
+    startIndex += width * height ~/ (p.bytesPerPixel??1);
   }
 
   return PlanarYUVLuminanceSource(
