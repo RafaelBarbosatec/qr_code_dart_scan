@@ -1,3 +1,6 @@
+## 0.7.2
+- Fix issue [#7](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/7). Thanks so much [philseeley](https://github.com/philseeley)!
+
 ## 0.7.1
 - return `resolutionPreset` default to `QRCodeDartScanResolutionPreset.medium`
 - removre debug prints.
