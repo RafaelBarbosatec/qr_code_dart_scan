@@ -125,6 +125,10 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     controller?.startImageStream(_imageStream);
   }
 
+  void _stopImageStream() {
+    controller?.stopImageStream();
+  }
+
   void _imageStream(CameraImage image) async {
     if (!qrCodeDartScanController.scanEnabled) return;
     if (processingImg) return;
@@ -140,6 +144,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
 
     if (decoded != null && mounted) {
       widget.onCapture?.call(decoded);
+      _stopImageStream();
     }
 
     processingImg = false;
