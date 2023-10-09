@@ -70,6 +70,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   late QRCodeDartScanDecoder dartScanDecoder;
   bool initialized = false;
   bool processingImg = false;
+  String? _lastText;
 
   @override
   TypeScan typeScan = TypeScan.live;
@@ -139,7 +140,10 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     );
 
     if (decoded != null && mounted) {
-      widget.onCapture?.call(decoded);
+      if (_lastText != decoded.text) {
+        _lastText = decoded.text;
+        widget.onCapture?.call(decoded);
+      }
     }
 
     processingImg = false;

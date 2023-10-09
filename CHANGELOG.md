@@ -1,3 +1,6 @@
+## NEXT
+- Fix issue [#9](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/9)
+
 ## 0.7.2
 - Fix issue [#7](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/7). Thanks so much [philseeley](https://github.com/philseeley)!
 
