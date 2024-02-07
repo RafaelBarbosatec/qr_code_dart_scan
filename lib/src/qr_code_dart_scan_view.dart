@@ -202,17 +202,39 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   }
 
   Widget _getCameraWidget(BuildContext context) {
+    var camera = controller!.value;
+    // fetch screen size
+    final size = MediaQuery.of(context).size;
+
+    // calculate scale depending on screen and camera ratios
+    // this is actually size.aspectRatio / (1 / camera.aspectRatio)
+    // because camera preview size is received as landscape
+    // but we're calculating for portrait orientation
+    Size sizePreview = size;
+    if (widget.widthPreview != null && widget.heightPreview != null) {
+      sizePreview = Size(widget.widthPreview!, widget.heightPreview!);
+    }
+    var scale = sizePreview.aspectRatio * camera.aspectRatio;
+
+    // to prevent scaling down, invert the value
+    if (scale < 1) scale = 1 / scale;
+
     return SizedBox(
       width: widget.widthPreview,
       height: widget.heightPreview,
-      child: CameraPreview(
-        controller!,
-        child: Stack(
-          children: [
-            if (typeScan == TypeScan.takePicture) _buildButton(),
-            widget.child ?? const SizedBox.shrink(),
-          ],
-        ),
+      child: Stack(
+        children: [
+          Transform.scale(
+            scale: scale,
+            child: Center(
+              child: CameraPreview(
+                controller!,
+              ),
+            ),
+          ),
+          if (typeScan == TypeScan.takePicture) _buildButton(),
+          widget.child ?? const SizedBox.shrink(),
+        ],
       ),
     );
   }
@@ -221,9 +243,11 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
 class _ButtonTakePicture extends StatelessWidget {
   final VoidCallback onTakePicture;
   final bool isLoading;
-  const _ButtonTakePicture(
-      {Key? key, required this.onTakePicture, this.isLoading = false})
-      : super(key: key);
+  const _ButtonTakePicture({
+    Key? key,
+    required this.onTakePicture,
+    this.isLoading = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
