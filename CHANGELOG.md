@@ -1,6 +1,7 @@
 ## 0.7.4
 - Fix issue [#11](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/11)
 - Fix AspectRatio
+- Update dependencies.
 
 ## 0.7.3
 - Fix issue [#9](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/9)
