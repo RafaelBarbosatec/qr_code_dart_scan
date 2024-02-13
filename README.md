@@ -91,15 +91,15 @@ It's important to note that the `MediaRecorder` class is not working properly on
         // }
         // resolutionPreset: = QrCodeDartScanResolutionPreset.high,
         // formats: [ // You can restrict specific formats.
-        //   BarcodeFormat.QR_CODE,
-        //   BarcodeFormat.AZTEC,
-        //   BarcodeFormat.DATA_MATRIX,
-        //   BarcodeFormat.PDF_417,
-        //   BarcodeFormat.CODE_39,
-        //   BarcodeFormat.CODE_93,
-        //   BarcodeFormat.CODE_128,
-        //  BarcodeFormat.EAN_8,
-        //   BarcodeFormat.EAN_13,
+        //  BarcodeFormat.qrCode,
+        //  BarcodeFormat.aztec,
+        //  BarcodeFormat.dataMatrix,
+        //  BarcodeFormat.pdf417,
+        //  BarcodeFormat.code39,
+        //  BarcodeFormat.code93,
+        //  BarcodeFormat.code128,
+        //  BarcodeFormat.ean8,
+        //  BarcodeFormat.ean13,
         // ],
         onCapture: (Result result) {
           // do anything with result
@@ -124,15 +124,15 @@ You may use only the our decoder if you want:
 
   final decoder = QRCodeDartScanDecoder(
     // formats: [ // You can restrict specific formats.
-    //   BarcodeFormat.QR_CODE,
-    //   BarcodeFormat.AZTEC,
-    //   BarcodeFormat.DATA_MATRIX,
-    //   BarcodeFormat.PDF_417,
-    //   BarcodeFormat.CODE_39,
-    //   BarcodeFormat.CODE_93,
-    //   BarcodeFormat.CODE_128,
-    //  BarcodeFormat.EAN_8,
-    //   BarcodeFormat.EAN_13,
+    //  BarcodeFormat.qrCode,
+    //  BarcodeFormat.aztec,
+    //  BarcodeFormat.dataMatrix,
+    //  BarcodeFormat.pdf417,
+    //  BarcodeFormat.code39,
+    //  BarcodeFormat.code93,
+    //  BarcodeFormat.code128,
+    //  BarcodeFormat.ean8,
+    //  BarcodeFormat.ean13,
     // ],
   );
 
