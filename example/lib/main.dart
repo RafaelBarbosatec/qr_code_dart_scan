@@ -1,12 +1,15 @@
-import 'package:example/live_decode.dart';
-import 'package:example/picture_decode.dart';
 import 'package:flutter/material.dart';
 
+import 'live_decode.dart';
+import 'picture_decode.dart';
+
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -26,7 +29,7 @@ class MyApp extends StatelessWidget {
 
 class HomePage extends StatelessWidget {
   static const routeName = '/';
-  static get route => {routeName: (BuildContext context) => HomePage()};
+  static get route => {routeName: (BuildContext context) => const HomePage()};
 
   const HomePage({Key? key}) : super(key: key);
 
@@ -34,7 +37,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('QRCodeDartScan'),
+        title: const Text('QRCodeDartScan'),
       ),
       body: Center(
         child: Column(
@@ -42,11 +45,11 @@ class HomePage extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () => LiveDecodePage.open(context),
-              child: Text('Live decode'),
+              child: const Text('Live decode'),
             ),
             ElevatedButton(
               onPressed: () => PictureDecode.open(context),
-              child: Text('Picture decode'),
+              child: const Text('Picture decode'),
             )
           ],
         ),

@@ -14,18 +14,19 @@ import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 /// on 28/06/22
 class LiveDecodePage extends StatefulWidget {
   static const routeName = '/live';
-  static get route => {routeName: (BuildContext context) => LiveDecodePage()};
+  static get route =>
+      {routeName: (BuildContext context) => const LiveDecodePage()};
   static open(BuildContext context) {
     Navigator.of(context).pushNamed(routeName);
   }
 
-  LiveDecodePage({Key? key}) : super(key: key);
+  const LiveDecodePage({Key? key}) : super(key: key);
 
   @override
-  _LiveDecodePageState createState() => _LiveDecodePageState();
+  LiveDecodePageState createState() => LiveDecodePageState();
 }
 
-class _LiveDecodePageState extends State<LiveDecodePage> {
+class LiveDecodePageState extends State<LiveDecodePage> {
   Result? currentResult;
 
   @override
@@ -41,8 +42,8 @@ class _LiveDecodePageState extends State<LiveDecodePage> {
         child: Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            margin: EdgeInsets.all(20),
-            padding: EdgeInsets.all(20),
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),

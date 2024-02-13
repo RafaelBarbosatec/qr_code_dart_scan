@@ -14,7 +14,8 @@ import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 /// on 28/06/22
 class PictureDecode extends StatefulWidget {
   static const routeName = '/picture';
-  static get route => {routeName: (BuildContext context) => PictureDecode()};
+  static get route =>
+      {routeName: (BuildContext context) => const PictureDecode()};
   static open(BuildContext context) {
     Navigator.of(context).pushNamed(routeName);
   }
@@ -42,8 +43,8 @@ class _PictureDecodeState extends State<PictureDecode> {
         child: Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            margin: EdgeInsets.only(left: 20, right: 20, bottom: 200),
-            padding: EdgeInsets.all(20),
+            margin: const EdgeInsets.only(left: 20, right: 20, bottom: 200),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),

@@ -77,10 +77,10 @@ packages:
     dependency: transitive
     description:
       name: charset
-      sha256: e8346cf597b6cea278d2d3a29b2d01ed8fb325aad718e70f22b0cb653cb31700
+      sha256: "27802032a581e01ac565904ece8c8962564b1070690794f0072f6865958ce8b9"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "2.0.1"
   clock:
     dependency: transitive
     description:
@@ -238,7 +238,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.7.3"
+    version: "0.7.4"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -336,10 +336,10 @@ packages:
     dependency: transitive
     description:
       name: zxing_lib
-      sha256: "84f6ec19b04dd54bc0b25c539c7c3567a5f9e872e3feb23763df027a1f855c11"
+      sha256: "870a63610be3f20009ca9201f7ba2d53d7eaefa675c154b3e8c1f6fc55984d04"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.0"
+    version: "1.1.2"
 sdks:
   dart: ">=3.2.3 <4.0.0"
   flutter: ">=3.16.6"

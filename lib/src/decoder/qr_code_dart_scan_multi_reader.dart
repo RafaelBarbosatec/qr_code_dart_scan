@@ -28,51 +28,49 @@ class QRCodeDartScanMultiReader {
   QRCodeDartScanMultiReader(this.formats) {
     for (var format in formats) {
       switch (format) {
-        case BarcodeFormat.AZTEC:
+        case BarcodeFormat.aztec:
           _readers.add(AztecReader());
           break;
-        case BarcodeFormat.CODABAR:
+        case BarcodeFormat.codabar:
           _readers.add(CodaBarReader());
           break;
-        case BarcodeFormat.CODE_39:
+        case BarcodeFormat.code39:
           _readers.add(Code39Reader());
           break;
-        case BarcodeFormat.CODE_93:
+        case BarcodeFormat.code93:
           _readers.add(Code93Reader());
           break;
-        case BarcodeFormat.CODE_128:
+        case BarcodeFormat.code128:
           _readers.add(Code128Reader());
           break;
-        case BarcodeFormat.DATA_MATRIX:
+        case BarcodeFormat.dataMatrix:
           _readers.add(DataMatrixReader());
           break;
-        case BarcodeFormat.EAN_8:
+        case BarcodeFormat.ean8:
           _readers.add(EAN8Reader());
           break;
-        case BarcodeFormat.EAN_13:
+        case BarcodeFormat.ean13:
           _readers.add(EAN13Reader());
           break;
-        case BarcodeFormat.ITF:
+        case BarcodeFormat.itf:
           _readers.add(ITFReader());
           break;
-        case BarcodeFormat.MAXICODE:
+        case BarcodeFormat.maxicode:
           _readers.add(MaxiCodeReader());
           break;
-        case BarcodeFormat.PDF_417:
+        case BarcodeFormat.pdf417:
           _readers.add(PDF417Reader());
           break;
-        case BarcodeFormat.QR_CODE:
+        case BarcodeFormat.qrCode:
           _readers.add(QRCodeReader());
           break;
-        case BarcodeFormat.RSS_14:
+        case BarcodeFormat.rss14:
           _readers.add(RSS14Reader());
           break;
-        case BarcodeFormat.RSS_EXPANDED:
+        case BarcodeFormat.rssExpanded:
           _readers.add(RSSExpandedReader());
           break;
-        case BarcodeFormat.UPC_A:
-        case BarcodeFormat.UPC_E:
-        case BarcodeFormat.UPC_EAN_EXTENSION:
+        default:
       }
     }
   }
