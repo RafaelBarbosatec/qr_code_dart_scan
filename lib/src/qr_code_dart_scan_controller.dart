@@ -82,6 +82,10 @@ class QRCodeDartScanController {
     return _dartScanInterface?.changeTypeScan(type);
   }
 
+  Future<void>? dispose() {
+    return _cameraController?.dispose();
+  }
+
   bool get scanEnabled => _scanEnabled;
   TypeScan? get typeScan => _dartScanInterface?.typeScan;
 }

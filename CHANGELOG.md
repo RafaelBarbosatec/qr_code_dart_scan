@@ -1,3 +1,7 @@
+## 0.7.5
+- Update dependencies.
+- Adds the method `dispose` in `QRCodeDartScanController`
+
 ## 0.7.4
 - Fix issue [#11](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/11)
 - Fix AspectRatio
