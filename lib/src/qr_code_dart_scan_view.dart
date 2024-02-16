@@ -241,6 +241,9 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
 }
 
 class _ButtonTakePicture extends StatelessWidget {
+  static const buttonContainerHeight = 150.0;
+  static const buttonSize = 80.0;
+  static const progressSize = 40.0;
   final VoidCallback onTakePicture;
   final bool isLoading;
   const _ButtonTakePicture({
@@ -254,14 +257,14 @@ class _ButtonTakePicture extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
-        height: 150,
+        height: buttonContainerHeight,
         color: Colors.black,
         child: Center(
           child: InkWell(
             onTap: onTakePicture,
             child: Container(
-              width: 80,
-              height: 80,
+              width: buttonSize,
+              height: buttonSize,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(40),
@@ -275,8 +278,8 @@ class _ButtonTakePicture extends StatelessWidget {
                 child: isLoading
                     ? const Center(
                         child: SizedBox(
-                          width: 40,
-                          height: 40,
+                          width: progressSize,
+                          height: progressSize,
                           child: CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation<Color>(
                               Colors.white,
