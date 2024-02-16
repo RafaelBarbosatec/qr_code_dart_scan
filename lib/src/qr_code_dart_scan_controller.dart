@@ -82,7 +82,10 @@ class QRCodeDartScanController {
     return _dartScanInterface?.changeTypeScan(type);
   }
 
-  Future<void>? dispose() {
+  Future<void>? dispose() async {
+    if (typeScan == TypeScan.live) {
+      await _cameraController?.stopImageStream();
+    }
     return _cameraController?.dispose();
   }
 

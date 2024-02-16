@@ -85,7 +85,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
 
   @override
   void dispose() {
-    controller?.dispose();
+    qrCodeDartScanController.dispose();
     super.dispose();
   }
 
@@ -278,8 +278,9 @@ class _ButtonTakePicture extends StatelessWidget {
                           width: 40,
                           height: 40,
                           child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         ),
                       )
