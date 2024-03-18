@@ -1,4 +1,4 @@
-name: example
+name: qr_code_dart_scan_example
 description: A new Flutter application.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
@@ -16,6 +16,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_lints: ^2.0.0
 
 
 

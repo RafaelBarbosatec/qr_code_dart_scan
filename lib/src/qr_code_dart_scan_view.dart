@@ -64,6 +64,7 @@ class QRCodeDartScanView extends StatefulWidget {
 }
 
 class QRCodeDartScanViewState extends State<QRCodeDartScanView>
+    with WidgetsBindingObserver
     implements DartScanInterface {
   CameraController? controller;
   late QRCodeDartScanController qrCodeDartScanController;
@@ -76,17 +77,37 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   TypeScan typeScan = TypeScan.live;
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!(controller?.value.isInitialized == true)) {
+      return;
+    }
+    if (state == AppLifecycleState.inactive) {
+      postFrame(() {
+        setState(() {
+          initialized = false;
+          controller?.dispose();
+        });
+      });
+    } else if (state == AppLifecycleState.resumed) {
+      _initController();
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
   void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
     typeScan = widget.typeScan;
     dartScanDecoder = QRCodeDartScanDecoder(formats: widget.formats);
     _initController();
-    super.initState();
   }
 
   @override
   void dispose() {
-    controller?.dispose();
     super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    qrCodeDartScanController.dispose();
   }
 
   @override
@@ -98,11 +119,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   }
 
   void _initController() async {
-    final cameras = await availableCameras();
-    var camera = cameras.first;
-    if (widget.typeCamera == TypeCamera.front && cameras.length > 1) {
-      camera = cameras[1];
-    }
+    final camera = await _getCamera();
     controller = CameraController(
       camera,
       widget.resolutionPreset.toResolutionPreset(),
@@ -238,9 +255,30 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
       ),
     );
   }
+
+  Future<CameraDescription> _getCamera() async {
+    final CameraLensDirection lensDirection;
+    switch (widget.typeCamera) {
+      case TypeCamera.back:
+        lensDirection = CameraLensDirection.back;
+        break;
+      case TypeCamera.front:
+        lensDirection = CameraLensDirection.front;
+        break;
+    }
+
+    final cameras = await availableCameras();
+    return cameras.firstWhere(
+      (camera) => camera.lensDirection == lensDirection,
+      orElse: () => cameras.first,
+    );
+  }
 }
 
 class _ButtonTakePicture extends StatelessWidget {
+  static const buttonContainerHeight = 150.0;
+  static const buttonSize = 80.0;
+  static const progressSize = 40.0;
   final VoidCallback onTakePicture;
   final bool isLoading;
   const _ButtonTakePicture({
@@ -254,14 +292,14 @@ class _ButtonTakePicture extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
-        height: 150,
+        height: buttonContainerHeight,
         color: Colors.black,
         child: Center(
           child: InkWell(
             onTap: onTakePicture,
             child: Container(
-              width: 80,
-              height: 80,
+              width: buttonSize,
+              height: buttonSize,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(40),
@@ -275,11 +313,12 @@ class _ButtonTakePicture extends StatelessWidget {
                 child: isLoading
                     ? const Center(
                         child: SizedBox(
-                          width: 40,
-                          height: 40,
+                          width: progressSize,
+                          height: progressSize,
                           child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         ),
                       )
