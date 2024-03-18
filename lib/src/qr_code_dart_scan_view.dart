@@ -82,7 +82,12 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
       return;
     }
     if (state == AppLifecycleState.inactive) {
-      qrCodeDartScanController.dispose();
+      postFrame(() {
+        setState(() {
+          initialized = false;
+          controller?.dispose();
+        });
+      });
     } else if (state == AppLifecycleState.resumed) {
       _initController();
     }
@@ -100,8 +105,9 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
 
   @override
   void dispose() {
-    qrCodeDartScanController.dispose();
     super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    qrCodeDartScanController.dispose();
   }
 
   @override
