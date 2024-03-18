@@ -1,4 +1,4 @@
-## next
+## 0.7.6
 - Handle with `didChangeAppLifecycleState`.
 - Fix issue [#15](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/15). Thanks [thierrylee](https://github.com/thierrylee)!
 
