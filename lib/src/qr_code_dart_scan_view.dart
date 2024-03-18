@@ -64,6 +64,7 @@ class QRCodeDartScanView extends StatefulWidget {
 }
 
 class QRCodeDartScanViewState extends State<QRCodeDartScanView>
+    with WidgetsBindingObserver
     implements DartScanInterface {
   CameraController? controller;
   late QRCodeDartScanController qrCodeDartScanController;
@@ -76,11 +77,25 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   TypeScan typeScan = TypeScan.live;
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!(controller?.value.isInitialized == true)) {
+      return;
+    }
+    if (state == AppLifecycleState.inactive) {
+      qrCodeDartScanController.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      _initController();
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
   void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
     typeScan = widget.typeScan;
     dartScanDecoder = QRCodeDartScanDecoder(formats: widget.formats);
     _initController();
-    super.initState();
   }
 
   @override
@@ -98,11 +113,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   }
 
   void _initController() async {
-    final cameras = await availableCameras();
-    var camera = cameras.first;
-    if (widget.typeCamera == TypeCamera.front && cameras.length > 1) {
-      camera = cameras[1];
-    }
+    final camera = await _getCamera();
     controller = CameraController(
       camera,
       widget.resolutionPreset.toResolutionPreset(),
@@ -236,6 +247,24 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
           widget.child ?? const SizedBox.shrink(),
         ],
       ),
+    );
+  }
+
+  Future<CameraDescription> _getCamera() async {
+    final CameraLensDirection lensDirection;
+    switch (widget.typeCamera) {
+      case TypeCamera.back:
+        lensDirection = CameraLensDirection.back;
+        break;
+      case TypeCamera.front:
+        lensDirection = CameraLensDirection.front;
+        break;
+    }
+
+    final cameras = await availableCameras();
+    return cameras.firstWhere(
+      (camera) => camera.lensDirection == lensDirection,
+      orElse: () => cameras.first,
     );
   }
 }
