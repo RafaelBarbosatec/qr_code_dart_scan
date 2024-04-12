@@ -1,6 +1,6 @@
 library qr_code_dart_scan;
 
-export 'package:camera/camera.dart' show XFile;
+export 'package:camera/camera.dart';
 export 'package:zxing_lib/zxing.dart';
 
 export 'src/decoder/qr_code_dart_scan_decoder.dart';
