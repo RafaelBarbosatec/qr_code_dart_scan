@@ -28,11 +28,13 @@ class LiveDecodePage extends StatefulWidget {
 
 class LiveDecodePageState extends State<LiveDecodePage> {
   Result? currentResult;
+  final QRCodeDartScanController _controller = QRCodeDartScanController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: QRCodeDartScanView(
+        controller: _controller,
         scanInvertedQRCode: true,
         onCapture: (Result result) {
           setState(() {
@@ -54,6 +56,11 @@ class LiveDecodePageState extends State<LiveDecodePage> {
               children: [
                 Text('Text: ${currentResult?.text ?? 'Not found'}'),
                 Text('Format: ${currentResult?.barcodeFormat ?? 'Not found'}'),
+                ElevatedButton(
+                    onPressed: () {
+                      _controller.changeCamera(TypeCamera.front);
+                    },
+                    child: const Text('Change cam')),
               ],
             ),
           ),

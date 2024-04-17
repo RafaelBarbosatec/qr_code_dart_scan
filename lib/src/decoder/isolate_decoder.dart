@@ -1,4 +1,3 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_code_dart_scan/src/decoder/decode_event.dart';
