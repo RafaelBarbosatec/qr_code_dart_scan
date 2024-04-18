@@ -37,14 +37,12 @@ class LiveDecodePageState extends State<LiveDecodePage> {
         controller: _controller,
         scanInvertedQRCode: true,
         onResultInterceptor: (oldREsult, newResult) {
-          print('o: ${oldREsult?.text}| n: ${newResult.text}');
           return true;
         },
         onCapture: (Result result) {
           setState(() {
             currentResult = result;
           });
-          print('Result: ${result.text}');
         },
         child: Align(
           alignment: Alignment.bottomCenter,
