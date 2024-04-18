@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
 
@@ -21,6 +22,7 @@ class PreviewState extends Equatable {
   final bool initialized;
   final TypeScan typeScan;
   final TypeCamera typeCamera;
+  final DeviceOrientation? lockCaptureOrientation;
 
   const PreviewState({
     this.result,
@@ -28,6 +30,7 @@ class PreviewState extends Equatable {
     this.initialized = false,
     this.typeScan = TypeScan.live,
     this.typeCamera = TypeCamera.back,
+    this.lockCaptureOrientation,
   });
 
   PreviewState copyWith({
@@ -60,12 +63,12 @@ class QRCodeDartScanController {
   final ValueNotifier<PreviewState> state = ValueNotifier(const PreviewState());
   CameraController? cameraController;
   QRCodeDartScanDecoder? _codeDartScanDecoder;
-  QRCodeDartScanResolutionPreset _resolutionPreset =
-      QRCodeDartScanResolutionPreset.medium;
+  QRCodeDartScanResolutionPreset _resolutionPreset = QRCodeDartScanResolutionPreset.medium;
   bool scanEnabled = true;
   bool _scanInvertedQRCode = false;
   Duration _intervalScan = const Duration(seconds: 1);
   _LastScan? _lastScan;
+  DeviceOrientation? _lockCaptureOrientation;
 
   Future<void> config(
     List<BarcodeFormat> formats,
@@ -75,6 +78,7 @@ class QRCodeDartScanController {
     QRCodeDartScanResolutionPreset resolutionPreset,
     Duration intervalScan,
     OnResultInterceptorCallback? onResultInterceptor,
+    DeviceOrientation? lockCaptureOrientation,
   ) async {
     _scanInvertedQRCode = scanInvertedQRCode;
     state.value = state.value.copyWith(
@@ -90,6 +94,9 @@ class QRCodeDartScanController {
         ),
       onResultInterceptor: onResultInterceptor,
     );
+    if (lockCaptureOrientation != null) {
+      _lockCaptureOrientation = lockCaptureOrientation;
+    }
     await _initController(typeCamera);
   }
 
@@ -105,7 +112,13 @@ class QRCodeDartScanController {
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.yuv420,
     );
+
     await cameraController?.initialize();
+
+    if (_lockCaptureOrientation != null) {
+      cameraController?.lockCaptureOrientation(_lockCaptureOrientation!);
+    }
+
     if (state.value.typeScan == TypeScan.live) {
       cameraController?.startImageStream(_imageStream);
     }
