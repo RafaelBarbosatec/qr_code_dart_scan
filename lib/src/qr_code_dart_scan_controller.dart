@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
 
@@ -60,12 +61,12 @@ class QRCodeDartScanController {
   final ValueNotifier<PreviewState> state = ValueNotifier(const PreviewState());
   CameraController? cameraController;
   QRCodeDartScanDecoder? _codeDartScanDecoder;
-  QRCodeDartScanResolutionPreset _resolutionPreset =
-      QRCodeDartScanResolutionPreset.medium;
+  QRCodeDartScanResolutionPreset _resolutionPreset = QRCodeDartScanResolutionPreset.medium;
   bool scanEnabled = true;
   bool _scanInvertedQRCode = false;
   Duration _intervalScan = const Duration(seconds: 1);
   _LastScan? _lastScan;
+  DeviceOrientation? _lockCaptureOrientation;
 
   Future<void> config(
     List<BarcodeFormat> formats,
@@ -90,6 +91,7 @@ class QRCodeDartScanController {
         ),
       onResultInterceptor: onResultInterceptor,
     );
+    _lockCaptureOrientation = _lockCaptureOrientation;
     await _initController(typeCamera);
   }
 
@@ -112,6 +114,9 @@ class QRCodeDartScanController {
     state.value = state.value.copyWith(
       initialized: true,
     );
+    if (_lockCaptureOrientation != null) {
+      await cameraController?.lockCaptureOrientation(_lockCaptureOrientation!);
+    }
   }
 
   Future<CameraDescription> _getCamera(TypeCamera typeCamera) async {

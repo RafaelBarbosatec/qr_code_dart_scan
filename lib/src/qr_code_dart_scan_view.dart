@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
 import 'package:qr_code_dart_scan/src/util/qr_code_dart_scan_resolution_preset.dart';
@@ -46,6 +47,7 @@ class QRCodeDartScanView extends StatefulWidget {
   final TakePictureButtonBuilder? takePictureButtonBuilder;
   final Duration intervalScan;
   final OnResultInterceptorCallback? onResultInterceptor;
+  final DeviceOrientation? lockCaptureOrientation;
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
@@ -61,14 +63,14 @@ class QRCodeDartScanView extends StatefulWidget {
     this.heightPreview = double.maxFinite,
     this.intervalScan = const Duration(seconds: 1),
     this.onResultInterceptor,
+    this.lockCaptureOrientation,
   }) : super(key: key);
 
   @override
   QRCodeDartScanViewState createState() => QRCodeDartScanViewState();
 }
 
-class QRCodeDartScanViewState extends State<QRCodeDartScanView>
-    with WidgetsBindingObserver {
+class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBindingObserver {
   late QRCodeDartScanController controller;
   bool initialized = false;
 
@@ -174,8 +176,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
               ),
             ),
           ),
-          if (controller.state.value.typeScan == TypeScan.takePicture)
-            _buildButton(),
+          if (controller.state.value.typeScan == TypeScan.takePicture) _buildButton(),
           widget.child ?? const SizedBox.shrink(),
         ],
       ),
