@@ -36,9 +36,6 @@ class LiveDecodePageState extends State<LiveDecodePage> {
       body: QRCodeDartScanView(
         controller: _controller,
         scanInvertedQRCode: true,
-        onResultInterceptor: (oldREsult, newResult) {
-          return true;
-        },
         onCapture: (Result result) {
           setState(() {
             currentResult = result;

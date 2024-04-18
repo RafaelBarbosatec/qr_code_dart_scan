@@ -81,7 +81,12 @@ It's important to note that the `MediaRecorder` class is not working properly on
     return Scaffold(
       body: QRCodeDartScanView(
         scanInvertedQRCode: true, // enable scan invert qr code ( default = false)
-        typeScan: TypeScan.live, // if TypeScan.takePicture will try decode when click to take a picture (default TypeScan.live)
+        
+        typeScan: TypeScan.live, // if TypeScan.takePicture will try decode when click to take a picture(default TypeScan.live)
+        // intervalScan: const Duration(seconds:1)
+        // onResultInterceptor: (old,new){
+        //  do any rule to controll onCapture.
+        // }
         // takePictureButtonBuilder: (context,controller,isLoading){ // if typeScan == TypeScan.takePicture you can customize the button.
         //    if(loading) return CircularProgressIndicator();
         //    return ElevatedButton(
