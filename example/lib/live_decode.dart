@@ -36,10 +36,15 @@ class LiveDecodePageState extends State<LiveDecodePage> {
       body: QRCodeDartScanView(
         controller: _controller,
         scanInvertedQRCode: true,
+        onResultInterceptor: (oldREsult, newResult) {
+          print('o: ${oldREsult?.text}| n: ${newResult.text}');
+          return true;
+        },
         onCapture: (Result result) {
           setState(() {
             currentResult = result;
           });
+          print('Result: ${result.text}');
         },
         child: Align(
           alignment: Alignment.bottomCenter,
@@ -58,7 +63,11 @@ class LiveDecodePageState extends State<LiveDecodePage> {
                 Text('Format: ${currentResult?.barcodeFormat ?? 'Not found'}'),
                 ElevatedButton(
                     onPressed: () {
-                      _controller.changeCamera(TypeCamera.front);
+                      _controller.changeCamera(
+                        _controller.state.value.typeCamera == TypeCamera.front
+                            ? TypeCamera.back
+                            : TypeCamera.front,
+                      );
                     },
                     child: const Text('Change cam')),
               ],

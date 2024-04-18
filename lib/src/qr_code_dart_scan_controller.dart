@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
@@ -14,95 +15,19 @@ import 'package:qr_code_dart_scan/src/util/extensions.dart';
 /// Rafaelbarbosatec
 /// on 12/08/21
 
-abstract class DartScanInterface {
-  TypeScan typeScan = TypeScan.live;
-  Future<void> takePictureAndDecode();
-  Future<void> changeTypeScan(TypeScan type);
-}
-
-// class QRCodeDartScanController {
-//   bool _scanEnabled = true;
-//   CameraController? _cameraController;
-//   DartScanInterface? _dartScanInterface;
-
-//   void configure(
-//     CameraController cameraController,
-//     DartScanInterface dartScanInterface,
-//   ) {
-//     _cameraController = cameraController;
-//     _dartScanInterface = dartScanInterface;
-//   }
-
-//   Future<void>? setFlashMode(FlashMode mode) {
-//     return _cameraController?.setFlashMode(mode);
-//   }
-
-//   Future<void>? setZoomLevel(double zoom) {
-//     return _cameraController?.setZoomLevel(zoom);
-//   }
-
-//   Future<void>? setFocusMode(FocusMode mode) {
-//     return _cameraController?.setFocusMode(mode);
-//   }
-
-//   Future<void>? setFocusPoint(Offset? point) {
-//     return _cameraController?.setFocusPoint(point);
-//   }
-
-//   Future<double>? getExposureOffsetStepSize() {
-//     return _cameraController?.getExposureOffsetStepSize();
-//   }
-
-//   Future<double>? getMaxExposureOffset() {
-//     return _cameraController?.getMaxExposureOffset();
-//   }
-
-//   Future<double>? getMaxZoomLevel() {
-//     return _cameraController?.getMaxZoomLevel();
-//   }
-
-//   Future<double>? getMinExposureOffset() {
-//     return _cameraController?.getMinExposureOffset();
-//   }
-
-//   Future<double>? getMinZoomLevel() {
-//     return _cameraController?.getMinZoomLevel();
-//   }
-
-//   void setScanEnabled(bool enable) {
-//     _scanEnabled = enable;
-//   }
-
-//   Future<void>? takePictureAndDecode() {
-//     return _dartScanInterface?.takePictureAndDecode();
-//   }
-
-//   Future<void>? changeTypeScan(TypeScan type) {
-//     return _dartScanInterface?.changeTypeScan(type);
-//   }
-
-//   Future<void>? dispose() async {
-//     if (typeScan == TypeScan.live) {
-//       await _cameraController?.stopImageStream();
-//     }
-//     return _cameraController?.dispose();
-//   }
-
-//   bool get scanEnabled => _scanEnabled;
-//   TypeScan? get typeScan => _dartScanInterface?.typeScan;
-// }
-
-class PreviewState {
+class PreviewState extends Equatable {
   final Result? result;
   final bool processing;
   final bool initialized;
   final TypeScan typeScan;
+  final TypeCamera typeCamera;
 
-  PreviewState({
+  const PreviewState({
     this.result,
     this.processing = false,
     this.initialized = false,
     this.typeScan = TypeScan.live,
+    this.typeCamera = TypeCamera.back,
   });
 
   PreviewState copyWith({
@@ -110,27 +35,38 @@ class PreviewState {
     bool? processing,
     bool? initialized,
     TypeScan? typeScan,
+    TypeCamera? typeCamera,
   }) {
     return PreviewState(
       result: result,
       processing: processing ?? this.processing,
       initialized: initialized ?? this.initialized,
       typeScan: typeScan ?? this.typeScan,
+      typeCamera: typeCamera ?? this.typeCamera,
     );
   }
+
+  @override
+  List<Object?> get props => [
+        result,
+        processing,
+        initialized,
+        typeScan,
+        typeCamera,
+      ];
 }
 
 class QRCodeDartScanController {
-  final ValueNotifier<PreviewState> state = ValueNotifier(PreviewState());
+  final ValueNotifier<PreviewState> state = ValueNotifier(const PreviewState());
   CameraController? cameraController;
-   QRCodeDartScanDecoder? _codeDartScanDecoder;
+  QRCodeDartScanDecoder? _codeDartScanDecoder;
   QRCodeDartScanResolutionPreset _resolutionPreset =
       QRCodeDartScanResolutionPreset.medium;
   bool scanEnabled = true;
   bool _scanInvertedQRCode = false;
   Duration _intervalScan = const Duration(seconds: 1);
-   _LastScan? _lastScan ;
-  TypeCamera typeCamera = TypeCamera.back;
+  _LastScan? _lastScan;
+
   Future<void> config(
     List<BarcodeFormat> formats,
     TypeCamera typeCamera,
@@ -160,8 +96,8 @@ class QRCodeDartScanController {
   Future<void> _initController(TypeCamera typeCamera) async {
     state.value = state.value.copyWith(
       initialized: false,
+      typeCamera: typeCamera,
     );
-    this.typeCamera = typeCamera;
     final camera = await _getCamera(typeCamera);
     cameraController = CameraController(
       camera,
@@ -213,10 +149,7 @@ class QRCodeDartScanController {
 
     if (decoded != null) {
       if (_lastScan?.checkTime(_intervalScan, decoded) == true) {
-        _lastScan = _LastScan(
-          data: decoded,
-          date: DateTime.now(),
-        );
+        _lastScan = _lastScan!.updateResult(decoded);
         state.value = state.value.copyWith(
           result: decoded,
         );
@@ -287,6 +220,14 @@ class _LastScan {
     required this.date,
     this.onResultInterceptor,
   });
+
+  _LastScan updateResult(Result data) {
+    return _LastScan(
+      data: data,
+      date: DateTime.now(),
+      onResultInterceptor: onResultInterceptor,
+    );
+  }
 
   bool checkTime(Duration intervalScan, Result newResult) {
     final now = DateTime.now();

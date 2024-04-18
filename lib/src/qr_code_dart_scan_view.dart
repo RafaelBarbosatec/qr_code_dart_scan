@@ -90,7 +90,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   @override
   void initState() {
     super.initState();
-    controller = QRCodeDartScanController();
+
     WidgetsBinding.instance.addObserver(this);
     _initController();
   }
@@ -112,6 +112,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   }
 
   void _initController() async {
+    controller = widget.controller ?? QRCodeDartScanController();
     controller.state.addListener(_onStateListener);
     await controller.config(
       widget.formats,
@@ -160,7 +161,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     if (scale < 1) scale = 1 / scale;
 
     return SizedBox(
-      key: Key(controller.typeCamera.toString()),
+      key: Key(controller.state.value.typeCamera.toString()),
       width: widget.widthPreview,
       height: widget.heightPreview,
       child: Stack(
@@ -183,7 +184,6 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
 
   void _onStateListener() {
     final state = controller.state.value;
-    print('INIT: ${state.initialized}');
     if (state.initialized != initialized) {
       postFrame(() {
         setState(() {
@@ -254,5 +254,8 @@ class _ButtonTakePicture extends StatelessWidget {
   }
 }
 
+// If return true the newResult is passed in 'onCapture'
 typedef OnResultInterceptorCallback = bool Function(
-    Result? oldREsult, Result newResult);
+  Result? oldREsult,
+  Result newResult,
+);
