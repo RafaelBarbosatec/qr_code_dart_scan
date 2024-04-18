@@ -124,6 +124,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
       widget.resolutionPreset,
       widget.intervalScan,
       widget.onResultInterceptor,
+      widget.lockCaptureOrientation,
     );
   }
 

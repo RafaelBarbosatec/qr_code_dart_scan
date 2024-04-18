@@ -22,6 +22,7 @@ class PreviewState extends Equatable {
   final bool initialized;
   final TypeScan typeScan;
   final TypeCamera typeCamera;
+  final DeviceOrientation? lockCaptureOrientation;
 
   const PreviewState({
     this.result,
@@ -29,6 +30,7 @@ class PreviewState extends Equatable {
     this.initialized = false,
     this.typeScan = TypeScan.live,
     this.typeCamera = TypeCamera.back,
+    this.lockCaptureOrientation,
   });
 
   PreviewState copyWith({
@@ -76,6 +78,7 @@ class QRCodeDartScanController {
     QRCodeDartScanResolutionPreset resolutionPreset,
     Duration intervalScan,
     OnResultInterceptorCallback? onResultInterceptor,
+    DeviceOrientation? lockCaptureOrientation,
   ) async {
     _scanInvertedQRCode = scanInvertedQRCode;
     state.value = state.value.copyWith(
@@ -91,7 +94,9 @@ class QRCodeDartScanController {
         ),
       onResultInterceptor: onResultInterceptor,
     );
-    _lockCaptureOrientation = _lockCaptureOrientation;
+    if (lockCaptureOrientation != null) {
+      _lockCaptureOrientation = lockCaptureOrientation;
+    }
     await _initController(typeCamera);
   }
 
@@ -107,16 +112,19 @@ class QRCodeDartScanController {
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.yuv420,
     );
+
     await cameraController?.initialize();
+
+    if (_lockCaptureOrientation != null) {
+      cameraController?.lockCaptureOrientation(_lockCaptureOrientation!);
+    }
+
     if (state.value.typeScan == TypeScan.live) {
       cameraController?.startImageStream(_imageStream);
     }
     state.value = state.value.copyWith(
       initialized: true,
     );
-    if (_lockCaptureOrientation != null) {
-      await cameraController?.lockCaptureOrientation(_lockCaptureOrientation!);
-    }
   }
 
   Future<CameraDescription> _getCamera(TypeCamera typeCamera) async {
