@@ -44,6 +44,8 @@ class QRCodeDartScanView extends StatefulWidget {
   final double? widthPreview;
   final double? heightPreview;
   final TakePictureButtonBuilder? takePictureButtonBuilder;
+  final Duration intervalScan;
+  final OnResultInterceptorCallback? onResultInterceptor;
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
@@ -57,6 +59,8 @@ class QRCodeDartScanView extends StatefulWidget {
     this.takePictureButtonBuilder,
     this.widthPreview = double.maxFinite,
     this.heightPreview = double.maxFinite,
+    this.intervalScan = const Duration(seconds: 1),
+    this.onResultInterceptor,
   }) : super(key: key);
 
   @override
@@ -64,29 +68,18 @@ class QRCodeDartScanView extends StatefulWidget {
 }
 
 class QRCodeDartScanViewState extends State<QRCodeDartScanView>
-    with WidgetsBindingObserver
-    implements DartScanInterface {
-  CameraController? controller;
-  late QRCodeDartScanController qrCodeDartScanController;
-  late QRCodeDartScanDecoder dartScanDecoder;
+    with WidgetsBindingObserver {
+  late QRCodeDartScanController controller;
   bool initialized = false;
-  bool processingImg = false;
-  String? _lastText;
-
-  @override
-  TypeScan typeScan = TypeScan.live;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!(controller?.value.isInitialized == true)) {
+    if (!(controller.cameraController?.value.isInitialized == true)) {
       return;
     }
     if (state == AppLifecycleState.inactive) {
       postFrame(() {
-        setState(() {
-          initialized = false;
-          controller?.dispose();
-        });
+        controller.dispose();
       });
     } else if (state == AppLifecycleState.resumed) {
       _initController();
@@ -97,9 +90,8 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addObserver(this);
-    typeScan = widget.typeScan;
-    dartScanDecoder = QRCodeDartScanDecoder(formats: widget.formats);
     _initController();
   }
 
@@ -107,7 +99,8 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   void dispose() {
     super.dispose();
     WidgetsBinding.instance.removeObserver(this);
-    qrCodeDartScanController.dispose();
+    controller.state.removeListener(_onStateListener);
+    controller.dispose();
   }
 
   @override
@@ -119,107 +112,38 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   }
 
   void _initController() async {
-    final camera = await _getCamera();
-    controller = CameraController(
-      camera,
-      widget.resolutionPreset.toResolutionPreset(),
-      enableAudio: false,
-      imageFormatGroup: ImageFormatGroup.yuv420,
+    controller = widget.controller ?? QRCodeDartScanController();
+    controller.state.addListener(_onStateListener);
+    await controller.config(
+      widget.formats,
+      widget.typeCamera,
+      widget.typeScan,
+      widget.scanInvertedQRCode,
+      widget.resolutionPreset,
+      widget.intervalScan,
+      widget.onResultInterceptor,
     );
-    qrCodeDartScanController = widget.controller ?? QRCodeDartScanController();
-    await controller!.initialize();
-    qrCodeDartScanController.configure(controller!, this);
-    if (typeScan == TypeScan.live) {
-      _startImageStream();
-    }
-    postFrame(() {
-      setState(() {
-        initialized = true;
-      });
-    });
-  }
-
-  void _startImageStream() {
-    controller?.startImageStream(_imageStream);
-  }
-
-  void _imageStream(CameraImage image) async {
-    if (!qrCodeDartScanController.scanEnabled) return;
-    if (processingImg) return;
-    processingImg = true;
-    _processImage(image);
-  }
-
-  void _processImage(CameraImage image) async {
-    final decoded = await dartScanDecoder.decodeCameraImage(
-      image,
-      scanInverted: widget.scanInvertedQRCode,
-    );
-
-    if (decoded != null && mounted) {
-      if (_lastText != decoded.text) {
-        _lastText = decoded.text;
-        widget.onCapture?.call(decoded);
-      }
-    }
-
-    processingImg = false;
-  }
-
-  @override
-  Future<void> takePictureAndDecode() async {
-    if (processingImg) return;
-    setState(() {
-      processingImg = true;
-    });
-    final xFile = await controller?.takePicture();
-
-    if (xFile != null) {
-      final decoded = await dartScanDecoder.decodeFile(
-        xFile,
-        scanInverted: widget.scanInvertedQRCode,
-      );
-
-      if (decoded != null && mounted) {
-        widget.onCapture?.call(decoded);
-      }
-    }
-
-    setState(() {
-      processingImg = false;
-    });
   }
 
   Widget _buildButton() {
-    return widget.takePictureButtonBuilder?.call(
-          context,
-          qrCodeDartScanController,
-          processingImg,
-        ) ??
-        _ButtonTakePicture(
-          onTakePicture: takePictureAndDecode,
-          isLoading: processingImg,
-        );
-  }
-
-  @override
-  Future<void> changeTypeScan(TypeScan type) async {
-    if (typeScan == type) {
-      return;
-    }
-    if (typeScan == TypeScan.takePicture) {
-      _startImageStream();
-    } else {
-      await controller?.stopImageStream();
-      processingImg = false;
-    }
-    setState(() {
-      typeScan = type;
-    });
+    return ValueListenableBuilder<PreviewState>(
+      valueListenable: controller.state,
+      builder: (context, value, child) {
+        return widget.takePictureButtonBuilder?.call(
+              context,
+              controller,
+              value.processing,
+            ) ??
+            _ButtonTakePicture(
+              onTakePicture: controller.takePictureAndDecode,
+              isLoading: value.processing,
+            );
+      },
+    );
   }
 
   Widget _getCameraWidget(BuildContext context) {
-    var camera = controller!.value;
+    var camera = controller.cameraController!.value;
     // fetch screen size
     final size = MediaQuery.of(context).size;
 
@@ -237,6 +161,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     if (scale < 1) scale = 1 / scale;
 
     return SizedBox(
+      key: Key(controller.state.value.typeCamera.toString()),
       width: widget.widthPreview,
       height: widget.heightPreview,
       child: Stack(
@@ -245,33 +170,30 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
             scale: scale,
             child: Center(
               child: CameraPreview(
-                controller!,
+                controller.cameraController!,
               ),
             ),
           ),
-          if (typeScan == TypeScan.takePicture) _buildButton(),
+          if (controller.state.value.typeScan == TypeScan.takePicture)
+            _buildButton(),
           widget.child ?? const SizedBox.shrink(),
         ],
       ),
     );
   }
 
-  Future<CameraDescription> _getCamera() async {
-    final CameraLensDirection lensDirection;
-    switch (widget.typeCamera) {
-      case TypeCamera.back:
-        lensDirection = CameraLensDirection.back;
-        break;
-      case TypeCamera.front:
-        lensDirection = CameraLensDirection.front;
-        break;
+  void _onStateListener() {
+    final state = controller.state.value;
+    if (state.initialized != initialized) {
+      postFrame(() {
+        setState(() {
+          initialized = state.initialized;
+        });
+      });
     }
-
-    final cameras = await availableCameras();
-    return cameras.firstWhere(
-      (camera) => camera.lensDirection == lensDirection,
-      orElse: () => cameras.first,
-    );
+    if (state.result != null) {
+      widget.onCapture?.call(state.result!);
+    }
   }
 }
 
@@ -331,3 +253,9 @@ class _ButtonTakePicture extends StatelessWidget {
     );
   }
 }
+
+// If return true the newResult is passed in 'onCapture'
+typedef OnResultInterceptorCallback = bool Function(
+  Result? oldREsult,
+  Result newResult,
+);

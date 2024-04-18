@@ -1,3 +1,9 @@
+## 0.8.0
+- `QRCodeDartScanController` Improvements
+- Adds `Future<void> changeCamera(TypeCamera typeCamera)` method in `QRCodeDartScanController`.
+- Adds `intervalScan` param in `QRCodeDartScanView`.
+- Adds `onResultInterceptor` param in `QRCodeDartScanView`.
+
 ## 0.7.7
 - Fix issue [#18](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/18). Thanks [MateusLucasDaSilva](https://github.com/MateusLucasDaSilva)!
 
