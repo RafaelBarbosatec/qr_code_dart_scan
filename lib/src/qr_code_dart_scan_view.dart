@@ -73,14 +73,18 @@ class QRCodeDartScanView extends StatefulWidget {
 class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBindingObserver {
   late QRCodeDartScanController controller;
   bool initialized = false;
+  bool _isControllerDisposed = false;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!(controller.cameraController?.value.isInitialized == true)) {
       return;
     }
-    if (state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.inactive && !_isControllerDisposed) {
       postFrame(() {
+        _isControllerDisposed = true;
+        initialized = false;
+        controller.state.removeListener(_onStateListener);
         controller.dispose();
       });
     } else if (state == AppLifecycleState.resumed) {
@@ -101,6 +105,8 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
   void dispose() {
     super.dispose();
     WidgetsBinding.instance.removeObserver(this);
+    _isControllerDisposed = true;
+    initialized = false;
     controller.state.removeListener(_onStateListener);
     controller.dispose();
   }
@@ -115,6 +121,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
 
   void _initController() async {
     controller = widget.controller ?? QRCodeDartScanController();
+    _isControllerDisposed = false;
     controller.state.addListener(_onStateListener);
     await controller.config(
       widget.formats,
