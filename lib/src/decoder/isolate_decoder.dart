@@ -57,12 +57,9 @@ Result? decodePlanes(Map<dynamic, dynamic> msg) {
     } catch (_) {
       return null;
     }
-  } catch (e) {
-    if (kDebugMode) {
-      print('ERROR(decodePlanes):$e');
-    }
+  } catch (_) {
+    return null;
   }
-  return null;
 }
 
 Future<Result?> _decodeImage(Map<dynamic, dynamic> map) async {
@@ -92,11 +89,8 @@ Future<Result?> _decodeImage(Map<dynamic, dynamic> map) async {
       return null;
     }
   } catch (e) {
-    if (kDebugMode) {
-      print('ERROR(_decodeImage):$e');
-    }
+    return null;
   }
-  return null;
 }
 
 int _getLuminanceSourcePixel(List<int> byte, int index) {

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:zxing_lib/aztec.dart';
 import 'package:zxing_lib/datamatrix.dart';
 import 'package:zxing_lib/maxicode.dart';
@@ -80,11 +79,7 @@ class QRCodeDartScanMultiReader {
       try {
         return reader.decode(image);
         // ignore: empty_catches
-      } catch (e) {
-        if (kDebugMode) {
-          print(e);
-        }
-      }
+      } catch (e) {}
     }
     return null;
   }

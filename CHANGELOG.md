@@ -1,3 +1,6 @@
+## 0.8.2
+- Remove debug prints
+
 ## 0.8.1
 - fix app life circle issue [26](https://github.com/RafaelBarbosatec/qr_code_dart_scan/pull/26). Thanks [Ömral Cörüt](https://github.com/omralcrt) !
 
