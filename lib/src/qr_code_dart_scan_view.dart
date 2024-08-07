@@ -59,8 +59,8 @@ class QRCodeDartScanView extends StatefulWidget {
     this.formats = QRCodeDartScanDecoder.acceptedFormats,
     this.child,
     this.takePictureButtonBuilder,
-    this.widthPreview = double.maxFinite,
-    this.heightPreview = double.maxFinite,
+    this.widthPreview,
+    this.heightPreview,
     this.intervalScan = const Duration(seconds: 1),
     this.onResultInterceptor,
     this.lockCaptureOrientation,
@@ -70,7 +70,8 @@ class QRCodeDartScanView extends StatefulWidget {
   QRCodeDartScanViewState createState() => QRCodeDartScanViewState();
 }
 
-class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBindingObserver {
+class QRCodeDartScanViewState extends State<QRCodeDartScanView>
+    with WidgetsBindingObserver {
   late QRCodeDartScanController controller;
   bool initialized = false;
   bool _isControllerDisposed = false;
@@ -165,28 +166,32 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
     if (widget.widthPreview != null && widget.heightPreview != null) {
       sizePreview = Size(widget.widthPreview!, widget.heightPreview!);
     }
+
     var scale = sizePreview.aspectRatio * camera.aspectRatio;
 
-    // to prevent scaling down, invert the value
+    // // to prevent scaling down, invert the value
     if (scale < 1) scale = 1 / scale;
 
-    return SizedBox(
-      key: Key(controller.state.value.typeCamera.toString()),
-      width: widget.widthPreview,
-      height: widget.heightPreview,
-      child: Stack(
-        children: [
-          Transform.scale(
-            scale: scale,
-            child: Center(
-              child: CameraPreview(
-                controller.cameraController!,
+    return ClipRRect(
+      child: SizedBox(
+        key: Key(controller.state.value.typeCamera.toString()),
+        width: widget.widthPreview,
+        height: widget.heightPreview,
+        child: Stack(
+          children: [
+            Transform.scale(
+              scale: scale,
+              child: Center(
+                child: CameraPreview(
+                  controller.cameraController!,
+                ),
               ),
             ),
-          ),
-          if (controller.state.value.typeScan == TypeScan.takePicture) _buildButton(),
-          widget.child ?? const SizedBox.shrink(),
-        ],
+            if (controller.state.value.typeScan == TypeScan.takePicture)
+              _buildButton(),
+            widget.child ?? const SizedBox.shrink(),
+          ],
+        ),
       ),
     );
   }

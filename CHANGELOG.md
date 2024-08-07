@@ -1,3 +1,6 @@
+## 0.8.3
+- Fix camera preview scale.
+
 ## 0.8.2
 - Remove debug prints
 
