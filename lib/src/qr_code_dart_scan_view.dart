@@ -75,6 +75,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   late QRCodeDartScanController controller;
   bool initialized = false;
   bool _isControllerDisposed = false;
+  Key _cameraKey = UniqueKey();
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -174,7 +175,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
 
     return ClipRRect(
       child: SizedBox(
-        key: Key(controller.state.value.typeCamera.toString()),
+        key: _cameraKey,
         width: widget.widthPreview,
         height: widget.heightPreview,
         child: Stack(
@@ -201,6 +202,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     if (state.initialized != initialized) {
       postFrame(() {
         setState(() {
+          _cameraKey = Key(state.typeCamera.toString());
           initialized = state.initialized;
         });
       });

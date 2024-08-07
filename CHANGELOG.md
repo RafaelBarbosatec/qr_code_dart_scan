@@ -1,3 +1,6 @@
+## NEXT
+- Camera key improvments
+
 ## 0.8.3
 - Fix camera preview scale.
 
