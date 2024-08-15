@@ -70,6 +70,13 @@ class IsolatePool {
   }
 
   static dynamic _processTask(dynamic message) {
-    return ImageDecoder.decodePlanes(message);
+    switch (message['type']) {
+      case 'planes':
+        return ImageDecoder.decodePlanes(message);
+      case 'image':
+        return ImageDecoder.decodeImage(message);
+    }
+
+    return Future.value();
   }
 }

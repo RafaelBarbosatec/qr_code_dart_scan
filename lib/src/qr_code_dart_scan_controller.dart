@@ -86,7 +86,10 @@ class QRCodeDartScanController {
       typeScan: typeScan,
     );
     _intervalScan = intervalScan;
-    _codeDartScanDecoder = QRCodeDartScanDecoder(formats: formats);
+    _codeDartScanDecoder = QRCodeDartScanDecoder(
+      formats: formats,
+      usePoolIsolate: true,
+    );
     _resolutionPreset = resolutionPreset;
     _lastScan = _LastScan(
       date: DateTime.now()

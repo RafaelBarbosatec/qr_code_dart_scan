@@ -35,7 +35,15 @@ class IsolateDecoder {
       invert: insverted,
     );
 
-    return compute(ImageDecoder.decodeImage, event.toMap());
+    var map = event.toMap();
+
+    if (pool != null) {
+      map['type'] = 'image';
+      final result = await pool!.runTask(map);
+      return result;
+    }
+
+    return compute(ImageDecoder.decodeImage, map);
   }
 
   Future<Result?> decodeCameraImage(
@@ -51,7 +59,14 @@ class IsolateDecoder {
       invert: insverted,
     );
 
-    final result = await pool!.runTask(event.toMap());
-    return result;
+    var map = event.toMap();
+
+    if (pool != null) {
+      map['type'] = 'planes';
+      final result = await pool!.runTask(map);
+      return result;
+    }
+
+    return compute(ImageDecoder.decodePlanes, map);
   }
 }

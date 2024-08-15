@@ -29,8 +29,9 @@ class QRCodeDartScanDecoder {
   ];
   final List<BarcodeFormat> formats;
   late IsolateDecoder _isolateDecoder;
+  final bool usePoolIsolate;
 
-  QRCodeDartScanDecoder({required this.formats}) {
+  QRCodeDartScanDecoder({required this.formats, this.usePoolIsolate = false}) {
     for (var format in formats) {
       if (!acceptedFormats.contains(format)) {
         throw Exception('$format format not supported in the moment');
@@ -39,7 +40,9 @@ class QRCodeDartScanDecoder {
     _isolateDecoder = IsolateDecoder(
       formats: formats,
     );
-    _isolateDecoder.start();
+    if (usePoolIsolate) {
+      _isolateDecoder.start();
+    }
   }
 
   Future<Result?> decodeCameraImage(
