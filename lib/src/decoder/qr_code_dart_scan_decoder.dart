@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
-import 'package:qr_code_dart_scan/src/decoder/isolate_decoder.dart';
 import 'package:zxing_lib/zxing.dart';
+
+import 'isolate_decoder.dart';
 
 ///
 /// Created by
@@ -35,7 +36,10 @@ class QRCodeDartScanDecoder {
         throw Exception('$format format not supported in the moment');
       }
     }
-    _isolateDecoder = IsolateDecoder(formats: formats);
+    _isolateDecoder = IsolateDecoder(
+      formats: formats,
+    );
+    _isolateDecoder.start();
   }
 
   Future<Result?> decodeCameraImage(
@@ -50,7 +54,6 @@ class QRCodeDartScanDecoder {
         insverted: scanInverted,
       );
     }
-
     return decoded;
   }
 
@@ -65,5 +68,9 @@ class QRCodeDartScanDecoder {
     }
 
     return decoded;
+  }
+
+  void dispose() {
+    _isolateDecoder.dispose();
   }
 }
