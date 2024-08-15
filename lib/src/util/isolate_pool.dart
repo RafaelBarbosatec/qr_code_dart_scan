@@ -3,6 +3,10 @@ import 'dart:collection';
 import 'dart:isolate';
 
 import 'package:qr_code_dart_scan/src/decoder/image_decoder.dart';
+enum IsolateTaskType{
+  planes,
+  image
+}
 
 class IsolatePool {
   final int size;
@@ -71,9 +75,9 @@ class IsolatePool {
 
   static dynamic _processTask(dynamic message) {
     switch (message['type']) {
-      case 'planes':
+      case IsolateTaskType.planes:
         return ImageDecoder.decodePlanes(message);
-      case 'image':
+      case IsolateTaskType.image:
         return ImageDecoder.decodeImage(message);
     }
 

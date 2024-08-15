@@ -38,7 +38,7 @@ class IsolateDecoder {
     var map = event.toMap();
 
     if (pool != null) {
-      map['type'] = 'image';
+      map['type'] =  IsolateTaskType.image;
       final result = await pool!.runTask(map);
       return result;
     }
@@ -62,7 +62,7 @@ class IsolateDecoder {
     var map = event.toMap();
 
     if (pool != null) {
-      map['type'] = 'planes';
+      map['type'] =  IsolateTaskType.planes;
       final result = await pool!.runTask(map);
       return result;
     }
