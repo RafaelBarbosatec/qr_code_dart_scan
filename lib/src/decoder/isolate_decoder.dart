@@ -2,13 +2,28 @@ import 'package:flutter/foundation.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_code_dart_scan/src/decoder/decode_event.dart';
 import 'package:qr_code_dart_scan/src/decoder/global_functions.dart';
-import 'package:qr_code_dart_scan/src/decoder/qr_code_dart_scan_multi_reader.dart';
-import 'package:zxing_lib/common.dart';
+import 'package:qr_code_dart_scan/src/util/isolate_pool.dart';
+
+import 'image_decoder.dart';
 
 class IsolateDecoder {
   final List<BarcodeFormat> formats;
+  final int countIsolates;
+  IsolatePool? pool;
 
-  IsolateDecoder({this.formats = QRCodeDartScanDecoder.acceptedFormats});
+  IsolateDecoder({
+    this.formats = QRCodeDartScanDecoder.acceptedFormats,
+    this.countIsolates = 2,
+  });
+
+  Future<void> start() {
+    pool = IsolatePool(countIsolates);
+    return pool!.start();
+  }
+
+  void dispose() {
+    pool?.dispose();
+  }
 
   Future<Result?> decodeFileImage(XFile file, {bool insverted = false}) async {
     final bytes = await file.readAsBytes();
@@ -23,7 +38,15 @@ class IsolateDecoder {
       invert: insverted,
     );
 
-    return compute(_decodeImage, event.toMap());
+    var map = event.toMap();
+
+    if (pool != null) {
+      map['type'] = IsolateTaskType.image;
+      final result = await pool!.runTask(map);
+      return result;
+    }
+
+    return compute(ImageDecoder.decodeImage, map);
   }
 
   Future<Result?> decodeCameraImage(
@@ -35,71 +58,15 @@ class IsolateDecoder {
       formats: formats,
       invert: insverted,
     );
-    return compute(decodePlanes, event.toMap());
-  }
-}
 
-Result? decodePlanes(Map<dynamic, dynamic> msg) {
-  try {
-    DecodeCameraImageEvent event = DecodeCameraImageEvent.fromMap(msg);
+    var map = event.toMap();
 
-    LuminanceSource source = transformToLuminanceSource(
-      event.cameraImage.planes,
-    );
-
-    var bitmap = BinaryBitmap(
-      HybridBinarizer(event.invert ? source.invert() : source),
-    );
-
-    final reader = QRCodeDartScanMultiReader(event.formats);
-    try {
-      return reader.decode(bitmap);
-    } catch (_) {
-      return null;
-    }
-  } catch (_) {
-    return null;
-  }
-}
-
-Future<Result?> _decodeImage(Map<dynamic, dynamic> map) async {
-  try {
-    final DecodeImageEvent event = DecodeImageEvent.fromMap(map);
-
-    var pixels = Uint8List(event.width * event.height);
-
-    for (int i = 0; i < pixels.length; i++) {
-      pixels[i] = _getLuminanceSourcePixel(event.image, i * 4);
+    if (pool != null) {
+      map['type'] = IsolateTaskType.planes;
+      final result = await pool!.runTask(map);
+      return result;
     }
 
-    final source = RGBLuminanceSource.orig(
-      event.width,
-      event.height,
-      pixels,
-    );
-
-    var bitmap = BinaryBitmap(
-      HybridBinarizer(event.invert ? source.invert() : source),
-    );
-
-    final reader = QRCodeDartScanMultiReader(event.formats);
-    try {
-      return reader.decode(bitmap);
-    } catch (_) {
-      return null;
-    }
-  } catch (e) {
-    return null;
+    return compute(ImageDecoder.decodePlanes, map);
   }
-}
-
-int _getLuminanceSourcePixel(List<int> byte, int index) {
-  if (byte.length <= index + 3) {
-    return 0xff;
-  }
-  final r = byte[index] & 0xff; // red
-  final g2 = (byte[index + 1] << 1) & 0x1fe; // 2 * green
-  final b = byte[index + 2]; // blue
-  // Calculate green-favouring average cheaply
-  return ((r + g2 + b) ~/ 4);
 }

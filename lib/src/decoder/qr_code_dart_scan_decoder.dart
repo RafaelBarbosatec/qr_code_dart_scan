@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
-import 'package:qr_code_dart_scan/src/decoder/isolate_decoder.dart';
 import 'package:zxing_lib/zxing.dart';
+
+import 'isolate_decoder.dart';
 
 ///
 /// Created by
@@ -25,17 +26,30 @@ class QRCodeDartScanDecoder {
     BarcodeFormat.code128,
     BarcodeFormat.ean8,
     BarcodeFormat.ean13,
+    BarcodeFormat.itf,
   ];
   final List<BarcodeFormat> formats;
   late IsolateDecoder _isolateDecoder;
+  final bool usePoolIsolate;
+  final int countIsolates;
 
-  QRCodeDartScanDecoder({required this.formats}) {
+  QRCodeDartScanDecoder({
+    required this.formats,
+    this.usePoolIsolate = false,
+    this.countIsolates = 2,
+  }) {
     for (var format in formats) {
       if (!acceptedFormats.contains(format)) {
         throw Exception('$format format not supported in the moment');
       }
     }
-    _isolateDecoder = IsolateDecoder(formats: formats);
+    _isolateDecoder = IsolateDecoder(
+      formats: formats,
+      countIsolates: countIsolates,
+    );
+    if (usePoolIsolate) {
+      _isolateDecoder.start();
+    }
   }
 
   Future<Result?> decodeCameraImage(
@@ -50,7 +64,6 @@ class QRCodeDartScanDecoder {
         insverted: scanInverted,
       );
     }
-
     return decoded;
   }
 
@@ -65,5 +78,9 @@ class QRCodeDartScanDecoder {
     }
 
     return decoded;
+  }
+
+  void dispose() {
+    _isolateDecoder.dispose();
   }
 }

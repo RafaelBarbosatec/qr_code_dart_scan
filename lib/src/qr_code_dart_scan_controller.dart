@@ -63,7 +63,8 @@ class QRCodeDartScanController {
   final ValueNotifier<PreviewState> state = ValueNotifier(const PreviewState());
   CameraController? cameraController;
   QRCodeDartScanDecoder? _codeDartScanDecoder;
-  QRCodeDartScanResolutionPreset _resolutionPreset = QRCodeDartScanResolutionPreset.medium;
+  QRCodeDartScanResolutionPreset _resolutionPreset =
+      QRCodeDartScanResolutionPreset.medium;
   bool scanEnabled = true;
   bool _scanInvertedQRCode = false;
   Duration _intervalScan = const Duration(seconds: 1);
@@ -85,7 +86,10 @@ class QRCodeDartScanController {
       typeScan: typeScan,
     );
     _intervalScan = intervalScan;
-    _codeDartScanDecoder = QRCodeDartScanDecoder(formats: formats);
+    _codeDartScanDecoder = QRCodeDartScanDecoder(
+      formats: formats,
+      usePoolIsolate: true,
+    );
     _resolutionPreset = resolutionPreset;
     _lastScan = _LastScan(
       date: DateTime.now()
@@ -211,11 +215,16 @@ class QRCodeDartScanController {
   }
 
   Future<void> changeCamera(TypeCamera typeCamera) async {
-    await dispose();
+    await _disposeController();
     await _initController(typeCamera);
   }
 
   Future<void> dispose() async {
+    _codeDartScanDecoder?.dispose();
+    return _disposeController();
+  }
+
+  Future<void> _disposeController() async {
     if (state.value.typeScan == TypeScan.live) {
       await cameraController?.stopImageStream();
     }
