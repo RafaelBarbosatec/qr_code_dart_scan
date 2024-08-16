@@ -1,5 +1,7 @@
 ## NEXT
 - Camera key improvments
+- Update camera pluggin to `0.11.0`
+- Performance improvements. Now using pool of isolates to process in live.
 
 ## 0.8.3
 - Fix camera preview scale.

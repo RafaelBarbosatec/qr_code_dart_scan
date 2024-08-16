@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  camera: ^0.10.5+9
+  camera: ^0.11.0
   zxing_lib: ^1.1.2
   image: ^4.1.6
   camera_platform_interface: ^2.7.3
