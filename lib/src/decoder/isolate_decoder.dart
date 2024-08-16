@@ -53,9 +53,6 @@ class IsolateDecoder {
     CameraImage image, {
     bool insverted = false,
   }) async {
-    if (pool == null) {
-      throw Exception('Should call start method before');
-    }
     final event = DecodeCameraImageEvent(
       cameraImage: image,
       formats: formats,
