@@ -26,12 +26,18 @@ class QRCodeDartScanDecoder {
     BarcodeFormat.code128,
     BarcodeFormat.ean8,
     BarcodeFormat.ean13,
+    BarcodeFormat.itf,
   ];
   final List<BarcodeFormat> formats;
   late IsolateDecoder _isolateDecoder;
   final bool usePoolIsolate;
+  final int countIsolates;
 
-  QRCodeDartScanDecoder({required this.formats, this.usePoolIsolate = false}) {
+  QRCodeDartScanDecoder({
+    required this.formats,
+    this.usePoolIsolate = false,
+    this.countIsolates = 2,
+  }) {
     for (var format in formats) {
       if (!acceptedFormats.contains(format)) {
         throw Exception('$format format not supported in the moment');
@@ -39,6 +45,7 @@ class QRCodeDartScanDecoder {
     }
     _isolateDecoder = IsolateDecoder(
       formats: formats,
+      countIsolates: countIsolates,
     );
     if (usePoolIsolate) {
       _isolateDecoder.start();

@@ -1,7 +1,8 @@
-## NEXT
+## 0.9.0
 - Camera key improvments
 - Update camera pluggin to `0.11.0`
 - Performance improvements. Now using pool of isolates to process in live.
+- Adds support to `itf`.
 
 ## 0.8.3
 - Fix camera preview scale.

@@ -8,13 +8,16 @@ import 'image_decoder.dart';
 
 class IsolateDecoder {
   final List<BarcodeFormat> formats;
-
+  final int countIsolates;
   IsolatePool? pool;
 
-  IsolateDecoder({this.formats = QRCodeDartScanDecoder.acceptedFormats});
+  IsolateDecoder({
+    this.formats = QRCodeDartScanDecoder.acceptedFormats,
+    this.countIsolates = 2,
+  });
 
-  Future start() {
-    pool = IsolatePool(2);
+  Future<void> start() {
+    pool = IsolatePool(countIsolates);
     return pool!.start();
   }
 
@@ -38,7 +41,7 @@ class IsolateDecoder {
     var map = event.toMap();
 
     if (pool != null) {
-      map['type'] =  IsolateTaskType.image;
+      map['type'] = IsolateTaskType.image;
       final result = await pool!.runTask(map);
       return result;
     }
@@ -62,7 +65,7 @@ class IsolateDecoder {
     var map = event.toMap();
 
     if (pool != null) {
-      map['type'] =  IsolateTaskType.planes;
+      map['type'] = IsolateTaskType.planes;
       final result = await pool!.runTask(map);
       return result;
     }
