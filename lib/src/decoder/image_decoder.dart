@@ -14,8 +14,16 @@ class ImageDecoder {
         event.cameraImage.planes,
       );
 
+      if (event.rotate) {
+        source = source.rotateCounterClockwise();
+      }
+
+      if (event.invert) {
+        source = source.invert();
+      }
+
       var bitmap = BinaryBitmap(
-        HybridBinarizer(event.invert ? source.invert() : source),
+        HybridBinarizer(source),
       );
 
       final reader = QRCodeDartScanMultiReader(event.formats);

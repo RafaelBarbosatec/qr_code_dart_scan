@@ -69,17 +69,20 @@ class DecodeImageEvent {
 
 class DecodeCameraImageEvent {
   final bool invert;
+  final bool rotate;
   final CameraImage cameraImage;
   final List<BarcodeFormat> formats;
 
   DecodeCameraImageEvent({
     required this.cameraImage,
     this.invert = false,
+    this.rotate = false,
     this.formats = const [],
   });
 
   DecodeCameraImageEvent.fromMap(Map map)
       : invert = map['invert'] as bool,
+        rotate = map['rotate'] as bool,
         cameraImage = _fromPlateformData(map),
         formats = map['formats']
             .map<BarcodeFormat>((f) => BarcodeFormat.values[f])
@@ -110,6 +113,7 @@ class DecodeCameraImageEvent {
   Map toMap() {
     return {
       'invert': invert,
+      'rotate': rotate,
       'image': cameraImage.toPlatformData(),
       'formats': formats.map((e) => e.index).toList(),
     };
@@ -117,11 +121,13 @@ class DecodeCameraImageEvent {
 
   DecodeCameraImageEvent copyWith({
     bool? invert,
+    bool? rotate,
     CameraImage? cameraImage,
     List<BarcodeFormat>? formats,
   }) {
     return DecodeCameraImageEvent(
       invert: invert ?? this.invert,
+      rotate: rotate ?? this.rotate,
       cameraImage: cameraImage ?? this.cameraImage,
       formats: formats ?? this.formats,
     );

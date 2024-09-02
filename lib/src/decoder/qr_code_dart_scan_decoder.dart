@@ -61,7 +61,7 @@ class QRCodeDartScanDecoder {
     if (scanInverted && decoded == null) {
       decoded = await _isolateDecoder.decodeCameraImage(
         image,
-        insverted: scanInverted,
+        isInverted: scanInverted,
       );
     }
     return decoded;
