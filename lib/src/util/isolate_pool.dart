@@ -34,8 +34,10 @@ class IsolatePool {
           _sendPorts.add(message);
           return;
         }
-        final completer = _taskQueue.removeFirst();
-        completer.complete(message);
+        if (_taskQueue.isNotEmpty) {
+          final completer = _taskQueue.removeFirst();
+          completer.complete(message);
+        }
       });
     }
     _initialized = true;
@@ -48,13 +50,14 @@ class IsolatePool {
     _taskQueue.add(completer);
 
     // Find the next available isolate
-    final sendPort = _sendPorts[_taskQueue.length % size];
+    final sendPort = _sendPorts[(_taskQueue.length - 1) % size];
     sendPort.send(message);
 
     return completer.future;
   }
 
   void dispose() {
+    _initialized = false;
     for (var isolate in _isolates) {
       isolate.kill(priority: Isolate.immediate);
     }
@@ -62,7 +65,6 @@ class IsolatePool {
     _isolates.clear();
     _sendPorts.clear();
     _taskQueue.clear();
-    _initialized = false;
   }
 
   static void _isolateEntry(SendPort mainSendPort) {

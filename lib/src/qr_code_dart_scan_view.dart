@@ -79,12 +79,13 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!(controller.cameraController?.value.isInitialized == true)) {
+    final cameraController = controller.cameraController;
+    if (cameraController == null || !cameraController.value.isInitialized) {
       return;
     }
     if (state == AppLifecycleState.inactive && !_isControllerDisposed) {
-      postFrame(() {
-        _isControllerDisposed = true;
+      _isControllerDisposed = true;
+      setState(() {
         initialized = false;
         controller.state.removeListener(_onStateListener);
         controller.dispose();
