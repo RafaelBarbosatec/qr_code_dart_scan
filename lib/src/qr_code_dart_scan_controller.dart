@@ -221,6 +221,7 @@ class QRCodeDartScanController {
 
   Future<void> dispose() async {
     _codeDartScanDecoder?.dispose();
+    state.value = const PreviewState();
     return _disposeController();
   }
 

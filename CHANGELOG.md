@@ -1,3 +1,7 @@
+## 0.9.1
+- Fix issue [#28](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/28)
+- Fix issue [#29](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/29)
+
 ## 0.9.0
 - Camera key improvments
 - Update camera pluggin to `0.11.0`

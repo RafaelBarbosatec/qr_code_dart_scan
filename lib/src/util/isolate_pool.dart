@@ -3,10 +3,8 @@ import 'dart:collection';
 import 'dart:isolate';
 
 import 'package:qr_code_dart_scan/src/decoder/image_decoder.dart';
-enum IsolateTaskType{
-  planes,
-  image
-}
+
+enum IsolateTaskType { planes, image }
 
 class IsolatePool {
   final int size;
@@ -36,8 +34,10 @@ class IsolatePool {
           _sendPorts.add(message);
           return;
         }
-        final completer = _taskQueue.removeFirst();
-        completer.complete(message);
+        if (_taskQueue.isNotEmpty) {
+          final completer = _taskQueue.removeFirst();
+          completer.complete(message);
+        }
       });
     }
     _initialized = true;
@@ -45,21 +45,26 @@ class IsolatePool {
 
   Future<dynamic> runTask(dynamic message) {
     if (!_initialized) return Future.value();
+    if (_sendPorts.isEmpty) return Future.value();
     final completer = Completer();
     _taskQueue.add(completer);
 
     // Find the next available isolate
-    final sendPort = _sendPorts[_taskQueue.length % size];
+    final sendPort = _sendPorts[(_taskQueue.length - 1) % size];
     sendPort.send(message);
 
     return completer.future;
   }
 
   void dispose() {
+    _initialized = false;
     for (var isolate in _isolates) {
       isolate.kill(priority: Isolate.immediate);
     }
     _resultStreamController.close();
+    _isolates.clear();
+    _sendPorts.clear();
+    _taskQueue.clear();
   }
 
   static void _isolateEntry(SendPort mainSendPort) {

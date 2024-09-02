@@ -51,12 +51,12 @@ class IsolateDecoder {
 
   Future<Result?> decodeCameraImage(
     CameraImage image, {
-    bool insverted = false,
+    bool isInverted = false,
   }) async {
     final event = DecodeCameraImageEvent(
       cameraImage: image,
       formats: formats,
-      invert: insverted,
+      invert: isInverted,
     );
 
     var map = event.toMap();
