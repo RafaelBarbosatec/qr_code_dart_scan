@@ -3,10 +3,8 @@ import 'dart:collection';
 import 'dart:isolate';
 
 import 'package:qr_code_dart_scan/src/decoder/image_decoder.dart';
-enum IsolateTaskType{
-  planes,
-  image
-}
+
+enum IsolateTaskType { planes, image }
 
 class IsolatePool {
   final int size;
@@ -45,6 +43,7 @@ class IsolatePool {
 
   Future<dynamic> runTask(dynamic message) {
     if (!_initialized) return Future.value();
+    if (_sendPorts.isEmpty) return Future.value();
     final completer = Completer();
     _taskQueue.add(completer);
 
@@ -60,6 +59,10 @@ class IsolatePool {
       isolate.kill(priority: Isolate.immediate);
     }
     _resultStreamController.close();
+    _isolates.clear();
+    _sendPorts.clear();
+    _taskQueue.clear();
+    _initialized = false;
   }
 
   static void _isolateEntry(SendPort mainSendPort) {
