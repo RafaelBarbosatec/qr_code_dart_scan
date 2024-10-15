@@ -1,3 +1,8 @@
+## 0.9.2
+- Adds method `stopScan` and `startScan` in `QRCodeDartScanController`.
+- Adds get `isLiveScan`.
+- Fix `changeCamera` exception.
+
 ## 0.9.1
 - Fix issue [#28](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/28)
 - Fix issue [#29](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/29)

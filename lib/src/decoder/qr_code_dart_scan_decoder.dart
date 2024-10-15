@@ -36,7 +36,7 @@ class QRCodeDartScanDecoder {
   QRCodeDartScanDecoder({
     required this.formats,
     this.usePoolIsolate = false,
-    this.countIsolates = 2,
+    this.countIsolates = 1,
   }) {
     for (var format in formats) {
       if (!acceptedFormats.contains(format)) {
