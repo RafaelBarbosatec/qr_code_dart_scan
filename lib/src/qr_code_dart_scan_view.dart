@@ -94,9 +94,9 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
 
   void stopCamera() {
     setState(() {
-      initialized = false;
       controller.state.removeListener(_onStateListener);
       controller.dispose();
+      initialized = false;
     });
   }
 
@@ -118,10 +118,10 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   void dispose() {
     super.dispose();
     WidgetsBinding.instance.removeObserver(this);
-    _isControllerDisposed = true;
-    initialized = false;
     controller.state.removeListener(_onStateListener);
     controller.dispose();
+    _isControllerDisposed = true;
+    initialized = false;
   }
 
   @override
