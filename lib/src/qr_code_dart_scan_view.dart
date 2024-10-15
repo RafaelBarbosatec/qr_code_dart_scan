@@ -85,23 +85,33 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     }
     if (state == AppLifecycleState.inactive && !_isControllerDisposed) {
       _isControllerDisposed = true;
-      setState(() {
-        initialized = false;
-        controller.state.removeListener(_onStateListener);
-        controller.dispose();
-      });
+      stopCamera();
     } else if (state == AppLifecycleState.resumed) {
       _initController();
     }
     super.didChangeAppLifecycleState(state);
   }
 
+  void stopCamera() {
+    setState(() {
+      initialized = false;
+      controller.state.removeListener(_onStateListener);
+      controller.dispose();
+    });
+  }
+
+  void startCamera() {
+    if (initialized) {
+      return;
+    }
+    _initController();
+  }
+
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addObserver(this);
-    _initController();
+    startCamera();
   }
 
   @override

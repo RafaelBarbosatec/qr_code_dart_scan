@@ -54,17 +54,33 @@ class LiveDecodePageState extends State<LiveDecodePage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text('isLive: ${_controller.isLiveScan}'),
                 Text('Text: ${currentResult?.text ?? 'Not found'}'),
                 Text('Format: ${currentResult?.barcodeFormat ?? 'Not found'}'),
                 ElevatedButton(
-                    onPressed: () {
-                      _controller.changeCamera(
-                        _controller.state.value.typeCamera == TypeCamera.front
-                            ? TypeCamera.back
-                            : TypeCamera.front,
-                      );
-                    },
-                    child: const Text('Change cam')),
+                  onPressed: () async {
+                    _controller.changeCamera(
+                      _controller.state.value.typeCamera == TypeCamera.front
+                          ? TypeCamera.back
+                          : TypeCamera.front,
+                    );
+                  },
+                  child: const Text('Change cam'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_controller.isLiveScan) {
+                      await _controller.stopScan();
+                      currentResult = null;
+                    } else {
+                      await _controller.startScan();
+                    }
+                    setState(() {});
+                  },
+                  child: Text(
+                    _controller.isLiveScan ? 'Stop scan' : 'Start scan',
+                  ),
+                ),
               ],
             ),
           ),

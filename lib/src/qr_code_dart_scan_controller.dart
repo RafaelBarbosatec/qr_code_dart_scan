@@ -65,7 +65,8 @@ class QRCodeDartScanController {
   QRCodeDartScanDecoder? _codeDartScanDecoder;
   QRCodeDartScanResolutionPreset _resolutionPreset =
       QRCodeDartScanResolutionPreset.medium;
-  bool scanEnabled = true;
+  bool _scanEnabled = false;
+  bool get isLiveScan => state.value.typeScan == TypeScan.live && _scanEnabled;
   bool _scanInvertedQRCode = false;
   Duration _intervalScan = const Duration(seconds: 1);
   _LastScan? _lastScan;
@@ -123,9 +124,8 @@ class QRCodeDartScanController {
       cameraController?.lockCaptureOrientation(_lockCaptureOrientation!);
     }
 
-    if (state.value.typeScan == TypeScan.live) {
-      cameraController?.startImageStream(_imageStream);
-    }
+    await startScan();
+
     state.value = state.value.copyWith(
       initialized: true,
     );
@@ -150,7 +150,6 @@ class QRCodeDartScanController {
   }
 
   void _imageStream(CameraImage image) async {
-    if (!scanEnabled) return;
     if (state.value.processing) return;
     state.value = state.value.copyWith(
       processing: true,
@@ -182,14 +181,28 @@ class QRCodeDartScanController {
       return;
     }
     if (type == TypeScan.live) {
-      cameraController?.startImageStream(_imageStream);
+      await startScan();
     } else {
-      await cameraController?.stopImageStream();
+      await stopScan();
     }
     state.value = state.value.copyWith(
       processing: false,
       typeScan: type,
     );
+  }
+
+  Future<void> stopScan() async {
+    if (state.value.typeScan == TypeScan.live) {
+      await cameraController?.stopImageStream();
+      _scanEnabled = false;
+    }
+  }
+
+  Future<void> startScan() async {
+    if (state.value.typeScan == TypeScan.live) {
+      await cameraController?.startImageStream(_imageStream);
+      _scanEnabled = true;
+    }
   }
 
   Future<void> takePictureAndDecode() async {
@@ -215,6 +228,7 @@ class QRCodeDartScanController {
   }
 
   Future<void> changeCamera(TypeCamera typeCamera) async {
+    state.value = const PreviewState();
     await _disposeController();
     await _initController(typeCamera);
   }
