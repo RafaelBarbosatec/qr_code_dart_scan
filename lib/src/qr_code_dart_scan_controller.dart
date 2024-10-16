@@ -192,14 +192,14 @@ class QRCodeDartScanController {
   }
 
   Future<void> stopScan() async {
-    if (state.value.typeScan == TypeScan.live) {
+    if (isLiveScan) {
       await cameraController?.stopImageStream();
       _scanEnabled = false;
     }
   }
 
   Future<void> startScan() async {
-    if (state.value.typeScan == TypeScan.live) {
+    if (state.value.typeScan == TypeScan.live && !_scanEnabled) {
       await cameraController?.startImageStream(_imageStream);
       _scanEnabled = true;
     }
