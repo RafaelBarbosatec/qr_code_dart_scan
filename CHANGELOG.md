@@ -1,5 +1,6 @@
 ## 0.9.3
 - Fix `stopImageStream` exception.
+- Enabled `upcA`,`upcE`,`upcEanExtension`.
 
 ## 0.9.2
 - Adds method `stopScan` and `startScan` in `QRCodeDartScanController`.
