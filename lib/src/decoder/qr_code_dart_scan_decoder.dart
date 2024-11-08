@@ -27,9 +27,6 @@ class QRCodeDartScanDecoder {
     BarcodeFormat.ean8,
     BarcodeFormat.ean13,
     BarcodeFormat.itf,
-    BarcodeFormat.upcA,
-    BarcodeFormat.upcE,
-    BarcodeFormat.upcEanExtension,
   ];
 
   final List<BarcodeFormat> formats;
