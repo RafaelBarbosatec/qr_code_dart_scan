@@ -1,3 +1,6 @@
+## next
+- adds methods `toggleFlash`,`setFlash`,`setFlashAuto` in QRCodeDartScanController.
+
 ## 0.9.3
 - Fix `stopImageStream` exception.
 
