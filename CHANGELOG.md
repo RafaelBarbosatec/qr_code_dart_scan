@@ -1,4 +1,4 @@
-## next
+## 0.9.4
 - adds methods `toggleFlash`,`setFlash`,`setFlashAuto` in QRCodeDartScanController.
 
 ## 0.9.3
