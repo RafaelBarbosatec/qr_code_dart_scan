@@ -14,7 +14,7 @@ class ImageDecoder {
         event.cameraImage.planes,
       );
 
-      if (event.rotate) {
+      if (event.rotate && source.isRotateSupported) {
         source = source.rotateCounterClockwise();
       }
 
