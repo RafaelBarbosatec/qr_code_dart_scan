@@ -49,6 +49,7 @@ class QRCodeDartScanView extends StatefulWidget {
   final OnResultInterceptorCallback? onResultInterceptor;
   final DeviceOrientation? lockCaptureOrientation;
   final bool forceReadPortrait;
+  final ValueChanged<String>? onCameraError;
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
@@ -66,6 +67,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.onResultInterceptor,
     this.lockCaptureOrientation,
     this.forceReadPortrait = false,
+    this.onCameraError,
   }) : super(key: key);
 
   @override
@@ -147,6 +149,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
       widget.intervalScan,
       widget.onResultInterceptor,
       widget.lockCaptureOrientation,
+      widget.onCameraError,
     );
   }
 
