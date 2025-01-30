@@ -54,11 +54,15 @@ class IsolateDecoder {
     bool isInverted = false,
     bool forceReadPortrait = false,
   }) async {
+    final isLandscape = image.height < image.width;
+
+    bool rotate = isLandscape && forceReadPortrait;
+
     final event = DecodeCameraImageEvent(
       cameraImage: image,
       formats: formats,
       invert: isInverted,
-      forceReadPortrait: forceReadPortrait,
+      rotate: rotate,
     );
 
     var map = event.toMap();

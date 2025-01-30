@@ -9,16 +9,10 @@ class ImageDecoder {
   static Result? decodePlanes(Map<dynamic, dynamic> msg) {
     try {
       DecodeCameraImageEvent event = DecodeCameraImageEvent.fromMap(msg);
-      final isLandscape = event.cameraImage.height < event.cameraImage.width;
-
-      bool rotateCounterClockwise = event.rotate;
-
-      if (isLandscape && event.forceReadPortrait) {
-        rotateCounterClockwise = true;
-      }
+      
       LuminanceSource source = transformToLuminanceSource(
         event.cameraImage.planes,
-        rotateCounterClockwise: rotateCounterClockwise,
+        rotateCounterClockwise: event.rotate,
       );
 
       if (event.invert) {
