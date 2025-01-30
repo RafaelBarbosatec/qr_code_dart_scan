@@ -25,7 +25,7 @@ class IsolateDecoder {
     pool?.dispose();
   }
 
-  Future<Result?> decodeFileImage(XFile file, {bool insverted = false}) async {
+  Future<Result?> decodeFileImage(XFile file, {bool isInverted = false}) async {
     final bytes = await file.readAsBytes();
 
     final image = await myDecodeImageFromList(bytes);
@@ -35,7 +35,7 @@ class IsolateDecoder {
       width: image.width,
       height: image.height,
       formats: formats,
-      invert: insverted,
+      invert: isInverted,
     );
 
     var map = event.toMap();
@@ -52,11 +52,13 @@ class IsolateDecoder {
   Future<Result?> decodeCameraImage(
     CameraImage image, {
     bool isInverted = false,
+    bool forceReadPortrait = false,
   }) async {
     final event = DecodeCameraImageEvent(
       cameraImage: image,
       formats: formats,
       invert: isInverted,
+      forceReadPortrait: forceReadPortrait,
     );
 
     var map = event.toMap();

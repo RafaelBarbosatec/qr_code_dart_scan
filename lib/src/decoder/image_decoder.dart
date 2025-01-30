@@ -12,6 +12,7 @@ class ImageDecoder {
 
       LuminanceSource source = transformToLuminanceSource(
         event.cameraImage.planes,
+        forceReadPortrait: event.forceReadPortrait,
       );
 
       if (event.rotate && source.isRotateSupported) {
