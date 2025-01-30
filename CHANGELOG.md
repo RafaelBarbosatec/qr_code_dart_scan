@@ -1,5 +1,4 @@
 ## 0.9.4
-
 - Fix issue [#30](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/30). Adds `forceReadPortrait` in `QRCodeDartScanView` to force read portrait image.
 - adds methods `toggleFlash`,`setFlash`,`setFlashAuto` in QRCodeDartScanController.
 
