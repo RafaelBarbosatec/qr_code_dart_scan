@@ -30,6 +30,14 @@ class LiveDecodePageState extends State<LiveDecodePage> {
   final QRCodeDartScanController _controller = QRCodeDartScanController();
 
   @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {});
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: QRCodeDartScanView(

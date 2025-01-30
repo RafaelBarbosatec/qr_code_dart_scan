@@ -23,7 +23,7 @@ Future<ui.Image> myDecodeImageFromList(Uint8List bytes) {
   return completer.future;
 }
 
-LuminanceSource transformToLuminanceSource(List<Plane> planes, {bool forceReadPortrait = false}) {
+LuminanceSource transformToLuminanceSource(List<Plane> planes, {bool rotateCounterClockwise = false}) {
   final e = planes.first;
   int width = e.bytesPerRow;
   int height = (e.bytes.length / width).round();
@@ -38,9 +38,7 @@ LuminanceSource transformToLuminanceSource(List<Plane> planes, {bool forceReadPo
     startIndex += width * height ~/ (p.bytesPerPixel ?? 1);
   }
 
-  final isLandscape = height < width;
-
-  if (isLandscape && forceReadPortrait) {
+  if (rotateCounterClockwise) {
     // rotaciona a imagem 90 graus
     final rotatedData = Uint8List(width * height * total);
     for (int y = 0; y < height; y++) {
