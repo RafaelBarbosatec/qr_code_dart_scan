@@ -23,19 +23,34 @@ Future<ui.Image> myDecodeImageFromList(Uint8List bytes) {
   return completer.future;
 }
 
-LuminanceSource transformToLuminanceSource(List<Plane> planes) {
+LuminanceSource transformToLuminanceSource(List<Plane> planes, {bool forceReadPortrait = false}) {
   final e = planes.first;
-  final width = e.bytesPerRow;
-  final height = (e.bytes.length / width).round();
+  int width = e.bytesPerRow;
+  int height = (e.bytes.length / width).round();
   final total = planes
       .map<double>((p) => (p.bytesPerPixel ?? 1).toDouble())
       .reduce((value, element) => value + 1 / element)
       .toInt();
-  final data = Uint8List(width * height * total);
+  Uint8List data = Uint8List(width * height * total);
   int startIndex = 0;
   for (var p in planes) {
     List.copyRange(data, startIndex, p.bytes);
     startIndex += width * height ~/ (p.bytesPerPixel ?? 1);
+  }
+
+  final isLandscape = height < width;
+
+  if (isLandscape && forceReadPortrait) {
+    // rotaciona a imagem 90 graus
+    final rotatedData = Uint8List(width * height * total);
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        rotatedData[x * height + height - y - 1] = data[y * width + x];
+      }
+    }
+    width = height;
+    height = width;
+    data = rotatedData;
   }
 
   return PlanarYUVLuminanceSource(

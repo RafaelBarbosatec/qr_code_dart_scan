@@ -14,8 +14,7 @@ import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 /// on 28/06/22
 class LiveDecodePage extends StatefulWidget {
   static const routeName = '/live';
-  static get route =>
-      {routeName: (BuildContext context) => const LiveDecodePage()};
+  static get route => {routeName: (BuildContext context) => const LiveDecodePage()};
   static open(BuildContext context) {
     Navigator.of(context).pushNamed(routeName);
   }
