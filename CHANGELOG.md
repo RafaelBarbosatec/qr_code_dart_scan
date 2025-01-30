@@ -1,3 +1,6 @@
+## 0.9.7
+- Adds `onCameraError` in `QRCodeDartScanView`.
+
 ## 0.9.6
 - Update dependencies.
 

@@ -85,7 +85,10 @@ dependency_overrides:
     return Scaffold(
       body: QRCodeDartScanView(
         scanInvertedQRCode: true, // enable scan invert qr code ( default = false)
-        
+        onCameraError: (String error) {
+          debugPrint('Error: $error');
+        },
+        // forceReadPortrait: false, // if true will force read portrait image (default = false)
         typeScan: TypeScan.live, // if TypeScan.takePicture will try decode when click to take a picture(default TypeScan.live)
         // intervalScan: const Duration(seconds:1)
         // onResultInterceptor: (old,new){

@@ -71,6 +71,7 @@ class QRCodeDartScanController {
   Duration _intervalScan = const Duration(seconds: 1);
   _LastScan? _lastScan;
   DeviceOrientation? _lockCaptureOrientation;
+  ValueChanged<String>? _onCameraError;
 
   Future<void> config(
     List<BarcodeFormat> formats,
@@ -82,9 +83,11 @@ class QRCodeDartScanController {
     Duration intervalScan,
     OnResultInterceptorCallback? onResultInterceptor,
     DeviceOrientation? lockCaptureOrientation,
+    ValueChanged<String>? onCameraError,
   ) async {
     _scanInvertedQRCode = scanInvertedQRCode;
     _forceReadPortrait = forceReadPortrait;
+    _onCameraError = onCameraError;
     state.value = state.value.copyWith(
       typeScan: typeScan,
     );
@@ -120,7 +123,14 @@ class QRCodeDartScanController {
       imageFormatGroup: ImageFormatGroup.yuv420,
     );
 
-    await cameraController?.initialize();
+    try {
+      await cameraController?.initialize();
+    } catch (e) {
+      if (e is CameraException) {
+        _onCameraError?.call(e.code);
+      }
+      return;
+    }
 
     if (_lockCaptureOrientation != null) {
       cameraController?.lockCaptureOrientation(_lockCaptureOrientation!);
