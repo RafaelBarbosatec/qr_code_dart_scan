@@ -28,6 +28,7 @@ class QRCodeDartScanDecoder {
     BarcodeFormat.ean13,
     BarcodeFormat.itf,
   ];
+
   final List<BarcodeFormat> formats;
   late IsolateDecoder _isolateDecoder;
   final bool usePoolIsolate;

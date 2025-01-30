@@ -254,6 +254,41 @@ class QRCodeDartScanController {
       await cameraController?.stopImageStream();
     }
   }
+
+  Future<void> setFlashAuto() async {
+    if (cameraController == null || !cameraController!.value.isInitialized) {
+      return;
+    }
+    try {
+      await cameraController?.setFlashMode(
+        FlashMode.auto,
+      );
+    } catch (e) {
+      debugPrint('Error setFlashAuto flash: $e');
+    }
+  }
+
+  Future<void> setFlash(bool on) async {
+    if (cameraController == null || !cameraController!.value.isInitialized) {
+      return;
+    }
+    try {
+      await cameraController?.setFlashMode(
+        on ? FlashMode.torch : FlashMode.off,
+      );
+    } catch (e) {
+      debugPrint('Error setFlash = $on flash: $e');
+    }
+  }
+
+  bool get isFlashOn => cameraController!.value.flashMode == FlashMode.torch;
+
+  Future<void> toggleFlash() async {
+    if (cameraController == null || !cameraController!.value.isInitialized) {
+      return;
+    }
+    await setFlash(!isFlashOn);
+  }
 }
 
 class _LastScan {

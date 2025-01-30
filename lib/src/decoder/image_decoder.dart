@@ -15,7 +15,7 @@ class ImageDecoder {
         forceReadPortrait: event.forceReadPortrait,
       );
 
-      if (event.rotate) {
+      if (event.rotate && source.isRotateSupported) {
         source = source.rotateCounterClockwise();
       }
 
