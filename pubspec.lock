@@ -34,13 +34,13 @@ packages:
     source: hosted
     version: "0.11.0"
   camera_android_camerax:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: camera_android_camerax
-      sha256: "8bd9cab67551642eb33ceb33ece7acc0890014fc90ddfae637c7e2b683657e65"
+      sha256: "2985b8e5fca62709ebb2150962b1dae0444ba0a112be888ccf21e8371a1406d9"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.7+2"
+    version: "0.6.10+1"
   camera_avfoundation:
     dependency: transitive
     description:
@@ -390,5 +390,5 @@ packages:
     source: hosted
     version: "1.1.2"
 sdks:
-  dart: ">=3.4.0 <4.0.0"
-  flutter: ">=3.22.0"
+  dart: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
