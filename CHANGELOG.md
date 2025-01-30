@@ -1,3 +1,6 @@
+## 0.9.6
+- Update dependencies.
+
 ## 0.9.5
 - Fix issue [#30](https://github.com/RafaelBarbosatec/qr_code_dart_scan/issues/30). Adds `forceReadPortrait` in `QRCodeDartScanView` to force read portrait image.
 
