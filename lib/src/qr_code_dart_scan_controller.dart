@@ -67,7 +67,7 @@ class QRCodeDartScanController {
   bool _scanEnabled = false;
   bool get isLiveScan => state.value.typeScan == TypeScan.live && _scanEnabled;
   bool _scanInvertedQRCode = false;
-  bool _forceReadPortrait = false;
+  bool _forceReadLandscape = false;
   Duration _intervalScan = const Duration(seconds: 1);
   _LastScan? _lastScan;
   DeviceOrientation? _lockCaptureOrientation;
@@ -78,7 +78,7 @@ class QRCodeDartScanController {
     TypeCamera typeCamera,
     TypeScan typeScan,
     bool scanInvertedQRCode,
-    bool forceReadPortrait,
+    bool forceReadLandscape,
     QRCodeDartScanResolutionPreset resolutionPreset,
     Duration intervalScan,
     OnResultInterceptorCallback? onResultInterceptor,
@@ -86,7 +86,7 @@ class QRCodeDartScanController {
     ValueChanged<String>? onCameraError,
   ) async {
     _scanInvertedQRCode = scanInvertedQRCode;
-    _forceReadPortrait = forceReadPortrait;
+    _forceReadLandscape = forceReadLandscape;
     _onCameraError = onCameraError;
     state.value = state.value.copyWith(
       typeScan: typeScan,
@@ -173,7 +173,7 @@ class QRCodeDartScanController {
     final decoded = await _codeDartScanDecoder?.decodeCameraImage(
       image,
       scanInverted: _scanInvertedQRCode,
-      forceReadPortrait: _forceReadPortrait,
+      forceReadLandscape: _forceReadLandscape,
     );
 
     if (decoded != null) {

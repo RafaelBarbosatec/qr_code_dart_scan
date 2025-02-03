@@ -56,18 +56,18 @@ class QRCodeDartScanDecoder {
   Future<Result?> decodeCameraImage(
     CameraImage image, {
     bool scanInverted = false,
-    bool forceReadPortrait = false,
+    bool forceReadLandscape = false,
   }) async {
     Result? decoded = await _isolateDecoder.decodeCameraImage(
       image,
-      forceReadPortrait: forceReadPortrait,
+      forceReadLandscape: forceReadLandscape,
     );
 
     if (scanInverted && decoded == null) {
       decoded = await _isolateDecoder.decodeCameraImage(
         image,
         isInverted: scanInverted,
-        forceReadPortrait: forceReadPortrait,
+        forceReadLandscape: forceReadLandscape,
       );
     }
     return decoded;

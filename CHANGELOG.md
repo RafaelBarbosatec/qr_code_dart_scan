@@ -1,3 +1,6 @@
+## next
+- Update `forceReadPortrait` to `forceReadLandscape`. Read image portrait by default.
+
 ## 0.9.7
 - Adds `onCameraError` in `QRCodeDartScanView`.
 
