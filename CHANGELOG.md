@@ -1,5 +1,6 @@
-## next
+## 0.9.8
 - Update `forceReadPortrait` to `forceReadLandscape`. Read image portrait by default.
+- Fix IOS camera orientation.
 
 ## 0.9.7
 - Adds `onCameraError` in `QRCodeDartScanView`.
