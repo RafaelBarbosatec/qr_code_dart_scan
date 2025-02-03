@@ -1,5 +1,5 @@
 ## 0.9.8
-- Update `forceReadPortrait` to `forceReadLandscape`. Read image portrait by default.
+- Rename param `forceReadPortrait` to `forceReadLandscape`. Read image portrait by default. If `forceReadLandscape` is true, the image will be read in landscape mode, helpful to read itf code.
 - Fix IOS camera orientation.
 
 ## 0.9.7
