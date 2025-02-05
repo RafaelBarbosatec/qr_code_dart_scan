@@ -40,6 +40,7 @@ Linux |    | |
 - CODE_128
 - EAN_8
 - EAN_13
+- ITF
 
 ## Installation
 
@@ -128,6 +129,10 @@ dependency_overrides:
     
 ```
 
+***ATTENTION***
+
+Always keep the camera page in portrait mode. If you need read some code like ITF rotating the device, just set `forceReadLandscape` = true.
+
 ### Decoder
 
 You may use only the our decoder if you want:
@@ -145,6 +150,7 @@ You may use only the our decoder if you want:
     //  BarcodeFormat.code128,
     //  BarcodeFormat.ean8,
     //  BarcodeFormat.ean13,
+    //  BarcodeFormat.itf,
     // ],
   );
 
