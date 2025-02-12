@@ -1,6 +1,6 @@
 name: qr_code_dart_scan
 description: A QR code scanner that works on both iOS and Android using dart decoder.
-version: 0.9.8
+version: 0.9.9
 homepage: https://github.com/RafaelBarbosatec/qr_code_dart_scan
 
 environment:

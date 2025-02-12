@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:qr_code_dart_scan/src/util/image_decode_orientation.dart';
 import 'package:zxing_lib/zxing.dart';
 
 import 'isolate_decoder.dart';
@@ -56,18 +57,18 @@ class QRCodeDartScanDecoder {
   Future<Result?> decodeCameraImage(
     CameraImage image, {
     bool scanInverted = false,
-    bool forceReadLandscape = false,
+    ImageDecodeOrientation imageDecodeOrientation = ImageDecodeOrientation.original,
   }) async {
     Result? decoded = await _isolateDecoder.decodeCameraImage(
       image,
-      forceReadLandscape: forceReadLandscape,
+      imageDecodeOrientation: imageDecodeOrientation,
     );
 
     if (scanInverted && decoded == null) {
       decoded = await _isolateDecoder.decodeCameraImage(
         image,
         isInverted: scanInverted,
-        forceReadLandscape: forceReadLandscape,
+        imageDecodeOrientation: imageDecodeOrientation,
       );
     }
     return decoded;

@@ -1,3 +1,6 @@
+## 0.9.9
+- Adds `imageDecodeOrientation` in `QRCodeDartScanView` to force read image in landscape or portrait orientation.
+
 ## 0.9.8
 - Rename param `forceReadPortrait` to `forceReadLandscape`. Read image portrait by default. If `forceReadLandscape` is true, the image will be read in landscape mode, helpful to read itf code.
 - Fix IOS camera orientation.

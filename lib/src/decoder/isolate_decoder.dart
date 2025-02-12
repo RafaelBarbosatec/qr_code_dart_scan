@@ -52,12 +52,21 @@ class IsolateDecoder {
   Future<Result?> decodeCameraImage(
     CameraImage image, {
     bool isInverted = false,
-    bool forceReadLandscape = false,
+    ImageDecodeOrientation imageDecodeOrientation = ImageDecodeOrientation.original,
   }) async {
     final isPortrait = image.height > image.width;
     final isLandscape = image.height < image.width;
-
-    bool rotate = (isLandscape && !forceReadLandscape) || (isPortrait && forceReadLandscape);
+    bool rotate = false;
+    switch (imageDecodeOrientation) {
+      case ImageDecodeOrientation.landscape:
+        rotate = isPortrait;
+        break;
+      case ImageDecodeOrientation.portrait:
+        rotate = isLandscape;
+        break;
+      case ImageDecodeOrientation.original:
+        break;
+    }
 
     final event = DecodeCameraImageEvent(
       cameraImage: image,

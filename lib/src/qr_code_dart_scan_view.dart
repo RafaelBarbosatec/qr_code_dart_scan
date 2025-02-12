@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
+import 'package:qr_code_dart_scan/src/util/image_decode_orientation.dart';
 import 'package:qr_code_dart_scan/src/util/qr_code_dart_scan_resolution_preset.dart';
 import 'package:zxing_lib/zxing.dart';
 
@@ -48,7 +49,7 @@ class QRCodeDartScanView extends StatefulWidget {
   final Duration intervalScan;
   final OnResultInterceptorCallback? onResultInterceptor;
   final DeviceOrientation? lockCaptureOrientation;
-  final bool forceReadLandscape;
+  final ImageDecodeOrientation imageDecodeOrientation;
   final ValueChanged<String>? onCameraError;
   const QRCodeDartScanView({
     Key? key,
@@ -66,7 +67,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.intervalScan = const Duration(seconds: 1),
     this.onResultInterceptor,
     this.lockCaptureOrientation,
-    this.forceReadLandscape = false,
+    this.imageDecodeOrientation = ImageDecodeOrientation.original,
     this.onCameraError,
   }) : super(key: key);
 
@@ -144,7 +145,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
       widget.typeCamera,
       widget.typeScan,
       widget.scanInvertedQRCode,
-      widget.forceReadLandscape,
+      widget.imageDecodeOrientation,
       widget.resolutionPreset,
       widget.intervalScan,
       widget.onResultInterceptor,
