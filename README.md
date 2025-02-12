@@ -89,7 +89,7 @@ dependency_overrides:
         onCameraError: (String error) {
           debugPrint('Error: $error');
         },
-        // forceReadLandscape: false, // if true will force read landscape image (default = false)
+        // imageDecodeOrientation: ImageDecodeOrientation.original, // you can force how the image orientation will be decoded (default = original)
         typeScan: TypeScan.live, // if TypeScan.takePicture will try decode when click to take a picture(default TypeScan.live)
         // intervalScan: const Duration(seconds:1)
         // onResultInterceptor: (old,new){
