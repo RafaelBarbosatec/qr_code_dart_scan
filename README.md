@@ -131,7 +131,23 @@ dependency_overrides:
 
 ***ATTENTION***
 
-Always keep the camera page in portrait mode. If you need read some code like ITF rotating the device, just set `forceReadLandscape` = true.
+Always use this package in portrait mode.
+
+There is a bug in the `camera` plugin that sometimes the image is rotated 90 degrees.
+
+To avoid this problem, you can use the `imageDecodeOrientation` parameter to force the image to be decoded in the correct orientation.
+
+For example, if you are reading an ITF code, you can force the image to be decoded in landscape orientation.
+
+```dart
+imageDecodeOrientation: ImageDecodeOrientation.landscape,
+```
+
+if you want to force the image to be decoded in portrait orientation, you can use the following code:
+
+```dart
+imageDecodeOrientation: ImageDecodeOrientation.portrait,
+```
 
 ### Decoder
 

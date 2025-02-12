@@ -1,3 +1,7 @@
+
+## 0.9.9+1
+- update README.md
+
 ## 0.9.9
 - Adds `imageDecodeOrientation` in `QRCodeDartScanView` to force read image in landscape or portrait orientation.
 
