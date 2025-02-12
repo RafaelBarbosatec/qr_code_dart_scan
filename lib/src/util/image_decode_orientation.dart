@@ -6,5 +6,6 @@ enum ImageDecodeOrientation {
   portrait,
 
   /// The original orientation of the image provided by the camera
+  /// Some devices provide images in landscape orientation like Android, and IOS sometimes provide images in portrait orientation sometimes in landscape orientation
   original,
 }
