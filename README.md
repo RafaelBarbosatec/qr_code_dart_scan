@@ -149,6 +149,10 @@ if you want to force the image to be decoded in portrait orientation, you can us
 imageDecodeOrientation: ImageDecodeOrientation.portrait,
 ```
 
+### Camera performance
+
+The decoder process is done in dart code. So, in flutter debug mode, you will not have a good performance. But in release mode, the performance is very better.
+
 ### Decoder
 
 You may use only the our decoder if you want:
