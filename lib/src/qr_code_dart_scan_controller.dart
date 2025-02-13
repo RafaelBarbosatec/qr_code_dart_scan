@@ -63,18 +63,17 @@ class QRCodeDartScanController {
   final ValueNotifier<PreviewState> state = ValueNotifier(const PreviewState());
   CameraController? cameraController;
   QRCodeDartScanDecoder? _codeDartScanDecoder;
-  QRCodeDartScanResolutionPreset _resolutionPreset =
-      QRCodeDartScanResolutionPreset.medium;
+  QRCodeDartScanResolutionPreset _resolutionPreset = QRCodeDartScanResolutionPreset.medium;
   bool _scanEnabled = false;
   bool get isLiveScan => state.value.typeScan == TypeScan.live && _scanEnabled;
   bool _scanInvertedQRCode = false;
-  ImageDecodeOrientation _imageDecodeOrientation =
-      ImageDecodeOrientation.original;
+  ImageDecodeOrientation _imageDecodeOrientation = ImageDecodeOrientation.original;
   Duration _intervalScan = const Duration(seconds: 1);
   _LastScan? _lastScan;
   DeviceOrientation? _lockCaptureOrientation;
   ValueChanged<String>? _onCameraError;
   int? _fps;
+  int? _videoBitrate;
 
   Future<void> config(
     List<BarcodeFormat> formats,
@@ -88,8 +87,10 @@ class QRCodeDartScanController {
     DeviceOrientation? lockCaptureOrientation,
     ValueChanged<String>? onCameraError,
     int? fps,
+    int? videoBitrate,
   ) async {
     _fps = fps;
+    _videoBitrate = videoBitrate;
     _scanInvertedQRCode = scanInvertedQRCode;
     _imageDecodeOrientation = imageDecodeOrientation;
     _onCameraError = onCameraError;
@@ -127,6 +128,7 @@ class QRCodeDartScanController {
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.yuv420,
       fps: _fps,
+      videoBitrate: _videoBitrate,
     );
 
     try {

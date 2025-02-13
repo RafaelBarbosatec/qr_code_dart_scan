@@ -1,3 +1,5 @@
+## 0.9.10
+- Adds `videoBitrate` and `fps` in `QRCodeDartScanView`.
 
 ## 0.9.9+1
 - update README.md
