@@ -51,6 +51,7 @@ class QRCodeDartScanView extends StatefulWidget {
   final DeviceOrientation? lockCaptureOrientation;
   final ImageDecodeOrientation imageDecodeOrientation;
   final ValueChanged<String>? onCameraError;
+  final int? fps;
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
@@ -69,13 +70,15 @@ class QRCodeDartScanView extends StatefulWidget {
     this.lockCaptureOrientation,
     this.imageDecodeOrientation = ImageDecodeOrientation.original,
     this.onCameraError,
+    this.fps,
   }) : super(key: key);
 
   @override
   QRCodeDartScanViewState createState() => QRCodeDartScanViewState();
 }
 
-class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBindingObserver {
+class QRCodeDartScanViewState extends State<QRCodeDartScanView>
+    with WidgetsBindingObserver {
   late QRCodeDartScanController controller;
   bool initialized = false;
   bool _isControllerDisposed = false;
@@ -151,6 +154,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
       widget.onResultInterceptor,
       widget.lockCaptureOrientation,
       widget.onCameraError,
+      widget.fps,
     );
   }
 
@@ -205,7 +209,8 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
                 ),
               ),
             ),
-            if (controller.state.value.typeScan == TypeScan.takePicture) _buildButton(),
+            if (controller.state.value.typeScan == TypeScan.takePicture)
+              _buildButton(),
             widget.child ?? const SizedBox.shrink(),
           ],
         ),
