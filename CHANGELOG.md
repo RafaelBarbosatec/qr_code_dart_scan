@@ -1,3 +1,6 @@
+## Next
+- Fix exception: CameraException(Uninitialized CameraController, startImageStream() was called on an uninitialized CameraController.);
+
 ## 0.9.10
 - Adds `videoBitrate` and `fps` in `QRCodeDartScanView`.
 
