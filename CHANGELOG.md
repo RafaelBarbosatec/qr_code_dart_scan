@@ -1,4 +1,4 @@
-## Next
+## 0.9.11
 - Fix exception: CameraException(Uninitialized CameraController, startImageStream() was called on an uninitialized CameraController.);
 
 ## 0.9.10
