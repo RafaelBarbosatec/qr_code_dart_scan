@@ -1,5 +1,5 @@
 import 'package:qr_code_dart_decoder/src/camera/camera_decode_event.dart';
-import 'package:qr_code_dart_decoder/src/qr_code_dart_scan_multi_reader.dart';
+import 'package:qr_code_dart_decoder/src/multi_reader.dart';
 import 'package:qr_code_dart_decoder/src/util/liminance_mapper.dart';
 import 'package:zxing_lib/common.dart';
 import 'package:zxing_lib/zxing.dart';
@@ -22,7 +22,7 @@ abstract class CameraDecode {
         HybridBinarizer(source),
       );
 
-      final reader = QRCodeDartScanMultiReader(event.formats);
+      final reader = MultiReader(event.formats);
 
       return reader.decode(bitmap);
     } catch (_) {

@@ -19,12 +19,12 @@ import 'package:zxing_lib/zxing.dart';
 ///
 /// Rafaelbarbosatec
 /// on 16/08/21
-class QRCodeDartScanMultiReader {
+class MultiReader {
   final List<BarcodeFormat> formats;
 
   final List<Reader> _readers = [];
 
-  QRCodeDartScanMultiReader(this.formats) {
+  MultiReader(this.formats) {
     for (var format in formats) {
       switch (format) {
         case BarcodeFormat.aztec:

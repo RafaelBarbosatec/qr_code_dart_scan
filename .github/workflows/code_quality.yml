@@ -30,11 +30,11 @@ jobs:
           cd packages/qr_code_dart_decoder
           flutter pub get
 
-      # - name: Check lint errors
-      #   run: |
-      #     flutter analyze .
-      #     cd packages/qr_code_dart_decoder
-      #     flutter analyze .
+      - name: Check lint errors
+        run: |
+          flutter analyze .
+          cd packages/qr_code_dart_decoder
+          flutter analyze .
 
       - name: Run tests
         run: |

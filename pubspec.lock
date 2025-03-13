@@ -275,9 +275,10 @@ packages:
   qr_code_dart_decoder:
     dependency: "direct main"
     description:
-      path: "packages/qr_code_dart_decoder"
-      relative: true
-    source: path
+      name: qr_code_dart_decoder
+      sha256: bf90cbf6da2239002080ea41477d96435bbe06b94bc219229004986638e1cba6
+      url: "https://pub.dev"
+    source: hosted
     version: "0.0.1"
   sky_engine:
     dependency: transitive
