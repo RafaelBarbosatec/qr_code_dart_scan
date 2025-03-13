@@ -30,7 +30,7 @@ class FileDecodeEvent {
 
   FileDecodeEvent.fromMap(Map map)
       : invert = map['invert'] as bool,
-        image = map['image'] as Uint8List,
+        image = Uint8List.fromList((map['image'] as List).cast<int>()),
         width = map['width'] as int,
         height = map['height'] as int,
         formats = map['formats'].map<BarcodeFormat>((f) => BarcodeFormat.values[f]).toList();
@@ -38,7 +38,7 @@ class FileDecodeEvent {
   Map toMap() {
     return {
       'invert': invert,
-      'image': image,
+      'image': image.toList(),
       'width': width,
       'height': height,
       'formats': formats.map((e) => e.index).toList(),

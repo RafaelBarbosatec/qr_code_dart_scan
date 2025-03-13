@@ -117,17 +117,5 @@ void main() {
       // Note: formats is missing in fromMap implementation
       expect(recreatedEvent.formats, isEmpty);
     });
-
-    test('fromMap handles missing formats field', () {
-      final map = {
-        'invert': true,
-        'rotate': true,
-        'yuv420Planes': [testYuv420Planes.first.toMap()],
-      };
-
-      final event = CameraDecodeEvent.fromMap(map);
-
-      expect(event.formats, isEmpty);
-    });
   });
 }
