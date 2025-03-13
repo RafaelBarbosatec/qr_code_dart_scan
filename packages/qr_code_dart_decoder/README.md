@@ -43,6 +43,31 @@ Future<void> decodeQrFromImage(Uint8List imageBytes) async {
     print('No QR code found');
   }
 }
+
+Future<void> decodeQrFromCamera(CamperaImage image) async {
+  // Create decoder instance
+  final decoder = QrCodeDartDecoder(
+    formats: [BarcodeFormat.qrCode],
+  );
+
+  List<Yuv420Planes> yuv420Planes = image.planes
+        .map((e) => Yuv420Planes(
+              bytes: e.bytes,
+              bytesPerRow: e.bytesPerRow,
+              bytesPerPixel: e.bytesPerPixel,
+              width: e.width,
+              height: e.height,
+            ))
+        .toList();
+  
+  // Decode the image
+  final result = await decoder.decodeCameraImage(yuv420Planes);
+  if (result != null) {
+    print('Decoded text: ${result.text}');
+  } else {
+    print('No QR code found');
+  }
+}
 ```
 
 ## Camera Stream Processing
