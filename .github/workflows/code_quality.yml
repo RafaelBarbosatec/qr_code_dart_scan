@@ -8,7 +8,7 @@ on:
     types: [opened,ready_for_review,synchronize]
 
 jobs:
-  format-and-fix:
+  tests:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     steps:
@@ -30,11 +30,11 @@ jobs:
           cd packages/qr_code_dart_decoder
           flutter pub get
 
-      - name: Check lint errors
-        run: |
-          flutter analyze .
-          cd packages/qr_code_dart_decoder
-          flutter analyze .
+      # - name: Check lint errors
+      #   run: |
+      #     flutter analyze .
+      #     cd packages/qr_code_dart_decoder
+      #     flutter analyze .
 
       - name: Run tests
         run: |

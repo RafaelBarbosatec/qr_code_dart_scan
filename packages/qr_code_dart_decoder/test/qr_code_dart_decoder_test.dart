@@ -23,7 +23,7 @@ void main() {
   });
 
   test('decodeCameraImage', () async {
-    final file = File('test/fixtures/plane_test.json');
+    final file = File('test/fixtures/plane_qrcode.json');
     final jsonString = await file.readAsString();
     final jsonData = json.decode(jsonString);
     final yuv420Planes = (jsonData as List)
