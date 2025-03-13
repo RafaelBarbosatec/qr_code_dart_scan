@@ -16,7 +16,7 @@ dependencies:
   camera_platform_interface: ^2.7.3
   camera_android_camerax: ^0.6.10+1
   equatable: ^2.0.5
-  qr_code_dart_decoder: ^0.0.1
+  qr_code_dart_decoder: ^0.0.2
 
 dev_dependencies:
   flutter_test:
