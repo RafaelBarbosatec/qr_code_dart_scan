@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
+import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:qr_code_dart_scan/src/util/image_decode_orientation.dart';
-import 'package:zxing_lib/zxing.dart';
 
 import 'isolate_decoder.dart';
 

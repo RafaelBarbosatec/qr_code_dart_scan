@@ -34,6 +34,7 @@ class CameraDecodeEvent {
       'invert': invert,
       'rotate': rotate,
       'yuv420Planes': yuv420Planes.map((e) => e.toMap()).toList(),
+      'formats': formats.map((e) => e.name).toList(),
     };
   }
 
@@ -44,6 +45,7 @@ class CameraDecodeEvent {
       yuv420Planes: (map['yuv420Planes'] as List)
           .map((e) => Yuv420Planes.fromMap((e as Map).cast()))
           .toList(),
+      formats: (map['formats'] as List).map((e) => BarcodeFormat.values.byName(e)).toList(),
     );
   }
 }

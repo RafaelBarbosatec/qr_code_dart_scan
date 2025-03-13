@@ -12,10 +12,12 @@ dependencies:
 
   camera: ^0.11.0
   zxing_lib: ^1.1.2
-  image: ^4.1.6
+  image: ^4.5.1
   camera_platform_interface: ^2.7.3
   camera_android_camerax: ^0.6.10+1
   equatable: ^2.0.5
+  qr_code_dart_decoder:
+    path: packages/qr_code_dart_decoder
 
 dev_dependencies:
   flutter_test:

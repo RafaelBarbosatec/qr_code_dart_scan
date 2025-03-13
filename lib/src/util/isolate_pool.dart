@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:isolate';
 
-import 'package:qr_code_dart_scan/src/decoder/image_decoder.dart';
+import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 
 enum IsolateTaskType { planes, image }
 
@@ -11,8 +11,6 @@ class IsolatePool {
   final List<Isolate> _isolates = [];
   final List<SendPort> _sendPorts = [];
   final Queue<Completer> _taskQueue = Queue();
-  final StreamController<dynamic> _resultStreamController =
-      StreamController.broadcast();
   bool _initialized = false;
 
   IsolatePool(this.size);
@@ -61,7 +59,6 @@ class IsolatePool {
     for (var isolate in _isolates) {
       isolate.kill(priority: Isolate.immediate);
     }
-    _resultStreamController.close();
     _isolates.clear();
     _sendPorts.clear();
     _taskQueue.clear();
@@ -81,9 +78,9 @@ class IsolatePool {
   static dynamic _processTask(dynamic message) {
     switch (message['type']) {
       case IsolateTaskType.planes:
-        return ImageDecoder.decodePlanes(message);
+        return CameraDecode.decode(message);
       case IsolateTaskType.image:
-        return ImageDecoder.decodeImage(message);
+        return FileDecode.decode(message);
     }
 
     return Future.value();
