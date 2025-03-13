@@ -43,7 +43,7 @@ class Yuv420Planes {
 
   factory Yuv420Planes.fromMap(Map<String, dynamic> map) {
     return Yuv420Planes(
-      bytes: Uint8List.fromList(map['bytes'] as List<int>),
+      bytes: Uint8List.fromList((map['bytes'] as List).cast<int>()),
       bytesPerPixel: map['bytesPerPixel'] != null ? map['bytesPerPixel'] as int : null,
       bytesPerRow: map['bytesPerRow'] as int,
       height: map['height'] != null ? map['height'] as int : null,
