@@ -1,5 +1,4 @@
 import 'package:qr_code_dart_decoder/src/camera/camera_decode_event.dart';
-import 'package:qr_code_dart_decoder/src/multi_reader.dart';
 import 'package:qr_code_dart_decoder/src/util/liminance_mapper.dart';
 import 'package:zxing_lib/common.dart';
 import 'package:zxing_lib/zxing.dart';
@@ -14,17 +13,19 @@ abstract class CameraDecode {
         rotateCounterClockwise: event.rotate,
       );
 
-      if (event.invert) {
-        source = source.invert();
-      }
-
       var bitmap = BinaryBitmap(
         HybridBinarizer(source),
       );
 
-      final reader = MultiReader(event.formats);
+      final reader = MultiFormatReader();
 
-      return reader.decode(bitmap);
+      return reader.decode(
+        bitmap,
+        DecodeHint(
+          possibleFormats: event.formats,
+          alsoInverted: event.invert,
+        ),
+      );
     } catch (_) {
       return null;
     }

@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
-import 'package:qr_code_dart_decoder/src/multi_reader.dart';
+import 'package:qr_code_dart_decoder/src/util/liminance_mapper.dart';
 import 'package:zxing_lib/common.dart';
 import 'package:zxing_lib/zxing.dart';
 
@@ -14,7 +14,7 @@ abstract class FileDecode {
       final imageBytes = Uint8List.view(event.image.buffer);
 
       for (int i = 0, j = 0; i < pixelCount; i++, j += 4) {
-        pixels[i] = _getLuminanceSourcePixel(imageBytes, j);
+        pixels[i] = LiminanceMapper.getLuminanceSourcePixel(imageBytes, j);
       }
 
       final source = RGBLuminanceSource.orig(
@@ -22,25 +22,22 @@ abstract class FileDecode {
         event.height,
         pixels,
       );
-      final bitmap = BinaryBitmap(
-        HybridBinarizer(event.invert ? source.invert() : source),
-      );
-      final reader = MultiReader(event.formats);
 
-      return reader.decode(bitmap);
+      final bitmap = BinaryBitmap(
+        HybridBinarizer(source),
+      );
+
+      final reader = MultiFormatReader();
+
+      return reader.decode(
+        bitmap,
+        DecodeHint(
+          possibleFormats: event.formats,
+          alsoInverted: event.invert,
+        ),
+      );
     } catch (e) {
       return null;
     }
-  }
-
-  static int _getLuminanceSourcePixel(List<int> byte, int index) {
-    if (byte.length <= index + 3) {
-      return 0xff;
-    }
-    final r = byte[index] & 0xff; // red
-    final g2 = (byte[index + 1] << 1) & 0x1fe; // 2 * green
-    final b = byte[index + 2]; // blue
-    // Calculate green-favouring average cheaply
-    return ((r + g2 + b) ~/ 4);
   }
 }

@@ -59,37 +59,21 @@ class QRCodeDartScanDecoder {
     bool scanInverted = false,
     ImageDecodeOrientation imageDecodeOrientation = ImageDecodeOrientation.original,
   }) async {
-    Result? decoded = await _isolateDecoder.decodeCameraImage(
+    return _isolateDecoder.decodeCameraImage(
       image,
+      isInverted: scanInverted,
       imageDecodeOrientation: imageDecodeOrientation,
     );
-
-    if (scanInverted && decoded == null) {
-      decoded = await _isolateDecoder.decodeCameraImage(
-        image,
-        isInverted: scanInverted,
-        imageDecodeOrientation: imageDecodeOrientation,
-      );
-    }
-    return decoded;
   }
 
   Future<Result?> decodeFile(
     XFile file, {
     bool scanInverted = false,
   }) async {
-    Result? decoded = await _isolateDecoder.decodeFileImage(
+    return _isolateDecoder.decodeFileImage(
       file,
+      isInverted: scanInverted,
     );
-
-    if (scanInverted && decoded == null) {
-      decoded = await _isolateDecoder.decodeFileImage(
-        file,
-        isInverted: scanInverted,
-      );
-    }
-
-    return decoded;
   }
 
   void dispose() {

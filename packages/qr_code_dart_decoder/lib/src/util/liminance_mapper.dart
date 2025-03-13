@@ -22,23 +22,21 @@ abstract class LiminanceMapper {
       startIndex += width * height ~/ (p.bytesPerPixel ?? 1);
     }
 
-    if (rotateCounterClockwise) {
-      // rotaciona a imagem 90 graus
-      final rotatedData = Uint8List(width * height * total);
-      for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-          rotatedData[x * height + height - y - 1] = data[y * width + x];
-        }
-      }
-      width = height;
-      height = width;
-      data = rotatedData;
-    }
-
     return PlanarYUVLuminanceSource(
       data,
       width,
       height,
     );
+  }
+
+  static int getLuminanceSourcePixel(List<int> byte, int index) {
+    if (byte.length <= index + 3) {
+      return 0xff;
+    }
+    final r = byte[index] & 0xff; // red
+    final g2 = (byte[index + 1] << 1) & 0x1fe; // 2 * green
+    final b = byte[index + 2]; // blue
+    // Calculate green-favouring average cheaply
+    return ((r + g2 + b) ~/ 4);
   }
 }
