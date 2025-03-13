@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:test/test.dart';
@@ -18,5 +19,24 @@ void main() {
     final result = await decoder.decodeFile(bytes);
     expect(result, isNotNull);
     expect(result?.text, testResult);
+    expect(result?.barcodeFormat, BarcodeFormat.qrCode);
+  });
+
+  test('decodeCameraImage', () async {
+    final file = File('test/fixtures/plane_qrcode.json');
+    final jsonString = await file.readAsString();
+    final jsonData = json.decode(jsonString);
+    final yuv420Planes = (jsonData as List)
+        .map(
+          (e) => Yuv420Planes.fromMap(
+            (e as Map).cast(),
+          ),
+        )
+        .toList();
+
+    final result = await decoder.decodeCameraImage(yuv420Planes);
+    expect(result, isNotNull);
+    expect(result?.text, isNotNull);
+    expect(result?.barcodeFormat, BarcodeFormat.qrCode);
   });
 }

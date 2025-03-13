@@ -15,7 +15,7 @@ export 'package:qr_code_dart_decoder/src/camera/camera_decode_event.dart';
 export 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
-export 'package:zxing_lib/zxing.dart' show BarcodeFormat;
+export 'package:zxing_lib/zxing.dart' show BarcodeFormat, Result;
 
 /// A Calculator.
 class QrCodeDartDecoder {
@@ -38,7 +38,7 @@ class QrCodeDartDecoder {
   });
 
   Future<Result?> decodeFile(Uint8List bytes, {bool isInverted = false}) async {
-    final image = await decodeImage(bytes);
+    final image = decodeImage(bytes);
     final event = FileDecodeEvent(
       image: image!.buffer.asUint8List(),
       invert: isInverted,

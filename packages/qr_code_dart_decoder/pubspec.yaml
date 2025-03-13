@@ -1,16 +1,15 @@
 name: qr_code_dart_decoder
-description: "A new Flutter package project."
+description: "A Dart package for decoding QR codes and other barcode formats using the ZXing library"
 version: 0.0.1
-homepage:
+homepage: https://github.com/RafaelBarbosatec/qr_code_dart_scan/tree/main/packages/qr_code_dart_decoder
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=2.16.0 <4.0.0"
 
 dependencies:
   zxing_lib: ^1.1.2
   image: ^4.1.6
 
 dev_dependencies:
-  mocktail: ^1.0.0
   test: ^1.19.2
-  very_good_analysis: ^5.1.0
+  flutter_lints: ^2.0.0
