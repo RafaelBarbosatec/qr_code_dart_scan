@@ -22,6 +22,15 @@ void main() {
     expect(result?.barcodeFormat, BarcodeFormat.qrCode);
   });
 
+   test('decodeFile: should not find ', () async {
+    decoder = QrCodeDartDecoder(
+      formats: [BarcodeFormat.itf],
+    );
+    final bytes = base64Decode(testImageBase64);
+    final result = await decoder.decodeFile(bytes);
+    expect(result, isNull);
+  });
+
   test('decodeCameraImage', () async {
     final file = File('test/fixtures/plane_qrcode.json');
     final jsonString = await file.readAsString();
@@ -38,5 +47,24 @@ void main() {
     expect(result, isNotNull);
     expect(result?.text, isNotNull);
     expect(result?.barcodeFormat, BarcodeFormat.qrCode);
+  });
+
+  test('decodeCameraImage: should not find', () async {
+    decoder = QrCodeDartDecoder(
+      formats: [BarcodeFormat.itf],
+    );
+    final file = File('test/fixtures/plane_qrcode.json');
+    final jsonString = await file.readAsString();
+    final jsonData = json.decode(jsonString);
+    final yuv420Planes = (jsonData as List)
+        .map(
+          (e) => Yuv420Planes.fromMap(
+            (e as Map).cast(),
+          ),
+        )
+        .toList();
+
+    final result = await decoder.decodeCameraImage(yuv420Planes);
+    expect(result, isNull);
   });
 }

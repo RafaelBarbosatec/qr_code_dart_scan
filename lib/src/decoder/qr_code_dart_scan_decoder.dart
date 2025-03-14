@@ -32,12 +32,10 @@ class QRCodeDartScanDecoder {
 
   final List<BarcodeFormat> formats;
   late IsolateDecoder _isolateDecoder;
-  final bool usePoolIsolate;
   final int countIsolates;
 
   QRCodeDartScanDecoder({
     required this.formats,
-    this.usePoolIsolate = false,
     this.countIsolates = 1,
   }) {
     for (var format in formats) {
@@ -48,10 +46,7 @@ class QRCodeDartScanDecoder {
     _isolateDecoder = IsolateDecoder(
       formats: formats,
       countIsolates: countIsolates,
-    );
-    if (usePoolIsolate) {
-      _isolateDecoder.start();
-    }
+    )..start();
   }
 
   Future<Result?> decodeCameraImage(

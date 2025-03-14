@@ -22,6 +22,20 @@ abstract class LiminanceMapper {
       startIndex += width * height ~/ (p.bytesPerPixel ?? 1);
     }
 
+    if (rotateCounterClockwise) {
+      // rotaciona a imagem 90 graus
+      final rotatedData = Uint8List(width * height * total);
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          rotatedData[x * height + height - y - 1] = data[y * width + x];
+        }
+      }
+      final temp = width;
+      width = height;
+      height = temp;
+      data = rotatedData;
+    }
+
     return PlanarYUVLuminanceSource(
       data,
       width,

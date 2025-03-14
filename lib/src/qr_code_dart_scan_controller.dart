@@ -93,16 +93,16 @@ class QRCodeDartScanController {
     _videoBitrate = videoBitrate;
     _scanInvertedQRCode = scanInvertedQRCode;
     _imageDecodeOrientation = imageDecodeOrientation;
+    _lockCaptureOrientation = lockCaptureOrientation;
     _onCameraError = onCameraError;
+    _intervalScan = intervalScan;
+    _resolutionPreset = resolutionPreset;
     state.value = state.value.copyWith(
       typeScan: typeScan,
     );
-    _intervalScan = intervalScan;
     _codeDartScanDecoder = QRCodeDartScanDecoder(
       formats: formats,
-      usePoolIsolate: true,
     );
-    _resolutionPreset = resolutionPreset;
     _lastScan = _LastScan(
       date: DateTime.now()
         ..subtract(
@@ -110,9 +110,6 @@ class QRCodeDartScanController {
         ),
       onResultInterceptor: onResultInterceptor,
     );
-    if (lockCaptureOrientation != null) {
-      _lockCaptureOrientation = lockCaptureOrientation;
-    }
     await _initController(typeCamera);
   }
 
@@ -122,6 +119,10 @@ class QRCodeDartScanController {
       typeCamera: typeCamera,
     );
     final camera = await _getCamera(typeCamera);
+    if (camera == null) {
+      _onCameraError?.call('camera_not_found ($typeCamera)');
+      return;
+    }
     cameraController = CameraController(
       camera,
       _resolutionPreset.toResolutionPreset(),
@@ -133,15 +134,16 @@ class QRCodeDartScanController {
 
     try {
       await cameraController?.initialize();
+      if (_lockCaptureOrientation != null) {
+        cameraController?.lockCaptureOrientation(_lockCaptureOrientation!);
+      }
     } catch (e) {
       if (e is CameraException) {
         _onCameraError?.call(e.code);
+      } else {
+        _onCameraError?.call(e.toString());
       }
       return;
-    }
-
-    if (_lockCaptureOrientation != null) {
-      cameraController?.lockCaptureOrientation(_lockCaptureOrientation!);
     }
 
     await startScan();
@@ -151,7 +153,7 @@ class QRCodeDartScanController {
     );
   }
 
-  Future<CameraDescription> _getCamera(TypeCamera typeCamera) async {
+  Future<CameraDescription?> _getCamera(TypeCamera typeCamera) async {
     final CameraLensDirection lensDirection;
     switch (typeCamera) {
       case TypeCamera.back:
@@ -163,10 +165,13 @@ class QRCodeDartScanController {
     }
 
     final cameras = await availableCameras();
-    return cameras.firstWhere(
-      (camera) => camera.lensDirection == lensDirection,
-      orElse: () => cameras.first,
-    );
+    try {
+      return cameras.firstWhere(
+        (camera) => camera.lensDirection == lensDirection,
+      );
+    } catch (e) {
+      return null;
+    }
   }
 
   void _imageStream(CameraImage image) async {
