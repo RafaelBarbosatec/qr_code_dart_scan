@@ -1,3 +1,7 @@
+## 0.0.3
+
+* Adds rotate
+
 ## 0.0.2
 
 * Update MultiFormatReader.
