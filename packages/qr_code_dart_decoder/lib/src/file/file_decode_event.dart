@@ -19,6 +19,7 @@ class FileDecodeEvent {
   final int width;
   final int height;
   final List<BarcodeFormat> formats;
+  final bool rotate;
 
   FileDecodeEvent({
     required this.image,
@@ -26,6 +27,7 @@ class FileDecodeEvent {
     this.formats = const [],
     this.width = 0,
     this.height = 0,
+    this.rotate = false,
   });
 
   FileDecodeEvent.fromMap(Map map)
@@ -33,7 +35,8 @@ class FileDecodeEvent {
         image = Uint8List.fromList((map['image'] as List).cast<int>()),
         width = map['width'] as int,
         height = map['height'] as int,
-        formats = map['formats'].map<BarcodeFormat>((f) => BarcodeFormat.values[f]).toList();
+        formats = map['formats'].map<BarcodeFormat>((f) => BarcodeFormat.values[f]).toList(),
+        rotate = map['rotate'] as bool;
 
   Map toMap() {
     return {
@@ -42,6 +45,7 @@ class FileDecodeEvent {
       'width': width,
       'height': height,
       'formats': formats.map((e) => e.index).toList(),
+      'rotate': rotate,
     };
   }
 
@@ -51,6 +55,7 @@ class FileDecodeEvent {
     int? width,
     int? height,
     List<BarcodeFormat>? formats,
+    bool? rotate,
   }) {
     return FileDecodeEvent(
       invert: invert ?? this.invert,
@@ -58,6 +63,7 @@ class FileDecodeEvent {
       formats: formats ?? this.formats,
       width: width ?? this.width,
       height: height ?? this.height,
+      rotate: rotate ?? this.rotate,
     );
   }
 }

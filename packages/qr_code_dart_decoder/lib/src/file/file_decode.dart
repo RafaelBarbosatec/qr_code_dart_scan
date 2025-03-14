@@ -17,11 +17,15 @@ abstract class FileDecode {
         pixels[i] = LiminanceMapper.getLuminanceSourcePixel(imageBytes, j);
       }
 
-      final source = RGBLuminanceSource.orig(
+      LuminanceSource source = RGBLuminanceSource.orig(
         event.width,
         event.height,
         pixels,
       );
+
+      if (event.rotate) {
+        source = source.rotateCounterClockwise();
+      }
 
       final bitmap = BinaryBitmap(
         HybridBinarizer(source),

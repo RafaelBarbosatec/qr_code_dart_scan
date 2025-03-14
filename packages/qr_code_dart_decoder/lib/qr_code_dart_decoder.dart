@@ -37,7 +37,7 @@ class QrCodeDartDecoder {
     this.formats = acceptedFormats,
   });
 
-  Future<Result?> decodeFile(Uint8List bytes, {bool isInverted = false}) async {
+  Future<Result?> decodeFile(Uint8List bytes, {bool isInverted = false, bool rotate = false}) async {
     final image = decodeImage(bytes);
     final event = FileDecodeEvent(
       image: image!.buffer.asUint8List(),
@@ -45,6 +45,7 @@ class QrCodeDartDecoder {
       formats: formats,
       width: image.width,
       height: image.height,
+      rotate: rotate,
     );
     return FileDecode.decode(event.toMap());
   }
@@ -52,11 +53,13 @@ class QrCodeDartDecoder {
   Future<Result?> decodeCameraImage(
     List<Yuv420Planes> yuv420Planes, {
     bool isInverted = false,
+    bool rotate = false,
   }) async {
     final event = CameraDecodeEvent(
       yuv420Planes: yuv420Planes,
       invert: isInverted,
       formats: formats,
+      rotate: rotate,
     );
     return CameraDecode.decode(event.toMap());
   }
