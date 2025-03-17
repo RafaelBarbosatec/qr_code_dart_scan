@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
 import 'package:zxing_lib/zxing.dart';
 
 ///
@@ -20,6 +21,7 @@ class FileDecodeEvent {
   final int height;
   final List<BarcodeFormat> formats;
   final bool rotate;
+  final CropRect? cropRect;
 
   FileDecodeEvent({
     required this.image,
@@ -28,6 +30,7 @@ class FileDecodeEvent {
     this.width = 0,
     this.height = 0,
     this.rotate = false,
+    this.cropRect,
   });
 
   FileDecodeEvent.fromMap(Map map)
@@ -36,7 +39,9 @@ class FileDecodeEvent {
         width = map['width'] as int,
         height = map['height'] as int,
         formats = map['formats'].map<BarcodeFormat>((f) => BarcodeFormat.values[f]).toList(),
-        rotate = map['rotate'] as bool;
+        rotate = map['rotate'] as bool,
+        cropRect =
+            map['cropRect'] != null ? CropRect.fromMap((map['cropRect'] as Map).cast()) : null;
 
   Map toMap() {
     return {
@@ -46,6 +51,7 @@ class FileDecodeEvent {
       'height': height,
       'formats': formats.map((e) => e.index).toList(),
       'rotate': rotate,
+      'cropRect': cropRect?.toMap(),
     };
   }
 
@@ -56,6 +62,7 @@ class FileDecodeEvent {
     int? height,
     List<BarcodeFormat>? formats,
     bool? rotate,
+    CropRect? cropRect,
   }) {
     return FileDecodeEvent(
       invert: invert ?? this.invert,
@@ -64,6 +71,7 @@ class FileDecodeEvent {
       width: width ?? this.width,
       height: height ?? this.height,
       rotate: rotate ?? this.rotate,
+      cropRect: cropRect ?? this.cropRect,
     );
   }
 }

@@ -17,6 +17,7 @@ abstract class FileDecode {
         event.width,
         event.height,
         rotateCounterClockwise: event.rotate,
+        cropRect: event.cropRect,
       );
 
       final bitmap = BinaryBitmap(

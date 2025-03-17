@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Adds cropRect.
+
 ## 0.0.4
 
 * Adds tryHarder=true in decode.

@@ -8,6 +8,7 @@ import 'package:qr_code_dart_decoder/src/camera/camera_decode_event.dart';
 import 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
 import 'package:qr_code_dart_decoder/src/file/file_decode.dart';
 import 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
+import 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
 import 'package:zxing_lib/zxing.dart';
 
 export 'package:qr_code_dart_decoder/src/camera/camera_decode.dart';
@@ -15,6 +16,7 @@ export 'package:qr_code_dart_decoder/src/camera/camera_decode_event.dart';
 export 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
+export 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
 export 'package:zxing_lib/zxing.dart' show BarcodeFormat, Result;
 
 /// A Calculator.
@@ -37,7 +39,12 @@ class QrCodeDartDecoder {
     this.formats = acceptedFormats,
   });
 
-  Future<Result?> decodeFile(Uint8List bytes, {bool isInverted = false, bool rotate = false}) async {
+  Future<Result?> decodeFile(
+    Uint8List bytes, {
+    bool isInverted = false,
+    bool rotate = false,
+    CropRect? cropRect,
+  }) async {
     final image = decodeImage(bytes);
     final event = FileDecodeEvent(
       image: image!.buffer.asUint8List(),
@@ -46,6 +53,7 @@ class QrCodeDartDecoder {
       width: image.width,
       height: image.height,
       rotate: rotate,
+      cropRect: cropRect,
     );
     return FileDecode.decode(event.toMap());
   }
@@ -54,12 +62,14 @@ class QrCodeDartDecoder {
     List<Yuv420Planes> yuv420Planes, {
     bool isInverted = false,
     bool rotate = false,
+    CropRect? cropRect,
   }) async {
     final event = CameraDecodeEvent(
       yuv420Planes: yuv420Planes,
       invert: isInverted,
       formats: formats,
       rotate: rotate,
+      cropRect: cropRect,
     );
     return CameraDecode.decode(event.toMap());
   }

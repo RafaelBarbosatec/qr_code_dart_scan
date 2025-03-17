@@ -3,10 +3,13 @@ import 'dart:typed_data';
 import 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
 import 'package:zxing_lib/zxing.dart';
 
+import 'crop_rect.dart';
+
 abstract class LiminanceMapper {
   static LuminanceSource toLuminanceSource(
     List<Yuv420Planes> planes, {
     bool rotateCounterClockwise = false,
+    CropRect? cropRect,
   }) {
     final e = planes.first;
     int width = e.bytesPerRow;
@@ -36,11 +39,22 @@ abstract class LiminanceMapper {
       data = rotatedData;
     }
 
-    return RGBLuminanceSource.orig(
+    LuminanceSource luminanceSource = RGBLuminanceSource.orig(
       width,
       height,
       data,
     );
+
+    if (cropRect != null) {
+      luminanceSource = luminanceSource.crop(
+        cropRect.left.round(),
+        cropRect.top.round(),
+        cropRect.width.round(),
+        cropRect.height.round(),
+      );
+    }
+
+    return luminanceSource;
   }
 
   static LuminanceSource toLuminanceSourceFromBytes(
@@ -48,6 +62,7 @@ abstract class LiminanceMapper {
     int width,
     int height, {
     bool rotateCounterClockwise = false,
+    CropRect? cropRect,
   }) {
     final int pixelCount = width * height;
     Uint8List pixels = Uint8List(pixelCount);
@@ -70,11 +85,22 @@ abstract class LiminanceMapper {
       pixels = rotatedData;
     }
 
-    return RGBLuminanceSource.orig(
+    LuminanceSource luminanceSource = RGBLuminanceSource.orig(
       width,
       height,
       pixels,
     );
+
+    if (cropRect != null) {
+      luminanceSource = luminanceSource.crop(
+        cropRect.left.round(),
+        cropRect.top.round(),
+        cropRect.width.round(),
+        cropRect.height.round(),
+      );
+    }
+
+    return luminanceSource;
   }
 
   static int _getLuminanceSourcePixel(
