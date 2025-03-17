@@ -16,7 +16,7 @@ abstract class FileDecode {
         imageBytes,
         event.width,
         event.height,
-        rotateCounterClockwise: event.rotate,
+        rotationType: event.rotation,
         cropRect: event.cropRect,
       );
 

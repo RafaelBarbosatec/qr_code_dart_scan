@@ -1,3 +1,7 @@
+## NEXT
+
+* Adds rotation to decode event.
+
 ## 0.0.5
 
 * Adds cropRect.

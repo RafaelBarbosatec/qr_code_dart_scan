@@ -10,7 +10,7 @@ abstract class CameraDecode {
 
       LuminanceSource source = LiminanceMapper.toLuminanceSource(
         event.yuv420Planes,
-        rotateCounterClockwise: event.rotate,
+        rotationType: event.rotation,
         cropRect: event.cropRect,
       );
 

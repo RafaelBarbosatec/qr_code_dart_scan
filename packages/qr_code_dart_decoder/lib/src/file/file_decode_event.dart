@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
+import 'package:qr_code_dart_decoder/src/util/rotation_type.dart';
 import 'package:zxing_lib/zxing.dart';
 
 ///
@@ -20,7 +21,7 @@ class FileDecodeEvent {
   final int width;
   final int height;
   final List<BarcodeFormat> formats;
-  final bool rotate;
+  final RotationType? rotation;
   final CropRect? cropRect;
 
   FileDecodeEvent({
@@ -29,7 +30,7 @@ class FileDecodeEvent {
     this.formats = const [],
     this.width = 0,
     this.height = 0,
-    this.rotate = false,
+    this.rotation,
     this.cropRect,
   });
 
@@ -39,7 +40,7 @@ class FileDecodeEvent {
         width = map['width'] as int,
         height = map['height'] as int,
         formats = map['formats'].map<BarcodeFormat>((f) => BarcodeFormat.values[f]).toList(),
-        rotate = map['rotate'] as bool,
+        rotation = map['rotation'] != null ? RotationType.values.byName(map['rotation']) : null,
         cropRect =
             map['cropRect'] != null ? CropRect.fromMap((map['cropRect'] as Map).cast()) : null;
 
@@ -50,7 +51,7 @@ class FileDecodeEvent {
       'width': width,
       'height': height,
       'formats': formats.map((e) => e.index).toList(),
-      'rotate': rotate,
+      'rotation': rotation?.name,
       'cropRect': cropRect?.toMap(),
     };
   }
@@ -61,7 +62,7 @@ class FileDecodeEvent {
     int? width,
     int? height,
     List<BarcodeFormat>? formats,
-    bool? rotate,
+    RotationType? rotationType,
     CropRect? cropRect,
   }) {
     return FileDecodeEvent(
@@ -70,7 +71,7 @@ class FileDecodeEvent {
       formats: formats ?? this.formats,
       width: width ?? this.width,
       height: height ?? this.height,
-      rotate: rotate ?? this.rotate,
+      rotation: rotationType ?? rotation,
       cropRect: cropRect ?? this.cropRect,
     );
   }

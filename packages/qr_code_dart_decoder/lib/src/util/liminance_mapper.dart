@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
+import 'package:qr_code_dart_decoder/src/util/rotation_type.dart';
 import 'package:zxing_lib/zxing.dart';
 
 import 'crop_rect.dart';
@@ -8,7 +9,7 @@ import 'crop_rect.dart';
 abstract class LiminanceMapper {
   static LuminanceSource toLuminanceSource(
     List<Yuv420Planes> planes, {
-    bool rotateCounterClockwise = false,
+    RotationType? rotationType,
     CropRect? cropRect,
   }) {
     final e = planes.first;
@@ -25,18 +26,23 @@ abstract class LiminanceMapper {
       startIndex += width * height ~/ (p.bytesPerPixel ?? 1);
     }
 
-    if (rotateCounterClockwise) {
-      // rotaciona a imagem 90 graus
-      final rotatedData = Uint8List(width * height * total);
-      for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-          rotatedData[x * height + height - y - 1] = data[y * width + x];
-        }
+    if (rotationType != null) {
+      switch (rotationType) {
+        case RotationType.clockwise:
+          Uint8List rotatedData = _rotateClockWise(width, height, data, multiplier: total);
+          final temp = width;
+          width = height;
+          height = temp;
+          data = rotatedData;
+          break;
+        case RotationType.counterClockwise:
+          Uint8List rotatedData = _rotateCounterClockWise(width, height, data, multiplier: total);
+          final temp = width;
+          width = height;
+          height = temp;
+          data = rotatedData;
+          break;
       }
-      final temp = width;
-      width = height;
-      height = temp;
-      data = rotatedData;
     }
 
     LuminanceSource luminanceSource = RGBLuminanceSource.orig(
@@ -57,11 +63,41 @@ abstract class LiminanceMapper {
     return luminanceSource;
   }
 
+  static Uint8List _rotateCounterClockWise(
+    int width,
+    int height,
+    Uint8List data, {
+    int multiplier = 1,
+  }) {
+    final rotatedData = Uint8List(width * height * multiplier);
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        rotatedData[x * height + height - y - 1] = data[y * width + x];
+      }
+    }
+    return rotatedData;
+  }
+
+  static Uint8List _rotateClockWise(
+    int width,
+    int height,
+    Uint8List data, {
+    int multiplier = 1,
+  }) {
+    final rotatedData = Uint8List(width * height * multiplier);
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        rotatedData[(width - x - 1) * height + y] = data[y * width + x];
+      }
+    }
+    return rotatedData;
+  }
+
   static LuminanceSource toLuminanceSourceFromBytes(
     Uint8List imageBytes,
     int width,
     int height, {
-    bool rotateCounterClockwise = false,
+    RotationType? rotationType,
     CropRect? cropRect,
   }) {
     final int pixelCount = width * height;
@@ -71,18 +107,23 @@ abstract class LiminanceMapper {
       pixels[i] = _getLuminanceSourcePixel(imageBytes, j);
     }
 
-    if (rotateCounterClockwise) {
-      // rotaciona a imagem 90 graus anti-horario
-      final rotatedData = Uint8List(width * height);
-      for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-          rotatedData[x * height + height - y - 1] = pixels[y * width + x];
-        }
+    if (rotationType != null) {
+      switch (rotationType) {
+        case RotationType.clockwise:
+          Uint8List rotatedData = _rotateClockWise(width, height, pixels);
+          final temp = width;
+          width = height;
+          height = temp;
+          pixels = rotatedData;
+          break;
+        case RotationType.counterClockwise:
+          Uint8List rotatedData = _rotateCounterClockWise(width, height, pixels);
+          final temp = width;
+          width = height;
+          height = temp;
+          pixels = rotatedData;
+          break;
       }
-      final temp = width;
-      width = height;
-      height = temp;
-      pixels = rotatedData;
     }
 
     LuminanceSource luminanceSource = RGBLuminanceSource.orig(

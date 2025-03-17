@@ -90,7 +90,7 @@ void main() {
     test('decodeBoleto rotated', () async {
       decoder = QrCodeDartDecoder();
       final bytes = base64Decode(boletoBase64Rotated);
-      final result = await decoder.decodeFile(bytes, rotate: true);
+      final result = await decoder.decodeFile(bytes, rotate: RotationType.counterClockwise);
       expect(result, isNotNull);
       expect(result?.text, '00004000000000000060000000000000000000000000');
       expect(result?.barcodeFormat, BarcodeFormat.itf);

@@ -1,10 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:qr_code_dart_decoder/src/camera/camera_decode_event.dart';
-import 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
-import 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
+import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:test/test.dart';
-import 'package:zxing_lib/zxing.dart';
 
 void main() {
   final testYuv420Planes = [
@@ -21,13 +18,13 @@ void main() {
       final event = CameraDecodeEvent(
         yuv420Planes: testYuv420Planes,
         invert: true,
-        rotate: true,
+        rotation: RotationType.counterClockwise,
         formats: [BarcodeFormat.qrCode],
       );
 
       expect(event.yuv420Planes, equals(testYuv420Planes));
       expect(event.invert, isTrue);
-      expect(event.rotate, isTrue);
+      expect(event.rotation, equals(RotationType.counterClockwise));
       expect(event.formats, equals([BarcodeFormat.qrCode]));
     });
 
@@ -36,7 +33,7 @@ void main() {
 
       expect(event.yuv420Planes, equals(testYuv420Planes));
       expect(event.invert, isFalse);
-      expect(event.rotate, isFalse);
+      expect(event.rotation, isNull);
       expect(event.formats, isEmpty);
     });
 
@@ -53,19 +50,19 @@ void main() {
 
       final updatedEvent = event.copyWith(
         invert: true,
-        rotate: true,
+        rotationType: RotationType.counterClockwise,
         yuv420Planes: newYuv420Planes,
         formats: [BarcodeFormat.qrCode, BarcodeFormat.aztec],
       );
 
       expect(updatedEvent.invert, isTrue);
-      expect(updatedEvent.rotate, isTrue);
+      expect(updatedEvent.rotation, equals(RotationType.counterClockwise));
       expect(updatedEvent.yuv420Planes, equals(newYuv420Planes));
       expect(updatedEvent.formats, equals([BarcodeFormat.qrCode, BarcodeFormat.aztec]));
 
       // Original should remain unchanged
       expect(event.invert, isFalse);
-      expect(event.rotate, isFalse);
+      expect(event.rotation, isNull);
       expect(event.yuv420Planes, equals(testYuv420Planes));
       expect(event.formats, isEmpty);
     });
@@ -74,14 +71,14 @@ void main() {
       final event = CameraDecodeEvent(
         yuv420Planes: testYuv420Planes,
         invert: true,
-        rotate: true,
+        rotation: RotationType.counterClockwise,
         formats: [BarcodeFormat.qrCode],
       );
 
       final updatedEvent = event.copyWith();
 
       expect(updatedEvent.invert, isTrue);
-      expect(updatedEvent.rotate, isTrue);
+      expect(updatedEvent.rotation, equals(RotationType.counterClockwise));
       expect(updatedEvent.yuv420Planes, equals(testYuv420Planes));
       expect(updatedEvent.formats, equals([BarcodeFormat.qrCode]));
     });
@@ -90,14 +87,14 @@ void main() {
       final event = CameraDecodeEvent(
         yuv420Planes: testYuv420Planes,
         invert: true,
-        rotate: true,
+        rotation: RotationType.counterClockwise,
         cropRect: const CropRect.fromLTRB(10, 10, 10, 10),
       );
 
       final map = event.toMap();
 
       expect(map['invert'], isTrue);
-      expect(map['rotate'], isTrue);
+      expect(map['rotation'], equals(RotationType.counterClockwise.name));
       expect(map['yuv420Planes'], isA<List>());
       expect(map['yuv420Planes'].length, equals(1));
       expect(map['cropRect'], isA<Map>());
@@ -111,14 +108,14 @@ void main() {
       final originalEvent = CameraDecodeEvent(
         yuv420Planes: testYuv420Planes,
         invert: true,
-        rotate: true,
+        rotation: RotationType.counterClockwise,
       );
 
       final map = originalEvent.toMap();
       final recreatedEvent = CameraDecodeEvent.fromMap(map);
 
       expect(recreatedEvent.invert, isTrue);
-      expect(recreatedEvent.rotate, isTrue);
+      expect(recreatedEvent.rotation, equals(RotationType.counterClockwise));
       expect(recreatedEvent.yuv420Planes.length, equals(1));
 
       // Note: formats is missing in fromMap implementation
