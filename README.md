@@ -14,7 +14,7 @@ Scanning normal Qr code             |  Scanning invert Qr code
 
 - Camera scan preview in a widget
 - Scan QRCode
-- Scan invert QRCode
+- Scan inverted QRCode
 
 ## Supported platforms
 
@@ -89,7 +89,7 @@ dependency_overrides:
         onCameraError: (String error) {
           debugPrint('Error: $error');
         },
-        // cropRect: null // You can do crop the image to improve accuracy.
+        // cropRect: CropRect(left: 0, top: 0, width: 100, height: 100), // You can crop the image to improve accuracy by specifying a rectangle region. ( default = null)
         // imageDecodeOrientation: ImageDecodeOrientation.original, // you can force how the image orientation will be decoded (default = original)
         typeScan: TypeScan.live, // if TypeScan.takePicture will try decode when click to take a picture(default TypeScan.live)
         // intervalScan: const Duration(seconds:1)
