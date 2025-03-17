@@ -134,9 +134,7 @@ dependency_overrides:
 
 Always use this package in portrait mode.
 
-There is a bug in the `camera` plugin that sometimes the image is rotated 90 degrees.
-
-To avoid this problem, you can use the `imageDecodeOrientation` parameter to force the image to be decoded in the correct orientation.
+There is a bug in the `camera` plugin that sometimes the image is rotated 90 degrees, to avoid this problem, you can use the `imageDecodeOrientation` parameter to force the image to be decoded in the correct orientation.
 
 For example, if you are reading an ITF code, you can force the image to be decoded in landscape orientation.
 
