@@ -1,3 +1,9 @@
+## 0.0.4
+
+* Adds tryHarder=true in decode.
+* FileDecode improvements
+
+
 ## 0.0.3
 
 * Adds rotate

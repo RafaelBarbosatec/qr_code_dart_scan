@@ -9,23 +9,15 @@ abstract class FileDecode {
   static Future<Result?> decode(Map<dynamic, dynamic> map) async {
     try {
       final FileDecodeEvent event = FileDecodeEvent.fromMap(map);
-      final int pixelCount = event.width * event.height;
-      final pixels = Uint8List(pixelCount);
+
       final imageBytes = Uint8List.view(event.image.buffer);
 
-      for (int i = 0, j = 0; i < pixelCount; i++, j += 4) {
-        pixels[i] = LiminanceMapper.getLuminanceSourcePixel(imageBytes, j);
-      }
-
-      LuminanceSource source = RGBLuminanceSource.orig(
+      LuminanceSource source = LiminanceMapper.toLuminanceSourceFromBytes(
+        imageBytes,
         event.width,
         event.height,
-        pixels,
+        rotateCounterClockwise: event.rotate,
       );
-
-      if (event.rotate) {
-        source = source.rotateCounterClockwise();
-      }
 
       final bitmap = BinaryBitmap(
         HybridBinarizer(source),
@@ -38,6 +30,7 @@ abstract class FileDecode {
         DecodeHint(
           possibleFormats: event.formats,
           alsoInverted: event.invert,
+          tryHarder: true,
         ),
       );
     } catch (e) {

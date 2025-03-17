@@ -41,12 +41,14 @@ void main() {
         'width': 100,
         'height': 200,
         'formats': [BarcodeFormat.qrCode.index, BarcodeFormat.codabar.index],
+        'rotate': true,
       };
 
       final event = FileDecodeEvent.fromMap(map);
 
       expect(event.image, equals(testImage));
       expect(event.invert, isTrue);
+      expect(event.rotate, isTrue);
       expect(event.formats.length, equals(2));
       expect(event.formats[0], equals(BarcodeFormat.qrCode));
       expect(event.formats[1], equals(BarcodeFormat.codabar));

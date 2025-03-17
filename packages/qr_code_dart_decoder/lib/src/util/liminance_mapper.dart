@@ -36,14 +36,51 @@ abstract class LiminanceMapper {
       data = rotatedData;
     }
 
-    return PlanarYUVLuminanceSource(
-      data,
+    return RGBLuminanceSource.orig(
       width,
       height,
+      data,
     );
   }
 
-  static int getLuminanceSourcePixel(List<int> byte, int index) {
+  static LuminanceSource toLuminanceSourceFromBytes(
+    Uint8List imageBytes,
+    int width,
+    int height, {
+    bool rotateCounterClockwise = false,
+  }) {
+    final int pixelCount = width * height;
+    Uint8List pixels = Uint8List(pixelCount);
+
+    for (int i = 0, j = 0; i < pixelCount; i++, j += 4) {
+      pixels[i] = _getLuminanceSourcePixel(imageBytes, j);
+    }
+
+    if (rotateCounterClockwise) {
+      // rotaciona a imagem 90 graus anti-horario
+      final rotatedData = Uint8List(width * height);
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          rotatedData[x * height + height - y - 1] = pixels[y * width + x];
+        }
+      }
+      final temp = width;
+      width = height;
+      height = temp;
+      pixels = rotatedData;
+    }
+
+    return RGBLuminanceSource.orig(
+      width,
+      height,
+      pixels,
+    );
+  }
+
+  static int _getLuminanceSourcePixel(
+    List<int> byte,
+    int index,
+  ) {
     if (byte.length <= index + 3) {
       return 0xff;
     }

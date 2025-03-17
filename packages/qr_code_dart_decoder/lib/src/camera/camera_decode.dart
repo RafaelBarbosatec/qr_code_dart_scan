@@ -24,6 +24,7 @@ abstract class CameraDecode {
         DecodeHint(
           possibleFormats: event.formats,
           alsoInverted: event.invert,
+          tryHarder: true,
         ),
       );
     } catch (_) {
