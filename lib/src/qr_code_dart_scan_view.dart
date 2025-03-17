@@ -1,11 +1,11 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
 import 'package:qr_code_dart_scan/src/util/image_decode_orientation.dart';
 import 'package:qr_code_dart_scan/src/util/qr_code_dart_scan_resolution_preset.dart';
-import 'package:zxing_lib/zxing.dart';
 
 import 'decoder/qr_code_dart_scan_decoder.dart';
 
@@ -39,20 +39,50 @@ class QRCodeDartScanView extends StatefulWidget {
 
   /// Use to limit a specific format
   /// If null use all accepted formats
+  /// List of barcode formats to scan for. If null or empty, uses all accepted formats
   final List<BarcodeFormat> formats;
+
+  /// Controller to manage the QR code scanning functionality
   final QRCodeDartScanController? controller;
+
+  /// Resolution preset for the camera preview
   final QRCodeDartScanResolutionPreset resolutionPreset;
+
+  /// Optional child widget to overlay on top of the camera preview
   final Widget? child;
+
+  /// Width of the camera preview
   final double? widthPreview;
+
+  /// Height of the camera preview
   final double? heightPreview;
+
+  /// Builder for customizing the take picture button
   final TakePictureButtonBuilder? takePictureButtonBuilder;
+
+  /// Minimum duration between scans of the same QR code
   final Duration intervalScan;
+
+  /// Callback to intercept and decide if the result should be returned
   final OnResultInterceptorCallback? onResultInterceptor;
+
+  /// Forces a specific device orientation for capturing
   final DeviceOrientation? lockCaptureOrientation;
+
+  /// Controls how the image is oriented during decoding
   final ImageDecodeOrientation imageDecodeOrientation;
+
+  /// Callback when camera errors occur
   final ValueChanged<String>? onCameraError;
+
+  /// Frames per second for the camera preview
   final int? fps;
+
+  /// Video bitrate for the camera preview
   final int? videoBitrate;
+
+  /// Rectangle to crop the camera image before decoding
+  final CropRect? cropRect;
 
   const QRCodeDartScanView({
     Key? key,
@@ -74,6 +104,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.onCameraError,
     this.fps,
     this.videoBitrate,
+    this.cropRect,
   }) : super(key: key);
 
   @override
@@ -158,6 +189,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
       widget.onCameraError,
       widget.fps,
       widget.videoBitrate,
+      widget.cropRect,
     );
   }
 

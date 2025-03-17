@@ -74,7 +74,7 @@ class QRCodeDartScanController {
   ValueChanged<String>? _onCameraError;
   int? _fps;
   int? _videoBitrate;
-
+  CropRect? _cropRect;
   Future<void> config(
     List<BarcodeFormat> formats,
     TypeCamera typeCamera,
@@ -88,6 +88,7 @@ class QRCodeDartScanController {
     ValueChanged<String>? onCameraError,
     int? fps,
     int? videoBitrate,
+    CropRect? cropRect,
   ) async {
     _fps = fps;
     _videoBitrate = videoBitrate;
@@ -97,6 +98,7 @@ class QRCodeDartScanController {
     _onCameraError = onCameraError;
     _intervalScan = intervalScan;
     _resolutionPreset = resolutionPreset;
+    _cropRect = cropRect;
     state.value = state.value.copyWith(
       typeScan: typeScan,
     );
@@ -187,6 +189,7 @@ class QRCodeDartScanController {
       image,
       scanInverted: _scanInvertedQRCode,
       imageDecodeOrientation: _imageDecodeOrientation,
+      cropRect: _cropRect,
     );
 
     if (decoded != null) {

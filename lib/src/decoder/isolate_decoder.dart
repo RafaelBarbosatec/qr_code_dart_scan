@@ -23,7 +23,7 @@ class IsolateDecoder {
     pool?.dispose();
   }
 
-  Future<Result?> decodeFileImage(XFile file, {bool isInverted = false}) async {
+  Future<Result?> decodeFileImage(XFile file, {bool isInverted = false, CropRect? cropRect}) async {
     final bytes = await file.readAsBytes();
     final image = await myDecodeImageFromList(bytes);
     final event = FileDecodeEvent(
@@ -32,6 +32,7 @@ class IsolateDecoder {
       height: image.height,
       formats: formats,
       invert: isInverted,
+      cropRect: cropRect,
     );
 
     var map = event.toMap();
@@ -49,6 +50,7 @@ class IsolateDecoder {
     CameraImage image, {
     bool isInverted = false,
     ImageDecodeOrientation imageDecodeOrientation = ImageDecodeOrientation.original,
+    CropRect? cropRect,
   }) async {
     final isPortrait = image.height > image.width;
     final isLandscape = image.height < image.width;
@@ -79,6 +81,7 @@ class IsolateDecoder {
       formats: formats,
       invert: isInverted,
       rotate: rotate,
+      cropRect: cropRect,
     );
 
     var map = event.toMap();

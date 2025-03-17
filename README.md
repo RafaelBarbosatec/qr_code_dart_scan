@@ -89,6 +89,7 @@ dependency_overrides:
         onCameraError: (String error) {
           debugPrint('Error: $error');
         },
+        // cropRect: null // You can do crop the image to improve accuracy.
         // imageDecodeOrientation: ImageDecodeOrientation.original, // you can force how the image orientation will be decoded (default = original)
         typeScan: TypeScan.live, // if TypeScan.takePicture will try decode when click to take a picture(default TypeScan.live)
         // intervalScan: const Duration(seconds:1)

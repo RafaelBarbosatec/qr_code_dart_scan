@@ -1,6 +1,7 @@
 library qr_code_dart_scan;
 
 export 'package:camera/camera.dart';
+export 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
 export 'package:zxing_lib/zxing.dart' show BarcodeFormat, Result;
 
 export 'src/decoder/qr_code_dart_scan_decoder.dart';

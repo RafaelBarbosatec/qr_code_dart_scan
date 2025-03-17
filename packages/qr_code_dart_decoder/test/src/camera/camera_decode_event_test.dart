@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:qr_code_dart_decoder/src/camera/camera_decode_event.dart';
 import 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
+import 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
 import 'package:test/test.dart';
 import 'package:zxing_lib/zxing.dart';
 
@@ -90,6 +91,7 @@ void main() {
         yuv420Planes: testYuv420Planes,
         invert: true,
         rotate: true,
+        cropRect: const CropRect.fromLTRB(10, 10, 10, 10),
       );
 
       final map = event.toMap();
@@ -98,6 +100,11 @@ void main() {
       expect(map['rotate'], isTrue);
       expect(map['yuv420Planes'], isA<List>());
       expect(map['yuv420Planes'].length, equals(1));
+      expect(map['cropRect'], isA<Map>());
+      expect(map['cropRect']['left'], equals(10));
+      expect(map['cropRect']['top'], equals(10));
+      expect(map['cropRect']['right'], equals(10));
+      expect(map['cropRect']['bottom'], equals(10));
     });
 
     test('fromMap creates instance from map correctly', () {

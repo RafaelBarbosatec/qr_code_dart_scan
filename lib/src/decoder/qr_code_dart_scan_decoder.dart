@@ -53,21 +53,25 @@ class QRCodeDartScanDecoder {
     CameraImage image, {
     bool scanInverted = false,
     ImageDecodeOrientation imageDecodeOrientation = ImageDecodeOrientation.original,
+    CropRect? cropRect,
   }) async {
     return _isolateDecoder.decodeCameraImage(
       image,
       isInverted: scanInverted,
       imageDecodeOrientation: imageDecodeOrientation,
+      cropRect: cropRect,
     );
   }
 
   Future<Result?> decodeFile(
     XFile file, {
     bool scanInverted = false,
+    CropRect? cropRect,
   }) async {
     return _isolateDecoder.decodeFileImage(
       file,
       isInverted: scanInverted,
+      cropRect: cropRect,
     );
   }
 
