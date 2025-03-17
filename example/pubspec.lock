@@ -275,10 +275,11 @@ packages:
   qr_code_dart_decoder:
     dependency: transitive
     description:
-      path: "../packages/qr_code_dart_decoder"
-      relative: true
-    source: path
-    version: "0.0.3"
+      name: qr_code_dart_decoder
+      sha256: "74f530d9c65edb4f76d0cc2e72ce63d52325d26b3470af757829d78ab9b8eb7f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   qr_code_dart_scan:
     dependency: "direct main"
     description:

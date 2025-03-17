@@ -1,6 +1,7 @@
 
-## Next
+## 0.10.0
 - Adds `lockCaptureOrientation` default to `DeviceOrientation.portraitUp` in `QRCodeDartScanView`.
+- Decode improvements. Now it use package `qr_code_dart_decoder`.
 
 ## 0.9.11
 - Fix exception: CameraException(Uninitialized CameraController, startImageStream() was called on an uninitialized CameraController.);
