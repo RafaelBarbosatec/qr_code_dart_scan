@@ -1,3 +1,5 @@
+## NEXT
+- Little improvements in `QRCodeDartScanView`.
 
 ## 0.10.0
 - Adds `lockCaptureOrientation` default to `DeviceOrientation.portraitUp` in `QRCodeDartScanView`.
