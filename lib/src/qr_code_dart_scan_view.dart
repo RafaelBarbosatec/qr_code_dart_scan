@@ -257,8 +257,8 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
     if (state.initialized != initialized) {
       postFrame(() {
         setState(() {
-          _cameraKey = Key(state.typeCamera.toString());
-          initialized = state.initialized;
+          _cameraKey = Key(controller.state.value.typeCamera.toString());
+          initialized = controller.state.value.initialized;
         });
       });
     }
