@@ -1,4 +1,4 @@
-## NEXT
+## 0.10.1
 - Little improvements in `QRCodeDartScanView`.
 - Increment some dependencies
 
