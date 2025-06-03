@@ -29,10 +29,10 @@ packages:
     dependency: transitive
     description:
       name: camera
-      sha256: cf8ed1789aa244392cfc49d13e97879700476ba641c92500e01f630e109c0f6c
+      sha256: "413d2b34fe28496c35c69ede5b232fb9dd5ca2c3a4cb606b14efc1c7546cc8cb"
       url: "https://pub.dev"
     source: hosted
-    version: "0.11.0"
+    version: "0.11.1"
   camera_android_camerax:
     dependency: "direct overridden"
     description:
@@ -45,10 +45,10 @@ packages:
     dependency: transitive
     description:
       name: camera_avfoundation
-      sha256: "7c28969a975a7eb2349bc2cb2dfe3ad218a33dba9968ecfb181ce08c87486655"
+      sha256: fdc0e668f65c8ddfb3be6c10ef4737fb6274cd04d8053a9525d410642f7989c0
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.17+3"
+    version: "0.9.19+1"
   camera_platform_interface:
     dependency: transitive
     description:
@@ -397,5 +397,5 @@ packages:
     source: hosted
     version: "1.1.2"
 sdks:
-  dart: ">=3.4.0 <4.0.0"
-  flutter: ">=3.22.0"
+  dart: ">=3.6.0 <4.0.0"
+  flutter: ">=3.27.0"
