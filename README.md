@@ -76,7 +76,7 @@ It's important to note that the `MediaRecorder` class is not working properly on
 
 ```
 dependency_overrides:
-  camera_android_camerax: 0.6.10+1
+  camera_android_camerax: 0.6.14
 ```
 
 ### Using
