@@ -42,6 +42,15 @@ void main() {
       expect(result?.barcodeFormat, BarcodeFormat.qrCode);
     });
 
+    // test('decodeFile qrcode without border', () async {
+    //   final file = File('test/qr_codes/without_quite_zone_black_background.png');
+    //   final bytes = await file.readAsBytes();
+    //   final result = await decoder.decodeFile(bytes);
+    //   expect(result, isNotNull);
+    //   expect(result?.text, isNotEmpty);
+    //   expect(result?.barcodeFormat, BarcodeFormat.qrCode);
+    // });
+
     test('decodeCameraImage', () async {
       final file = File('test/fixtures/plane_qrcode.json');
       final jsonString = await file.readAsString();
@@ -93,7 +102,7 @@ void main() {
 
     test('decodeBoleto rotated', () async {
       decoder = QrCodeDartDecoder();
-       final file = File('test/boleto/boleto_rotated.png');
+      final file = File('test/boleto/boleto_rotated.png');
       final bytes = await file.readAsBytes();
       final result = await decoder.decodeFile(bytes, rotate: RotationType.counterClockwise);
       expect(result, isNotNull);
