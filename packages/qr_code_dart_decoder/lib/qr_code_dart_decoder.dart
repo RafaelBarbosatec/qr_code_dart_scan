@@ -48,8 +48,11 @@ class QrCodeDartDecoder {
     CropRect? cropRect,
   }) async {
     final image = decodeImage(bytes);
+    if (image == null) {
+      return null;
+    }
     final event = FileDecodeEvent(
-      image: image!.buffer.asUint8List(),
+      image: image.buffer.asUint8List(),
       invert: isInverted,
       formats: formats,
       width: image.width,
