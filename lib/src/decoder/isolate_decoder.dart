@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
@@ -80,11 +82,13 @@ class IsolateDecoder {
       yuv420Planes: yuv420Planes,
       formats: formats,
       invert: isInverted,
-      rotate: rotate,
+      rotation: rotate ? RotationType.counterClockwise : null,
       cropRect: cropRect,
     );
 
     var map = event.toMap();
+    final json = jsonEncode(map);
+    print(json.isNotEmpty);
 
     if (pool != null) {
       map['type'] = IsolateTaskType.planes;

@@ -17,7 +17,7 @@ class CropBackgroundYuvProcessor extends PreYuvProcessor {
 
   @override
   List<Yuv420Planes>? process(List<Yuv420Planes> image) {
-    CropBackgroundYuv dispatcher = CropBackgroundYuv(tolerance: 0.05);
+    CropBackgroundYuv dispatcher = CropBackgroundYuv(tolerance: 0.7);
 
     // Process the planes to crop background
     final result = dispatcher.dispatch(image);
