@@ -79,7 +79,10 @@ void main() {
     });
 
     test('decodeCameraImage without quite zone', () async {
-      final file = File('test/fixtures/plane_qrcode_without_quite_zone.json');
+      decoder = QrCodeDartDecoder(
+        formats: [BarcodeFormat.qrCode],
+      );
+      final file = File('test/fixtures/plane_qrcode_without_quite_zone2.json');
       final jsonString = await file.readAsString();
       final jsonData = json.decode(jsonString);
       final yuv420Planes = (jsonData['yuv420Planes'] as List)
@@ -90,7 +93,9 @@ void main() {
           )
           .toList();
 
-      final result = await decoder.decodeCameraImage(yuv420Planes);
+      final result = await decoder.decodeCameraImage(
+        yuv420Planes,
+      );
       expect(result, isNotNull);
       expect(result?.text, isNotNull);
       expect(result?.barcodeFormat, BarcodeFormat.qrCode);

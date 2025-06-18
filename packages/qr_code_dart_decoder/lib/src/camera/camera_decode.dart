@@ -7,7 +7,6 @@ abstract class CameraDecode {
   static Result? decode(Map<dynamic, dynamic> msg) {
     try {
       CameraDecodeEvent event = CameraDecodeEvent.fromMap(msg.cast());
-
       LuminanceSource source = LiminanceMapper.toLuminanceSource(
         event.yuv420Planes,
         rotationType: event.rotation,

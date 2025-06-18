@@ -12,8 +12,8 @@ import 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
 import 'package:qr_code_dart_decoder/src/util/rotation_type.dart';
 import 'package:zxing_lib/zxing.dart';
 
-import 'src/util/pre_image_processor.dart';
-import 'src/util/pre_yuv_processor.dart';
+import 'src/util/pre_processors/image_pre_processor.dart';
+import 'src/util/pre_processors/yuv_pre_processor.dart';
 
 export 'package:qr_code_dart_decoder/src/camera/camera_decode.dart';
 export 'package:qr_code_dart_decoder/src/camera/camera_decode_event.dart';
@@ -22,6 +22,8 @@ export 'package:qr_code_dart_decoder/src/file/file_decode.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_background_yuv.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
+export 'package:qr_code_dart_decoder/src/util/pre_processors/image_pre_processor.dart';
+export 'package:qr_code_dart_decoder/src/util/pre_processors/yuv_pre_processor.dart';
 export 'package:qr_code_dart_decoder/src/util/rotation_type.dart';
 export 'package:zxing_lib/zxing.dart' show BarcodeFormat, Result;
 
@@ -50,7 +52,7 @@ class QrCodeDartDecoder {
     bool isInverted = false,
     RotationType? rotate,
     CropRect? cropRect,
-    PreImageProcessor? preImageProcessor,
+    ImagePreProcessor? preImageProcessor,
   }) async {
     var image = decodeImage(bytes);
     if (image == null) {
@@ -71,7 +73,7 @@ class QrCodeDartDecoder {
       return _tryUsingImageProcessor(
         image,
         event,
-        preImageProcessor ?? CropBackgroundProcessor(debug: true),
+        preImageProcessor ?? CropBackgroundProcessor(),
       );
     }
     return result;
@@ -82,7 +84,7 @@ class QrCodeDartDecoder {
     bool isInverted = false,
     RotationType? rotate,
     CropRect? cropRect,
-    PreYuvProcessor? preYuvProcessor,
+    YuvPreProcessor? preYuvProcessor,
   }) async {
     final event = CameraDecodeEvent(
       yuv420Planes: yuv420Planes,
@@ -105,20 +107,16 @@ class QrCodeDartDecoder {
   Future<Result?> _tryUsingImageProcessor(
     Image i,
     FileDecodeEvent e,
-    PreImageProcessor preImageProcessor,
+    ImagePreProcessor preImageProcessor,
   ) async {
     var image = preImageProcessor.process(i);
     if (image == null) {
       return null;
     }
-    final event = FileDecodeEvent(
+    final event = e.copyWith(
       image: image.buffer.asUint8List(),
-      invert: e.invert,
-      formats: formats,
       width: image.width,
       height: image.height,
-      rotation: e.rotation,
-      cropRect: e.cropRect,
     );
     return FileDecode.decode(event.toMap());
   }
@@ -126,19 +124,13 @@ class QrCodeDartDecoder {
   Future<Result?> _tryUsingYuvProcessor(
     List<Yuv420Planes> yuv420planes,
     CameraDecodeEvent e,
-    PreYuvProcessor preYuvProcessor,
+    YuvPreProcessor preYuvProcessor,
   ) async {
     var yuv420PlanesP = preYuvProcessor.process(yuv420planes);
     if (yuv420PlanesP == null) {
       return null;
     }
-    final event = CameraDecodeEvent(
-      yuv420Planes: yuv420PlanesP,
-      invert: e.invert,
-      formats: e.formats,
-      rotation: e.rotation,
-      cropRect: e.cropRect,
-    );
+    final event = e.copyWith(yuv420Planes: yuv420PlanesP);
     return CameraDecode.decode(event.toMap());
   }
 }

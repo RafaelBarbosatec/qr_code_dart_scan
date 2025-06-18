@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
@@ -9,11 +7,13 @@ import 'package:qr_code_dart_scan/src/util/isolate_pool.dart';
 class IsolateDecoder {
   final List<BarcodeFormat> formats;
   final int countIsolates;
+  final YuvPreProcessor? preYuvProcessor;
   IsolatePool? pool;
 
   IsolateDecoder({
     this.formats = QRCodeDartScanDecoder.acceptedFormats,
     this.countIsolates = 1,
+    required this.preYuvProcessor,
   });
 
   Future<void> start() {
@@ -82,20 +82,34 @@ class IsolateDecoder {
       yuv420Planes: yuv420Planes,
       formats: formats,
       invert: isInverted,
-      rotation: rotate ? RotationType.counterClockwise : null,
+      rotation: rotate ? RotationType.clockwise : null,
       cropRect: cropRect,
     );
 
     var map = event.toMap();
-    final json = jsonEncode(map);
-    print(json.isNotEmpty);
 
     if (pool != null) {
       map['type'] = IsolateTaskType.planes;
       final result = await pool!.runTask(map);
+      if (result == null) {
+        _tryUsingYuvProcessor(yuv420Planes, event);
+      }
       return result;
     }
 
     return compute(CameraDecode.decode, map);
+  }
+
+  Future<Result?> _tryUsingYuvProcessor(
+    List<Yuv420Planes> yuv420planesInput,
+    CameraDecodeEvent e,
+  ) async {
+    final processedYuv420Planes = preYuvProcessor?.process(yuv420planesInput);
+    if (processedYuv420Planes != null) {
+      final event = e.copyWith(yuv420Planes: processedYuv420Planes);
+      final map = event.toMap();
+      return compute(CameraDecode.decode, map);
+    }
+    return null;
   }
 }
