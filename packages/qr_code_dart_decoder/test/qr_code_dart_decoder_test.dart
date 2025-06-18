@@ -42,14 +42,23 @@ void main() {
       expect(result?.barcodeFormat, BarcodeFormat.qrCode);
     });
 
-    // test('decodeFile qrcode without border', () async {
-    //   final file = File('test/qr_codes/without_quite_zone_black_background.png');
-    //   final bytes = await file.readAsBytes();
-    //   final result = await decoder.decodeFile(bytes);
-    //   expect(result, isNotNull);
-    //   expect(result?.text, isNotEmpty);
-    //   expect(result?.barcodeFormat, BarcodeFormat.qrCode);
-    // });
+    test('decodeFile qrcode without border black background', () async {
+      final file = File('test/qr_codes/without_quite_zone_black_background.png');
+      final bytes = await file.readAsBytes();
+      final result = await decoder.decodeFile(bytes);
+      expect(result, isNotNull);
+      expect(result?.text, isNotEmpty);
+      expect(result?.barcodeFormat, BarcodeFormat.qrCode);
+    });
+
+    test('decodeFile qrcode without border black background2', () async {
+      final file = File('test/qr_codes/without_border_2.png');
+      final bytes = await file.readAsBytes();
+      final result = await decoder.decodeFile(bytes);
+      expect(result, isNotNull);
+      expect(result?.text, isNotEmpty);
+      expect(result?.barcodeFormat, BarcodeFormat.qrCode);
+    });
 
     test('decodeCameraImage', () async {
       final file = File('test/fixtures/plane_qrcode.json');

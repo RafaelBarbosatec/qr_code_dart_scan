@@ -7,9 +7,8 @@ import 'package:zxing_lib/zxing.dart';
 
 abstract class FileDecode {
   static Future<Result?> decode(Map<dynamic, dynamic> map) async {
+    final FileDecodeEvent event = FileDecodeEvent.fromMap(map);
     try {
-      final FileDecodeEvent event = FileDecodeEvent.fromMap(map);
-
       final imageBytes = Uint8List.view(event.image.buffer);
 
       LuminanceSource source = LiminanceMapper.toLuminanceSourceFromBytes(

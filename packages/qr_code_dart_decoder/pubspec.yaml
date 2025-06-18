@@ -7,7 +7,7 @@ environment:
   sdk: ">=2.16.0 <4.0.0"
 
 dependencies:
-  zxing_lib: ^1.1.2
+  zxing_lib: ^1.1.4
   image: ^4.1.6
 
 dev_dependencies:
