@@ -4,7 +4,6 @@ import 'dart:typed_data';
 
 import 'package:image/image.dart';
 import 'package:qr_code_dart_decoder/src/camera/camera_decode.dart';
-import 'package:qr_code_dart_decoder/src/camera/camera_decode_event.dart';
 import 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
 import 'package:qr_code_dart_decoder/src/file/file_decode.dart';
 import 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
@@ -16,7 +15,7 @@ import 'src/util/pre_processors/image_pre_processor.dart';
 import 'src/util/pre_processors/yuv_pre_processor.dart';
 
 export 'package:qr_code_dart_decoder/src/camera/camera_decode.dart';
-export 'package:qr_code_dart_decoder/src/camera/camera_decode_event.dart';
+export 'package:qr_code_dart_decoder/src/camera/isolate_camera_decode.dart';
 export 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
@@ -86,19 +85,17 @@ class QrCodeDartDecoder {
     CropRect? cropRect,
     YuvPreProcessor? preYuvProcessor,
   }) async {
-    final event = CameraDecodeEvent(
-      yuv420Planes: yuv420Planes,
-      invert: isInverted,
-      formats: formats,
+    final result = CameraDecode.decode(
+      yuv420Planes,
       rotation: rotate,
-      cropRect: cropRect,
+      formats: formats,
     );
-    final result = CameraDecode.decode(event.toMap());
     if (result == null) {
       return _tryUsingYuvProcessor(
         yuv420Planes,
-        event,
         preYuvProcessor ?? CropBackgroundYuvProcessor(debug: true),
+        rotate,
+        formats,
       );
     }
     return result;
@@ -123,14 +120,18 @@ class QrCodeDartDecoder {
 
   Future<Result?> _tryUsingYuvProcessor(
     List<Yuv420Planes> yuv420planes,
-    CameraDecodeEvent e,
     YuvPreProcessor preYuvProcessor,
+    RotationType? rotation,
+    List<BarcodeFormat>? formats,
   ) async {
     var yuv420PlanesP = preYuvProcessor.process(yuv420planes);
     if (yuv420PlanesP == null) {
       return null;
     }
-    final event = e.copyWith(yuv420Planes: yuv420PlanesP);
-    return CameraDecode.decode(event.toMap());
+    return CameraDecode.decode(
+      yuv420PlanesP,
+      rotation: rotation,
+      formats: formats,
+    );
   }
 }

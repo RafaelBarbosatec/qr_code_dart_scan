@@ -1,34 +1,47 @@
-import 'package:qr_code_dart_decoder/src/camera/camera_decode_event.dart';
+import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:qr_code_dart_decoder/src/util/liminance_mapper.dart';
 import 'package:zxing_lib/common.dart';
 import 'package:zxing_lib/zxing.dart';
 
 abstract class CameraDecode {
-  static Result? decode(Map<dynamic, dynamic> msg) {
+  static Result? decode(
+    List<Yuv420Planes> yuv420Planess, {
+    RotationType? rotation,
+    List<BarcodeFormat>? formats,
+  }) {
+    LuminanceSource source = LiminanceMapper.toLuminanceSource(
+      yuv420Planess,
+      rotationType: rotation,
+    );
+
+    var bitmap = BinaryBitmap(
+      HybridBinarizer(source),
+    );
+
+    final reader = MultiFormatReader();
+
     try {
-      CameraDecodeEvent event = CameraDecodeEvent.fromMap(msg.cast());
-      LuminanceSource source = LiminanceMapper.toLuminanceSource(
-        event.yuv420Planes,
-        rotationType: event.rotation,
-        cropRect: event.cropRect,
-      );
-
-      var bitmap = BinaryBitmap(
-        HybridBinarizer(source),
-      );
-
-      final reader = MultiFormatReader();
-
       return reader.decode(
         bitmap,
         DecodeHint(
-          possibleFormats: event.formats,
-          alsoInverted: event.invert,
-          tryHarder: true,
+          possibleFormats: formats,
+          alsoInverted: false,
+          tryHarder: false,
         ),
       );
-    } catch (_) {
-      return null;
+    } on NotFoundException catch (_) {
+      try {
+        return reader.decode(
+          bitmap,
+          DecodeHint(
+            possibleFormats: formats,
+            alsoInverted: true,
+            tryHarder: true,
+          ),
+        );
+      } catch (_) {
+        return null;
+      }
     }
   }
 }

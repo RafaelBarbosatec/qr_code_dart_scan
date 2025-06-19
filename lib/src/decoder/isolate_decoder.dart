@@ -2,27 +2,28 @@ import 'package:flutter/foundation.dart';
 import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_code_dart_scan/src/decoder/global_functions.dart';
-import 'package:qr_code_dart_scan/src/util/isolate_pool.dart';
 
 class IsolateDecoder {
   final List<BarcodeFormat> formats;
   final int countIsolates;
   final YuvPreProcessor? preYuvProcessor;
-  IsolatePool? pool;
+
+  late IsolateCameraDecode isolateController;
 
   IsolateDecoder({
     this.formats = QRCodeDartScanDecoder.acceptedFormats,
     this.countIsolates = 1,
     required this.preYuvProcessor,
-  });
+  }) {
+    isolateController = IsolateCameraDecode();
+  }
 
   Future<void> start() {
-    pool = IsolatePool(countIsolates);
-    return pool!.start();
+    return isolateController.start();
   }
 
   void dispose() {
-    pool?.dispose();
+    isolateController.terminate();
   }
 
   Future<Result?> decodeFileImage(XFile file, {bool isInverted = false, CropRect? cropRect}) async {
@@ -37,15 +38,7 @@ class IsolateDecoder {
       cropRect: cropRect,
     );
 
-    var map = event.toMap();
-
-    if (pool != null) {
-      map['type'] = IsolateTaskType.image;
-      final result = await pool!.runTask(map);
-      return result;
-    }
-
-    return compute(FileDecode.decode, map);
+    return compute(FileDecode.decode, event.toMap());
   }
 
   Future<Result?> decodeCameraImage(
@@ -78,38 +71,25 @@ class IsolateDecoder {
             ))
         .toList();
 
-    final event = CameraDecodeEvent(
-      yuv420Planes: yuv420Planes,
-      formats: formats,
-      invert: isInverted,
-      rotation: rotate ? RotationType.clockwise : null,
-      cropRect: cropRect,
-    );
-
-    var map = event.toMap();
-
-    if (pool != null) {
-      map['type'] = IsolateTaskType.planes;
-      final result = await pool!.runTask(map);
+    try {
+      final result = await isolateController.setYuv420Planess(
+        yuv420Planes,
+        rotation: rotate ? RotationType.clockwise : null,
+        formats: formats,
+      );
       if (result == null) {
-        _tryUsingYuvProcessor(yuv420Planes, event);
+        final processedYuv420Planes = preYuvProcessor?.process(yuv420Planes);
+        if (processedYuv420Planes != null) {
+          return isolateController.setYuv420Planess(
+            processedYuv420Planes,
+            rotation: rotate ? RotationType.clockwise : null,
+            formats: formats,
+          );
+        }
       }
       return result;
+    } catch (e) {
+      return null;
     }
-
-    return compute(CameraDecode.decode, map);
-  }
-
-  Future<Result?> _tryUsingYuvProcessor(
-    List<Yuv420Planes> yuv420planesInput,
-    CameraDecodeEvent e,
-  ) async {
-    final processedYuv420Planes = preYuvProcessor?.process(yuv420planesInput);
-    if (processedYuv420Planes != null) {
-      final event = e.copyWith(yuv420Planes: processedYuv420Planes);
-      final map = event.toMap();
-      return compute(CameraDecode.decode, map);
-    }
-    return null;
   }
 }
