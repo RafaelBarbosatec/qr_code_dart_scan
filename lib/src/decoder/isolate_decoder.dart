@@ -5,14 +5,12 @@ import 'package:qr_code_dart_scan/src/decoder/global_functions.dart';
 
 class IsolateDecoder {
   final List<BarcodeFormat> formats;
-  final int countIsolates;
   final YuvPreProcessor? preYuvProcessor;
 
   late IsolateCameraDecode isolateController;
 
   IsolateDecoder({
     this.formats = QRCodeDartScanDecoder.acceptedFormats,
-    this.countIsolates = 1,
     required this.preYuvProcessor,
   }) {
     isolateController = IsolateCameraDecode();

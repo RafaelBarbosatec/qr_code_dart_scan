@@ -33,11 +33,9 @@ class QRCodeDartScanDecoder {
 
   final List<BarcodeFormat> formats;
   late IsolateDecoder _isolateDecoder;
-  final int countIsolates;
 
   QRCodeDartScanDecoder({
     required this.formats,
-    this.countIsolates = 1,
   }) {
     for (var format in formats) {
       if (!acceptedFormats.contains(format)) {
@@ -46,7 +44,6 @@ class QRCodeDartScanDecoder {
     }
     _isolateDecoder = IsolateDecoder(
       formats: formats,
-      countIsolates: countIsolates,
       preYuvProcessor: CropBackgroundYuvProcessor(debug: kDebugMode),
     )..start();
   }
