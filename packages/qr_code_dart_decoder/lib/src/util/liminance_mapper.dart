@@ -15,7 +15,6 @@ abstract class LiminanceMapper {
     final e = planes.first;
     int width = e.bytesPerRow;
     int height = (e.bytes.length / width).round();
-    print('width: $width, height: $height');
     final total = planes
         .map<double>((p) => (p.bytesPerPixel ?? 1).toDouble())
         .reduce((value, element) => value + 1 / element)

@@ -1,5 +1,4 @@
 import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
 import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:qr_code_dart_scan/src/util/image_decode_orientation.dart';
 
@@ -44,7 +43,7 @@ class QRCodeDartScanDecoder {
     }
     _isolateDecoder = IsolateDecoder(
       formats: formats,
-      preYuvProcessor: CropBackgroundYuvProcessor(debug: kDebugMode),
+      preYuvProcessor: CropBackgroundYuvProcessor(),
     )..start();
   }
 
