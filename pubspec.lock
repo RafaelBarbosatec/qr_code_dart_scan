@@ -276,10 +276,10 @@ packages:
     dependency: "direct main"
     description:
       name: qr_code_dart_decoder
-      sha256: "6da7eda27726d504bed3c30eabf78ddca3eb9265e1c8dc49b30ef5974b9c267f"
+      sha256: "18fab1914681e04f275e680d661f4f868dfe19df2edc92c63ee477f082d97852"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.5"
+    version: "0.1.1"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -385,10 +385,10 @@ packages:
     dependency: "direct main"
     description:
       name: zxing_lib
-      sha256: "870a63610be3f20009ca9201f7ba2d53d7eaefa675c154b3e8c1f6fc55984d04"
+      sha256: f9170470b6bc947d21a6783486f88ef48aad66fc1380c8acd02b118418ec0ce0
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.2"
+    version: "1.1.4"
 sdks:
   dart: ">=3.6.0 <4.0.0"
   flutter: ">=3.27.0"

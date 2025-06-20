@@ -8,6 +8,7 @@ import 'package:qr_code_dart_scan/src/util/image_decode_orientation.dart';
 import 'package:qr_code_dart_scan/src/util/qr_code_dart_scan_resolution_preset.dart';
 
 import 'decoder/qr_code_dart_scan_decoder.dart';
+import 'util/qr_code_dart_scan_config.dart';
 
 ///
 /// Created by
@@ -35,7 +36,6 @@ class QRCodeDartScanView extends StatefulWidget {
   final TypeCamera typeCamera;
   final TypeScan typeScan;
   final ValueChanged<Result>? onCapture;
-  final bool scanInvertedQRCode;
 
   /// Use to limit a specific format
   /// If null use all accepted formats
@@ -81,15 +81,14 @@ class QRCodeDartScanView extends StatefulWidget {
   /// Video bitrate for the camera preview
   final int? videoBitrate;
 
-  /// Rectangle to crop the camera image before decoding
-  final CropRect? cropRect;
+  /// Strategy to crop the camera image before decoding
+  final CroppingStrategy? croppingStrategy;
 
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
     this.typeScan = TypeScan.live,
     this.onCapture,
-    this.scanInvertedQRCode = false,
     this.resolutionPreset = QRCodeDartScanResolutionPreset.medium,
     this.controller,
     this.formats = QRCodeDartScanDecoder.acceptedFormats,
@@ -104,7 +103,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.onCameraError,
     this.fps,
     this.videoBitrate,
-    this.cropRect,
+    this.croppingStrategy,
   }) : super(key: key);
 
   @override
@@ -177,19 +176,20 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
     _isControllerDisposed = false;
     controller.state.addListener(_onStateListener);
     await controller.config(
-      widget.formats,
-      widget.typeCamera,
-      widget.typeScan,
-      widget.scanInvertedQRCode,
-      widget.imageDecodeOrientation,
-      widget.resolutionPreset,
-      widget.intervalScan,
-      widget.onResultInterceptor,
-      widget.lockCaptureOrientation,
-      widget.onCameraError,
-      widget.fps,
-      widget.videoBitrate,
-      widget.cropRect,
+      QRCodeDartScanConfig(
+        formats: widget.formats,
+        typeCamera: widget.typeCamera,
+        typeScan: widget.typeScan,
+        imageDecodeOrientation: widget.imageDecodeOrientation,
+        resolutionPreset: widget.resolutionPreset,
+        intervalScan: widget.intervalScan,
+        onResultInterceptor: widget.onResultInterceptor,
+        lockCaptureOrientation: widget.lockCaptureOrientation,
+        onCameraError: widget.onCameraError,
+        fps: widget.fps,
+        videoBitrate: widget.videoBitrate,
+        croppingStrategy: widget.croppingStrategy,
+      ),
     );
   }
 

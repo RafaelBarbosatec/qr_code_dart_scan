@@ -32,11 +32,9 @@ class QRCodeDartScanDecoder {
 
   final List<BarcodeFormat> formats;
   late IsolateDecoder _isolateDecoder;
-  final int countIsolates;
 
   QRCodeDartScanDecoder({
     required this.formats,
-    this.countIsolates = 1,
   }) {
     for (var format in formats) {
       if (!acceptedFormats.contains(format)) {
@@ -45,32 +43,29 @@ class QRCodeDartScanDecoder {
     }
     _isolateDecoder = IsolateDecoder(
       formats: formats,
-      countIsolates: countIsolates,
+      preYuvProcessor: CropBackgroundYuvProcessor(),
     )..start();
   }
 
   Future<Result?> decodeCameraImage(
     CameraImage image, {
-    bool scanInverted = false,
     ImageDecodeOrientation imageDecodeOrientation = ImageDecodeOrientation.original,
-    CropRect? cropRect,
+    CroppingStrategy? croppingStrategy,
   }) async {
     return _isolateDecoder.decodeCameraImage(
       image,
-      isInverted: scanInverted,
+      isInverted: true,
       imageDecodeOrientation: imageDecodeOrientation,
-      cropRect: cropRect,
+      croppingStrategy: croppingStrategy,
     );
   }
 
   Future<Result?> decodeFile(
     XFile file, {
-    bool scanInverted = false,
     CropRect? cropRect,
   }) async {
     return _isolateDecoder.decodeFileImage(
       file,
-      isInverted: scanInverted,
       cropRect: cropRect,
     );
   }

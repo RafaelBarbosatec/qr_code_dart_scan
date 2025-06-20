@@ -1,3 +1,8 @@
+## 0.11.0
+- Adds `croppingStrategy` in `QRCodeDartScanView` to crop the image before decode.
+- Update `qr_code_dart_decoder` to `0.1.1`.
+- remove `scanInvertedQRCode` in `QRCodeDartScanView`. Now it is always true.
+
 ## 0.10.1
 - Little improvements in `QRCodeDartScanView`.
 - Increment some dependencies

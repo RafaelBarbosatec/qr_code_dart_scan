@@ -16,7 +16,6 @@ import 'package:zxing_lib/zxing.dart';
 /// Rafaelbarbosatec
 /// on 28/06/22
 class FileDecodeEvent {
-  final bool invert;
   final Uint8List image;
   final int width;
   final int height;
@@ -26,7 +25,6 @@ class FileDecodeEvent {
 
   FileDecodeEvent({
     required this.image,
-    this.invert = false,
     this.formats = const [],
     this.width = 0,
     this.height = 0,
@@ -35,8 +33,7 @@ class FileDecodeEvent {
   });
 
   FileDecodeEvent.fromMap(Map map)
-      : invert = map['invert'] as bool,
-        image = Uint8List.fromList((map['image'] as List).cast<int>()),
+      : image = Uint8List.fromList((map['image'] as List).cast<int>()),
         width = map['width'] as int,
         height = map['height'] as int,
         formats = map['formats'].map<BarcodeFormat>((f) => BarcodeFormat.values[f]).toList(),
@@ -46,7 +43,6 @@ class FileDecodeEvent {
 
   Map toMap() {
     return {
-      'invert': invert,
       'image': image.toList(),
       'width': width,
       'height': height,
@@ -66,7 +62,6 @@ class FileDecodeEvent {
     CropRect? cropRect,
   }) {
     return FileDecodeEvent(
-      invert: invert ?? this.invert,
       image: image ?? this.image,
       formats: formats ?? this.formats,
       width: width ?? this.width,

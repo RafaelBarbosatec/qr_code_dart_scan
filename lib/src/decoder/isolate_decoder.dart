@@ -2,28 +2,29 @@ import 'package:flutter/foundation.dart';
 import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_code_dart_scan/src/decoder/global_functions.dart';
-import 'package:qr_code_dart_scan/src/util/isolate_pool.dart';
 
 class IsolateDecoder {
   final List<BarcodeFormat> formats;
-  final int countIsolates;
-  IsolatePool? pool;
+  final YuvPreProcessor? preYuvProcessor;
+
+  late IsolateCameraDecode isolateController;
 
   IsolateDecoder({
     this.formats = QRCodeDartScanDecoder.acceptedFormats,
-    this.countIsolates = 1,
-  });
+    required this.preYuvProcessor,
+  }) {
+    isolateController = IsolateCameraDecode();
+  }
 
   Future<void> start() {
-    pool = IsolatePool(countIsolates);
-    return pool!.start();
+    return isolateController.start();
   }
 
   void dispose() {
-    pool?.dispose();
+    isolateController.terminate();
   }
 
-  Future<Result?> decodeFileImage(XFile file, {bool isInverted = false, CropRect? cropRect}) async {
+  Future<Result?> decodeFileImage(XFile file, {CropRect? cropRect}) async {
     final bytes = await file.readAsBytes();
     final image = await myDecodeImageFromList(bytes);
     final event = FileDecodeEvent(
@@ -31,26 +32,17 @@ class IsolateDecoder {
       width: image.width,
       height: image.height,
       formats: formats,
-      invert: isInverted,
       cropRect: cropRect,
     );
 
-    var map = event.toMap();
-
-    if (pool != null) {
-      map['type'] = IsolateTaskType.image;
-      final result = await pool!.runTask(map);
-      return result;
-    }
-
-    return compute(FileDecode.decode, map);
+    return compute(FileDecode.decode, event.toMap());
   }
 
   Future<Result?> decodeCameraImage(
     CameraImage image, {
     bool isInverted = false,
     ImageDecodeOrientation imageDecodeOrientation = ImageDecodeOrientation.original,
-    CropRect? cropRect,
+    CroppingStrategy? croppingStrategy,
   }) async {
     final isPortrait = image.height > image.width;
     final isLandscape = image.height < image.width;
@@ -76,22 +68,26 @@ class IsolateDecoder {
             ))
         .toList();
 
-    final event = CameraDecodeEvent(
-      yuv420Planes: yuv420Planes,
-      formats: formats,
-      invert: isInverted,
-      rotate: rotate,
-      cropRect: cropRect,
-    );
-
-    var map = event.toMap();
-
-    if (pool != null) {
-      map['type'] = IsolateTaskType.planes;
-      final result = await pool!.runTask(map);
+    try {
+      final result = await isolateController.setYuv420Planess(
+        yuv420Planes,
+        rotation: rotate ? RotationType.clockwise : null,
+        formats: formats,
+        croppingStrategy: croppingStrategy,
+      );
+      if (result == null) {
+        final processedYuv420Planes = preYuvProcessor?.process(yuv420Planes);
+        if (processedYuv420Planes != null) {
+          return isolateController.setYuv420Planess(
+            processedYuv420Planes,
+            rotation: rotate ? RotationType.clockwise : null,
+            formats: formats,
+          );
+        }
+      }
       return result;
+    } catch (e) {
+      return null;
     }
-
-    return compute(CameraDecode.decode, map);
   }
 }
