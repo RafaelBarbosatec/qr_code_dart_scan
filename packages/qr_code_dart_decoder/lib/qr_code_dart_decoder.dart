@@ -12,7 +12,7 @@ export 'package:qr_code_dart_decoder/src/file/file_decode.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_background_yuv.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
-export 'package:qr_code_dart_decoder/src/util/crop_type.dart';
+export 'package:qr_code_dart_decoder/src/util/crop_strategy.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_yuv.dart';
 export 'package:qr_code_dart_decoder/src/util/pre_processors/image_pre_processor.dart';
 export 'package:qr_code_dart_decoder/src/util/pre_processors/yuv_pre_processor.dart';
