@@ -85,7 +85,6 @@ dependency_overrides:
 
     return Scaffold(
       body: QRCodeDartScanView(
-        scanInvertedQRCode: true, // enable scan invert qr code ( default = false)
         onCameraError: (String error) {
           debugPrint('Error: $error');
         },
@@ -154,32 +153,3 @@ imageDecodeOrientation: ImageDecodeOrientation.portrait,
 ### Camera performance
 
 The decoder process is done in dart code. So, in flutter debug mode, you will not have a good performance. But in release mode, the performance is very better.
-
-### Decoder
-
-You may use only the our decoder if you want:
-
-``` dart
-
-  final decoder = QRCodeDartScanDecoder(
-    // formats: [ // You can restrict specific formats.
-    //  BarcodeFormat.qrCode,
-    //  BarcodeFormat.aztec,
-    //  BarcodeFormat.dataMatrix,
-    //  BarcodeFormat.pdf417,
-    //  BarcodeFormat.code39,
-    //  BarcodeFormat.code93,
-    //  BarcodeFormat.code128,
-    //  BarcodeFormat.ean8,
-    //  BarcodeFormat.ean13,
-    //  BarcodeFormat.itf,
-    // ],
-  );
-
-  Result? result = await decoder.decodeCameraImage(CameraImage());
-
-  // or
-
-  Result? result = await decoder.decodeFile(XFile());
-
-```
