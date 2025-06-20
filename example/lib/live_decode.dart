@@ -42,7 +42,6 @@ class LiveDecodePageState extends State<LiveDecodePage> {
     return Scaffold(
       body: QRCodeDartScanView(
         controller: _controller,
-        scanInvertedQRCode: true,
         resolutionPreset: QRCodeDartScanResolutionPreset.medium,
         onCapture: (Result result) {
           setState(() {

@@ -24,7 +24,7 @@ class IsolateDecoder {
     isolateController.terminate();
   }
 
-  Future<Result?> decodeFileImage(XFile file, {bool isInverted = false, CropRect? cropRect}) async {
+  Future<Result?> decodeFileImage(XFile file, {CropRect? cropRect}) async {
     final bytes = await file.readAsBytes();
     final image = await myDecodeImageFromList(bytes);
     final event = FileDecodeEvent(
@@ -32,7 +32,6 @@ class IsolateDecoder {
       width: image.width,
       height: image.height,
       formats: formats,
-      invert: isInverted,
       cropRect: cropRect,
     );
 

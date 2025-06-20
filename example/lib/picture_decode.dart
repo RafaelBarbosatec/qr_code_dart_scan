@@ -14,8 +14,7 @@ import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 /// on 28/06/22
 class PictureDecode extends StatefulWidget {
   static const routeName = '/picture';
-  static get route =>
-      {routeName: (BuildContext context) => const PictureDecode()};
+  static get route => {routeName: (BuildContext context) => const PictureDecode()};
   static open(BuildContext context) {
     Navigator.of(context).pushNamed(routeName);
   }
@@ -33,7 +32,6 @@ class _PictureDecodeState extends State<PictureDecode> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: QRCodeDartScanView(
-        scanInvertedQRCode: true,
         typeScan: TypeScan.takePicture,
         onCapture: (Result result) {
           setState(() {

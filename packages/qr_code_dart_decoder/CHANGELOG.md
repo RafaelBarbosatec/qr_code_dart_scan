@@ -1,6 +1,9 @@
-## NEXT
+## 0.1.1
 
 * Adds rotation to decode event.
+* Remove invert from decode event.
+* Adds CroppingStrategy to decode event.
+* Adds CropBackgroundYuvProcessor.
 
 ## 0.0.5
 

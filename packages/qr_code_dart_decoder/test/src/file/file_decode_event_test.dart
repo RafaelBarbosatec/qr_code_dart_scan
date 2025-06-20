@@ -11,14 +11,12 @@ void main() {
     test('constructor creates instance with correct values', () {
       final event = FileDecodeEvent(
         image: testImage,
-        invert: true,
         formats: testFormats,
         width: 100,
         height: 200,
       );
 
       expect(event.image, equals(testImage));
-      expect(event.invert, isTrue);
       expect(event.formats, equals(testFormats));
       expect(event.width, equals(100));
       expect(event.height, equals(200));
@@ -28,7 +26,6 @@ void main() {
       final event = FileDecodeEvent(image: testImage);
 
       expect(event.image, equals(testImage));
-      expect(event.invert, isFalse);
       expect(event.formats, isEmpty);
       expect(event.width, equals(0));
       expect(event.height, equals(0));
@@ -47,7 +44,6 @@ void main() {
       final event = FileDecodeEvent.fromMap(map);
 
       expect(event.image, equals(testImage));
-      expect(event.invert, isTrue);
       expect(event.rotation, equals(RotationType.counterClockwise));
       expect(event.formats.length, equals(2));
       expect(event.formats[0], equals(BarcodeFormat.qrCode));
@@ -59,7 +55,6 @@ void main() {
     test('toMap returns correct map representation', () {
       final event = FileDecodeEvent(
         image: testImage,
-        invert: true,
         formats: testFormats,
         width: 100,
         height: 200,
@@ -68,7 +63,6 @@ void main() {
       final map = event.toMap();
 
       expect(map['image'], equals(testImage));
-      expect(map['invert'], isTrue);
       expect(map['formats'], equals([BarcodeFormat.qrCode.index, BarcodeFormat.codabar.index]));
       expect(map['width'], equals(100));
       expect(map['height'], equals(200));
@@ -77,7 +71,6 @@ void main() {
     test('copyWith returns new instance with updated values', () {
       final event = FileDecodeEvent(
         image: testImage,
-        invert: false,
         formats: [BarcodeFormat.qrCode],
         width: 100,
         height: 200,
@@ -94,14 +87,12 @@ void main() {
 
       // Original event should be unchanged
       expect(event.image, equals(testImage));
-      expect(event.invert, isFalse);
       expect(event.formats, equals([BarcodeFormat.qrCode]));
       expect(event.width, equals(100));
       expect(event.height, equals(200));
 
       // New event should have updated values
       expect(newEvent.image, equals(newImage));
-      expect(newEvent.invert, isTrue);
       expect(newEvent.formats, equals(testFormats));
       expect(newEvent.width, equals(300));
       expect(newEvent.height, equals(400));
@@ -110,7 +101,6 @@ void main() {
     test('copyWith keeps original values when not specified', () {
       final event = FileDecodeEvent(
         image: testImage,
-        invert: true,
         formats: testFormats,
         width: 100,
         height: 200,
@@ -119,7 +109,6 @@ void main() {
       final newEvent = event.copyWith(width: 300);
 
       expect(newEvent.image, equals(testImage));
-      expect(newEvent.invert, isTrue);
       expect(newEvent.formats, equals(testFormats));
       expect(newEvent.width, equals(300)); // Only this should change
       expect(newEvent.height, equals(200));

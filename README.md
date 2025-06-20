@@ -115,6 +115,9 @@ dependency_overrides:
         //  BarcodeFormat.ean8,
         //  BarcodeFormat.ean13,
         // ],
+        // croppingStrategy: CroppingStrategy.cropCenterSquare(
+        //   squareSizeFactor: 0.7,
+        // ),
         onCapture: (Result result) {
           // do anything with result
           // result.text

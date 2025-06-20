@@ -8,33 +8,45 @@ import 'package:zxing_lib/zxing.dart';
 abstract class FileDecode {
   static Future<Result?> decode(Map<dynamic, dynamic> map) async {
     final FileDecodeEvent event = FileDecodeEvent.fromMap(map);
+
+    final imageBytes = Uint8List.view(event.image.buffer);
+
+    LuminanceSource source = LiminanceMapper.toLuminanceSourceFromBytes(
+      imageBytes,
+      event.width,
+      event.height,
+      rotationType: event.rotation,
+      cropRect: event.cropRect,
+    );
+
+    final bitmap = BinaryBitmap(
+      HybridBinarizer(source),
+    );
+
+    final reader = MultiFormatReader();
+
     try {
-      final imageBytes = Uint8List.view(event.image.buffer);
-
-      LuminanceSource source = LiminanceMapper.toLuminanceSourceFromBytes(
-        imageBytes,
-        event.width,
-        event.height,
-        rotationType: event.rotation,
-        cropRect: event.cropRect,
-      );
-
-      final bitmap = BinaryBitmap(
-        HybridBinarizer(source),
-      );
-
-      final reader = MultiFormatReader();
-
       return reader.decode(
         bitmap,
         DecodeHint(
           possibleFormats: event.formats,
-          alsoInverted: event.invert,
-          tryHarder: true,
+          alsoInverted: false,
+          tryHarder: false,
         ),
       );
-    } catch (e) {
-      return null;
+    } on NotFoundException catch (_) {
+      try {
+        return reader.decode(
+          bitmap,
+          DecodeHint(
+            possibleFormats: event.formats,
+            alsoInverted: true,
+            tryHarder: true,
+          ),
+        );
+      } catch (_) {
+        return null;
+      }
     }
   }
 }

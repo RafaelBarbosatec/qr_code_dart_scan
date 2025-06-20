@@ -1,9 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
+
+import 'util/qr_code_dart_scan_config.dart';
 
 ///
 /// Created by
@@ -64,56 +65,28 @@ class QRCodeDartScanController {
   final ValueNotifier<PreviewState> state = ValueNotifier(const PreviewState());
   CameraController? cameraController;
   QRCodeDartScanDecoder? _codeDartScanDecoder;
-  QRCodeDartScanResolutionPreset _resolutionPreset = QRCodeDartScanResolutionPreset.medium;
   bool _scanEnabled = false;
   bool get isLiveScan => state.value.typeScan == TypeScan.live && _scanEnabled;
-  bool _scanInvertedQRCode = false;
-  ImageDecodeOrientation _imageDecodeOrientation = ImageDecodeOrientation.original;
-  Duration _intervalScan = const Duration(seconds: 1);
   _LastScan? _lastScan;
-  DeviceOrientation? _lockCaptureOrientation;
-  ValueChanged<String>? _onCameraError;
-  int? _fps;
-  int? _videoBitrate;
-  CroppingStrategy? _croppingStrategy;
+  late QRCodeDartScanConfig _config;
   Future<void> config(
-    List<BarcodeFormat> formats,
-    TypeCamera typeCamera,
-    TypeScan typeScan,
-    bool scanInvertedQRCode,
-    ImageDecodeOrientation imageDecodeOrientation,
-    QRCodeDartScanResolutionPreset resolutionPreset,
-    Duration intervalScan,
-    OnResultInterceptorCallback? onResultInterceptor,
-    DeviceOrientation? lockCaptureOrientation,
-    ValueChanged<String>? onCameraError,
-    int? fps,
-    int? videoBitrate,
-    CroppingStrategy? croppingStrategy,
+    QRCodeDartScanConfig config,
   ) async {
-    _fps = fps;
-    _videoBitrate = videoBitrate;
-    _scanInvertedQRCode = scanInvertedQRCode;
-    _imageDecodeOrientation = imageDecodeOrientation;
-    _lockCaptureOrientation = lockCaptureOrientation;
-    _onCameraError = onCameraError;
-    _intervalScan = intervalScan;
-    _resolutionPreset = resolutionPreset;
-    _croppingStrategy = croppingStrategy;
+    _config = config;
     state.value = state.value.copyWith(
-      typeScan: typeScan,
+      typeScan: config.typeScan,
     );
     _codeDartScanDecoder = QRCodeDartScanDecoder(
-      formats: formats,
+      formats: config.formats,
     );
     _lastScan = _LastScan(
       date: DateTime.now()
         ..subtract(
           const Duration(days: 1),
         ),
-      onResultInterceptor: onResultInterceptor,
+      onResultInterceptor: config.onResultInterceptor,
     );
-    await _initController(typeCamera);
+    await _initController(config.typeCamera);
   }
 
   Future<void> _initController(TypeCamera typeCamera) async {
@@ -123,28 +96,28 @@ class QRCodeDartScanController {
     );
     final camera = await _getCamera(typeCamera);
     if (camera == null) {
-      _onCameraError?.call('camera_not_found ($typeCamera)');
+      _config.onCameraError?.call('camera_not_found ($typeCamera)');
       return;
     }
     cameraController = CameraController(
       camera,
-      _resolutionPreset.toResolutionPreset(),
+      _config.resolutionPreset.toResolutionPreset(),
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.yuv420,
-      fps: _fps,
-      videoBitrate: _videoBitrate,
+      fps: _config.fps,
+      videoBitrate: _config.videoBitrate,
     );
 
     try {
       await cameraController?.initialize();
-      if (_lockCaptureOrientation != null) {
-        cameraController?.lockCaptureOrientation(_lockCaptureOrientation!);
+      if (_config.lockCaptureOrientation != null) {
+        cameraController?.lockCaptureOrientation(_config.lockCaptureOrientation!);
       }
     } catch (e) {
       if (e is CameraException) {
-        _onCameraError?.call(e.code);
+        _config.onCameraError?.call(e.code);
       } else {
-        _onCameraError?.call(e.toString());
+        _config.onCameraError?.call(e.toString());
       }
       return;
     }
@@ -188,13 +161,12 @@ class QRCodeDartScanController {
   void _processImage(CameraImage image) async {
     final decoded = await _codeDartScanDecoder?.decodeCameraImage(
       image,
-      scanInverted: _scanInvertedQRCode,
-      imageDecodeOrientation: _imageDecodeOrientation,
-      croppingStrategy: _croppingStrategy,
+      imageDecodeOrientation: _config.imageDecodeOrientation,
+      croppingStrategy: _config.croppingStrategy,
     );
 
     if (decoded != null) {
-      if (_lastScan?.checkTime(_intervalScan, decoded) == true) {
+      if (_lastScan?.checkTime(_config.intervalScan, decoded) == true) {
         _lastScan = _lastScan!.updateResult(decoded);
         state.value = state.value.copyWith(
           result: decoded,
@@ -248,7 +220,6 @@ class QRCodeDartScanController {
     if (xFile != null) {
       final decoded = await _codeDartScanDecoder?.decodeFile(
         xFile,
-        scanInverted: _scanInvertedQRCode,
       );
       state.value = state.value.copyWith(
         result: decoded,

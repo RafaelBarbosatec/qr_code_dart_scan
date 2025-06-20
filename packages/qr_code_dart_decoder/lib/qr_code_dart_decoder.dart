@@ -41,7 +41,6 @@ class QrCodeDartDecoder {
 
   Future<Result?> decodeFile(
     Uint8List bytes, {
-    bool isInverted = false,
     RotationType? rotate,
     CropRect? cropRect,
     ImagePreProcessor? preImageProcessor,
@@ -53,7 +52,6 @@ class QrCodeDartDecoder {
 
     final event = FileDecodeEvent(
       image: image.buffer.asUint8List(),
-      invert: isInverted,
       formats: formats,
       width: image.width,
       height: image.height,
