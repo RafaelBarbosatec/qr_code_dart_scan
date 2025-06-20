@@ -81,8 +81,8 @@ class QRCodeDartScanView extends StatefulWidget {
   /// Video bitrate for the camera preview
   final int? videoBitrate;
 
-  /// Rectangle to crop the camera image before decoding
-  final CropRect? cropRect;
+  /// Strategy to crop the camera image before decoding
+  final CroppingStrategy? croppingStrategy;
 
   const QRCodeDartScanView({
     Key? key,
@@ -104,7 +104,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.onCameraError,
     this.fps,
     this.videoBitrate,
-    this.cropRect,
+    this.croppingStrategy,
   }) : super(key: key);
 
   @override
@@ -189,7 +189,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
       widget.onCameraError,
       widget.fps,
       widget.videoBitrate,
-      widget.cropRect,
+      widget.croppingStrategy,
     );
   }
 

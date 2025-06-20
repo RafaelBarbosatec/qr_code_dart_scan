@@ -8,7 +8,17 @@ abstract class CameraDecode {
     List<Yuv420Planes> yuv420Planess, {
     RotationType? rotation,
     List<BarcodeFormat>? formats,
+    CroppingStrategy? croppingStrategy,
   }) {
+    if (croppingStrategy != null) {
+      double width = yuv420Planess.first.bytesPerRow.toDouble();
+      double height = (yuv420Planess.first.bytes.length / width).round().toDouble();
+      yuv420Planess = CropYuv.cropYuv(
+        yuv420Planess,
+        croppingStrategy.getCropRect(width, height),
+      );
+    }
+
     LuminanceSource source = LiminanceMapper.toLuminanceSource(
       yuv420Planess,
       rotationType: rotation,

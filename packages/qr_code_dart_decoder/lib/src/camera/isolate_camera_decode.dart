@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:isolate';
 
 import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
-import 'package:zxing_lib/zxing.dart';
 
 enum _IsoCommand {
   decode,
@@ -11,7 +10,7 @@ enum _IsoCommand {
 }
 
 class _IsoPlanesMessage {
-  _IsoPlanesMessage(this.cmd, [this.data, this.rotation, this.formats])
+  _IsoPlanesMessage(this.cmd, [this.data, this.rotation, this.formats, this.croppingStrategy])
       : result = null,
         assert(cmd != _IsoCommand.decode || data != null);
 
@@ -20,6 +19,7 @@ class _IsoPlanesMessage {
         data = null,
         rotation = null,
         formats = null,
+        croppingStrategy = null,
         assert(result != null);
 
   _IsoPlanesMessage.fail()
@@ -27,6 +27,7 @@ class _IsoPlanesMessage {
         data = null,
         rotation = null,
         formats = null,
+        croppingStrategy = null,
         result = null;
 
   final List<Yuv420Planes>? data;
@@ -34,6 +35,7 @@ class _IsoPlanesMessage {
   final _IsoCommand cmd;
   final RotationType? rotation;
   final List<BarcodeFormat>? formats;
+  final CroppingStrategy? croppingStrategy;
 }
 
 /// controller an isolate to executer decode command
@@ -114,6 +116,7 @@ class IsolateCameraDecode {
     List<Yuv420Planes> yuv420Planess, {
     RotationType? rotation,
     List<BarcodeFormat>? formats,
+    CroppingStrategy? croppingStrategy,
   }) {
     _currentYuv420Planess = yuv420Planess;
     _completer = Completer<Result?>();
@@ -123,6 +126,7 @@ class IsolateCameraDecode {
         _currentYuv420Planess,
         rotation,
         formats,
+        croppingStrategy,
       ),
     );
 
@@ -153,6 +157,7 @@ Future<void> _decodeFromCamera(SendPort callerSP) async {
   List<Yuv420Planes>? yuv420Planess;
   RotationType? rotation;
   List<BarcodeFormat>? formats;
+  CroppingStrategy? croppingStrategy;
   Completer<bool> goNext = Completer();
   newIceRP.listen((dynamic message) {
     if (message is _IsoPlanesMessage) {
@@ -163,6 +168,7 @@ Future<void> _decodeFromCamera(SendPort callerSP) async {
         yuv420Planess = message.data;
         rotation = message.rotation;
         formats = message.formats;
+        croppingStrategy = message.croppingStrategy;
         goNext.complete(true);
       }
     }
@@ -178,6 +184,7 @@ Future<void> _decodeFromCamera(SendPort callerSP) async {
           yuv420Planess!,
           rotation: rotation,
           formats: formats,
+          croppingStrategy: croppingStrategy,
         );
         callerSP.send(_IsoPlanesMessage.result(results));
       } catch (_) {

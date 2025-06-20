@@ -43,7 +43,7 @@ class IsolateDecoder {
     CameraImage image, {
     bool isInverted = false,
     ImageDecodeOrientation imageDecodeOrientation = ImageDecodeOrientation.original,
-    CropRect? cropRect,
+    CroppingStrategy? croppingStrategy,
   }) async {
     final isPortrait = image.height > image.width;
     final isLandscape = image.height < image.width;
@@ -74,6 +74,7 @@ class IsolateDecoder {
         yuv420Planes,
         rotation: rotate ? RotationType.clockwise : null,
         formats: formats,
+        croppingStrategy: croppingStrategy,
       );
       if (result == null) {
         final processedYuv420Planes = preYuvProcessor?.process(yuv420Planes);

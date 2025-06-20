@@ -3,16 +3,7 @@ library qr_code_dart_decoder;
 import 'dart:typed_data';
 
 import 'package:image/image.dart';
-import 'package:qr_code_dart_decoder/src/camera/camera_decode.dart';
-import 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
-import 'package:qr_code_dart_decoder/src/file/file_decode.dart';
-import 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
-import 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
-import 'package:qr_code_dart_decoder/src/util/rotation_type.dart';
-import 'package:zxing_lib/zxing.dart';
-
-import 'src/util/pre_processors/image_pre_processor.dart';
-import 'src/util/pre_processors/yuv_pre_processor.dart';
+import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 
 export 'package:qr_code_dart_decoder/src/camera/camera_decode.dart';
 export 'package:qr_code_dart_decoder/src/camera/isolate_camera_decode.dart';
@@ -21,6 +12,8 @@ export 'package:qr_code_dart_decoder/src/file/file_decode.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_background_yuv.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
+export 'package:qr_code_dart_decoder/src/util/crop_type.dart';
+export 'package:qr_code_dart_decoder/src/util/crop_yuv.dart';
 export 'package:qr_code_dart_decoder/src/util/pre_processors/image_pre_processor.dart';
 export 'package:qr_code_dart_decoder/src/util/pre_processors/yuv_pre_processor.dart';
 export 'package:qr_code_dart_decoder/src/util/rotation_type.dart';
@@ -82,13 +75,14 @@ class QrCodeDartDecoder {
     List<Yuv420Planes> yuv420Planes, {
     bool isInverted = false,
     RotationType? rotate,
-    CropRect? cropRect,
+    CroppingStrategy? croppingStrategy,
     YuvPreProcessor? preYuvProcessor,
   }) async {
     final result = CameraDecode.decode(
       yuv420Planes,
       rotation: rotate,
       formats: formats,
+      croppingStrategy: croppingStrategy,
     );
     if (result == null) {
       return _tryUsingYuvProcessor(

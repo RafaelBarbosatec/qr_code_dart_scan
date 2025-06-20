@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
 
@@ -74,7 +75,7 @@ class QRCodeDartScanController {
   ValueChanged<String>? _onCameraError;
   int? _fps;
   int? _videoBitrate;
-  CropRect? _cropRect;
+  CroppingStrategy? _croppingStrategy;
   Future<void> config(
     List<BarcodeFormat> formats,
     TypeCamera typeCamera,
@@ -88,7 +89,7 @@ class QRCodeDartScanController {
     ValueChanged<String>? onCameraError,
     int? fps,
     int? videoBitrate,
-    CropRect? cropRect,
+    CroppingStrategy? croppingStrategy,
   ) async {
     _fps = fps;
     _videoBitrate = videoBitrate;
@@ -98,7 +99,7 @@ class QRCodeDartScanController {
     _onCameraError = onCameraError;
     _intervalScan = intervalScan;
     _resolutionPreset = resolutionPreset;
-    _cropRect = cropRect;
+    _croppingStrategy = croppingStrategy;
     state.value = state.value.copyWith(
       typeScan: typeScan,
     );
@@ -189,7 +190,7 @@ class QRCodeDartScanController {
       image,
       scanInverted: _scanInvertedQRCode,
       imageDecodeOrientation: _imageDecodeOrientation,
-      cropRect: _cropRect,
+      croppingStrategy: _croppingStrategy,
     );
 
     if (decoded != null) {

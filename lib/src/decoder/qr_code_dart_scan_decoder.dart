@@ -52,13 +52,13 @@ class QRCodeDartScanDecoder {
     CameraImage image, {
     bool scanInverted = false,
     ImageDecodeOrientation imageDecodeOrientation = ImageDecodeOrientation.original,
-    CropRect? cropRect,
+    CroppingStrategy? croppingStrategy,
   }) async {
     return _isolateDecoder.decodeCameraImage(
       image,
       isInverted: scanInverted,
       imageDecodeOrientation: imageDecodeOrientation,
-      cropRect: cropRect,
+      croppingStrategy: croppingStrategy,
     );
   }
 
