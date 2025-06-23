@@ -45,7 +45,7 @@ abstract class CameraDecode {
           tryHarder: false,
         ),
       );
-    } on NotFoundException catch (_) {
+    } catch (_) {
       try {
         return reader.decode(
           bitmap,
@@ -56,8 +56,48 @@ abstract class CameraDecode {
           ),
         );
       } catch (_) {
-        return null;
+        return _tryUsingCropBackground(
+          yuv420Planess,
+          reader,
+          formats,
+          rotation,
+        );
       }
+    }
+  }
+
+  static Result? _tryUsingCropBackground(
+    List<Yuv420Planes> yuv420Planess,
+    MultiFormatReader reader,
+    List<BarcodeFormat>? formats,
+    RotationType? rotation,
+  ) {
+    final processor = CropBackgroundYuvProcessor();
+    final processed = processor.process(yuv420Planess);
+    if (processed == null) {
+      return null;
+    }
+
+    LuminanceSource source = LiminanceMapper.toLuminanceSource(
+      processed,
+      rotationType: rotation,
+    );
+
+    var bitmap = BinaryBitmap(
+      HybridBinarizer(source),
+    );
+
+    try {
+      return reader.decode(
+        bitmap,
+        DecodeHint(
+          possibleFormats: formats,
+          alsoInverted: true,
+          tryHarder: true,
+        ),
+      );
+    } catch (e) {
+      return null;
     }
   }
 }

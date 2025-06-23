@@ -76,21 +76,12 @@ class QrCodeDartDecoder {
     CroppingStrategy? croppingStrategy,
     YuvPreProcessor? preYuvProcessor,
   }) async {
-    final result = CameraDecode.decode(
+    return CameraDecode.decode(
       yuv420Planes,
       rotation: rotate,
       formats: formats,
       croppingStrategy: croppingStrategy,
     );
-    if (result == null) {
-      return _tryUsingYuvProcessor(
-        yuv420Planes,
-        preYuvProcessor ?? CropBackgroundYuvProcessor(debug: true),
-        rotate,
-        formats,
-      );
-    }
-    return result;
   }
 
   Future<Result?> _tryUsingImageProcessor(
@@ -108,22 +99,5 @@ class QrCodeDartDecoder {
       height: image.height,
     );
     return FileDecode.decode(event.toMap());
-  }
-
-  Future<Result?> _tryUsingYuvProcessor(
-    List<Yuv420Planes> yuv420planes,
-    YuvPreProcessor preYuvProcessor,
-    RotationType? rotation,
-    List<BarcodeFormat>? formats,
-  ) async {
-    var yuv420PlanesP = preYuvProcessor.process(yuv420planes);
-    if (yuv420PlanesP == null) {
-      return null;
-    }
-    return CameraDecode.decode(
-      yuv420PlanesP,
-      rotation: rotation,
-      formats: formats,
-    );
   }
 }

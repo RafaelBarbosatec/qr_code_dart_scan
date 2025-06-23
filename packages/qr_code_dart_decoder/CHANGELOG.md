@@ -1,3 +1,8 @@
+## 0.1.2
+
+* Move crop background to FileDecode.
+* Move crop background to CameraDecode.
+
 ## 0.1.1
 
 * Adds rotation to decode event.
