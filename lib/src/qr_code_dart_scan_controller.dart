@@ -69,6 +69,8 @@ class QRCodeDartScanController {
   bool get isLiveScan => state.value.typeScan == TypeScan.live && _scanEnabled;
   _LastScan? _lastScan;
   late QRCodeDartScanConfig _config;
+  Result? _lastResult;
+
   Future<void> config(
     QRCodeDartScanConfig config,
   ) async {
@@ -84,7 +86,6 @@ class QRCodeDartScanController {
         ..subtract(
           const Duration(days: 1),
         ),
-      onResultInterceptor: config.onResultInterceptor,
     );
     await _initController(config.typeCamera);
   }
@@ -159,23 +160,32 @@ class QRCodeDartScanController {
   }
 
   void _processImage(CameraImage image) async {
-    final decoded = await _codeDartScanDecoder?.decodeCameraImage(
-      image,
-      imageDecodeOrientation: _config.imageDecodeOrientation,
-      croppingStrategy: _config.croppingStrategy,
-    );
-
-    if (decoded != null) {
-      if (_lastScan?.checkTime(_config.intervalScan, decoded) == true) {
-        _lastScan = _lastScan!.updateResult(decoded);
-        state.value = state.value.copyWith(
-          result: decoded,
+    try {
+      if (_lastScan?.checkTime(_config.intervalScan) == true) {
+        final decoded = await _codeDartScanDecoder?.decodeCameraImage(
+          image,
+          imageDecodeOrientation: _config.imageDecodeOrientation,
+          croppingStrategy: _config.croppingStrategy,
         );
+        if (decoded != null) {
+          final canNotify = _config.onResultInterceptor?.call(_lastResult, decoded) ?? true;
+          if (canNotify == true) {
+            _lastResult = decoded;
+            state.value = state.value.copyWith(
+              result: decoded,
+            );
+          }
+        }
       }
+    } catch (e) {
+      // Log error but continue processing
+      debugPrint('Error processing image: $e');
+    } finally {
+      // Sempre marca como não processando
+      state.value = state.value.copyWith(
+        processing: false,
+      );
     }
-    state.value = state.value.copyWith(
-      processing: false,
-    );
   }
 
   Future<void> changeTypeScan(TypeScan type) async {
@@ -293,30 +303,19 @@ class QRCodeDartScanController {
 }
 
 class _LastScan {
-  final Result? data;
-  final DateTime date;
-  final OnResultInterceptorCallback? onResultInterceptor;
+  DateTime date;
 
   _LastScan({
-    this.data,
     required this.date,
-    this.onResultInterceptor,
   });
 
-  _LastScan updateResult(Result data) {
-    return _LastScan(
-      data: data,
-      date: DateTime.now(),
-      onResultInterceptor: onResultInterceptor,
-    );
-  }
-
-  bool checkTime(Duration intervalScan, Result newResult) {
+  bool checkTime(Duration intervalScan) {
     final now = DateTime.now();
     final diff = now.difference(date);
     if (diff.inMilliseconds < intervalScan.inMilliseconds) {
       return false;
     }
-    return onResultInterceptor?.call(data, newResult) ?? true;
+    date = DateTime.now();
+    return true;
   }
 }

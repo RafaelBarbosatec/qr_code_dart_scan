@@ -96,7 +96,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.takePictureButtonBuilder,
     this.widthPreview,
     this.heightPreview,
-    this.intervalScan = const Duration(seconds: 1),
+    this.intervalScan = const Duration(milliseconds: 500),
     this.onResultInterceptor,
     this.lockCaptureOrientation = DeviceOrientation.portraitUp,
     this.imageDecodeOrientation = ImageDecodeOrientation.original,

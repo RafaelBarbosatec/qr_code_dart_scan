@@ -1,3 +1,6 @@
+## 0.11.2
+- Performance improvements.
+
 ## 0.11.1
 - Update `qr_code_dart_decoder` to `0.1.2`.
 
