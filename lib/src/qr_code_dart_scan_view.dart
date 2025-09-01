@@ -84,6 +84,9 @@ class QRCodeDartScanView extends StatefulWidget {
   /// Strategy to crop the camera image before decoding
   final CroppingStrategy? croppingStrategy;
 
+  /// Focus point for the camera preview
+  final Offset? focusPoint;
+
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
@@ -104,6 +107,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.fps,
     this.videoBitrate,
     this.croppingStrategy,
+    this.focusPoint,
   }) : super(key: key);
 
   @override
@@ -189,6 +193,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
         fps: widget.fps,
         videoBitrate: widget.videoBitrate,
         croppingStrategy: widget.croppingStrategy,
+        focusPoint: widget.focusPoint,
       ),
     );
   }

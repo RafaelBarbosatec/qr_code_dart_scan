@@ -111,6 +111,10 @@ class QRCodeDartScanController {
 
     try {
       await cameraController?.initialize();
+      if (_config.focusPoint != null) {
+        await cameraController?.setFocusMode(FocusMode.locked);
+        await cameraController?.setFocusPoint(_config.focusPoint!);
+      }
       if (_config.lockCaptureOrientation != null) {
         cameraController?.lockCaptureOrientation(_config.lockCaptureOrientation!);
       }
@@ -299,6 +303,18 @@ class QRCodeDartScanController {
       return;
     }
     await setFlash(!isFlashOn);
+  }
+
+  Future<void> setFocusPoint(Offset? point) async {
+    if (cameraController == null || !cameraController!.value.isInitialized) {
+      return;
+    }
+    if (point == null) {
+      await cameraController?.setFocusMode(FocusMode.auto);
+      return;
+    }
+    await cameraController?.setFocusMode(FocusMode.locked);
+    await cameraController?.setFocusPoint(point);
   }
 }
 

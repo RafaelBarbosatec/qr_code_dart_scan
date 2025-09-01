@@ -14,6 +14,7 @@ class QRCodeDartScanConfig {
   final int? fps;
   final int? videoBitrate;
   final CroppingStrategy? croppingStrategy;
+  final Offset? focusPoint;
 
   QRCodeDartScanConfig({
     required this.formats,
@@ -28,5 +29,6 @@ class QRCodeDartScanConfig {
     this.fps,
     this.videoBitrate,
     this.croppingStrategy,
+    this.focusPoint,
   });
 }

@@ -1,3 +1,6 @@
+## 0.11.3
+- Adds `focusPoint` in `QRCodeDartScanView` to set the focus point for the camera preview.
+
 ## 0.11.2
 - Performance improvements.
 
