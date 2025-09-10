@@ -259,9 +259,7 @@ class QRCodeDartScanController {
 
   Future<void> _disposeController() async {
     try {
-      if (state.value.typeScan == TypeScan.live) {
-        await stopScan();
-      }
+      await stopScan();
       await cameraController?.dispose();
     } catch (e) {
       debugPrint('Error dispose controller: $e');
