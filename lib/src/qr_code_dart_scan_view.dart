@@ -130,6 +130,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
       _isControllerDisposed = true;
       stopCamera();
     } else if (state == AppLifecycleState.resumed) {
+      _isControllerDisposed = false;
       _initController();
     }
     super.didChangeAppLifecycleState(state);
@@ -177,7 +178,6 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
 
   void _initController() async {
     controller = widget.controller ?? QRCodeDartScanController();
-    _isControllerDisposed = false;
     controller.state.addListener(_onStateListener);
     await controller.config(
       QRCodeDartScanConfig(
@@ -216,7 +216,12 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
   }
 
   Widget _getCameraWidget(BuildContext context) {
-    var camera = controller.cameraController!.value;
+    final cameraController = controller.cameraController;
+    if (cameraController == null || !cameraController.value.isInitialized) {
+      return widget.child ?? const SizedBox.shrink();
+    }
+
+    var camera = cameraController.value;
     // fetch screen size
     final size = MediaQuery.of(context).size;
 
@@ -245,7 +250,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
               scale: scale,
               child: Center(
                 child: CameraPreview(
-                  controller.cameraController!,
+                  cameraController,
                 ),
               ),
             ),

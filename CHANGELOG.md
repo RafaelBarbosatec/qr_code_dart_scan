@@ -1,3 +1,6 @@
+## 0.11.4
+- Fix issue `CameraException(Disposed CameraController, buildPreview() was called on a disposed CameraController.)`
+
 ## 0.11.3
 - Adds `focusPoint` in `QRCodeDartScanView` to set the focus point for the camera preview.
 
