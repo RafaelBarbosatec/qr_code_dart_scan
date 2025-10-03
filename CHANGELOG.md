@@ -1,3 +1,7 @@
+## 0.11.5
+- Add image stream watchdog to detect and handle native camera errors when stream stops responding.
+- Add `imageStreamTimeout` parameter to configure watchdog timeout (default 2 seconds).
+
 ## 0.11.4
 - Fix issue `CameraException(Disposed CameraController, buildPreview() was called on a disposed CameraController.)`
 
