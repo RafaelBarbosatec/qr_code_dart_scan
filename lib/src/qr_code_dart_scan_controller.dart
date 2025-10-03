@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -70,6 +72,8 @@ class QRCodeDartScanController {
   _LastScan? _lastScan;
   late QRCodeDartScanConfig _config;
   Result? _lastResult;
+  Timer? _imageStreamWatchdog;
+  DateTime? _lastImageStreamCall;
 
   Future<void> config(
     QRCodeDartScanConfig config,
@@ -156,6 +160,7 @@ class QRCodeDartScanController {
   }
 
   void _imageStream(CameraImage image) async {
+    _lastImageStreamCall = DateTime.now();
     if (state.value.processing) return;
     state.value = state.value.copyWith(
       processing: true,
@@ -209,8 +214,9 @@ class QRCodeDartScanController {
 
   Future<void> stopScan() async {
     if (isLiveScan) {
-      await stopImageStream();
+      await _stopImageStream();
       _scanEnabled = false;
+      _stopImageStreamWatchdog();
     }
   }
 
@@ -221,6 +227,7 @@ class QRCodeDartScanController {
     if (state.value.typeScan == TypeScan.live && !_scanEnabled) {
       await cameraController?.startImageStream(_imageStream);
       _scanEnabled = true;
+      _startImageStreamWatchdog();
     }
   }
 
@@ -266,9 +273,13 @@ class QRCodeDartScanController {
     }
   }
 
-  Future<void> stopImageStream() async {
-    if (cameraController?.value.isStreamingImages == true) {
-      await cameraController?.stopImageStream();
+  Future<void> _stopImageStream() async {
+    try {
+      if (cameraController?.value.isStreamingImages == true) {
+        await cameraController?.stopImageStream();
+      }
+    } catch (e) {
+      debugPrint('Error stop image stream: $e');
     }
   }
 
@@ -317,6 +328,37 @@ class QRCodeDartScanController {
     }
     await cameraController?.setFocusMode(FocusMode.locked);
     await cameraController?.setFocusPoint(point);
+  }
+
+  void _startImageStreamWatchdog() {
+    _lastImageStreamCall = DateTime.now();
+    _imageStreamWatchdog?.cancel();
+    _imageStreamWatchdog = Timer.periodic(
+      const Duration(seconds: 2),
+      (timer) {
+        final lastCall = _lastImageStreamCall;
+        if (lastCall == null) return;
+
+        final now = DateTime.now();
+        final timeSinceLastCall = now.difference(lastCall);
+        // Se passou mais de 10 segundos sem receber frames, considera como erro
+        if (timeSinceLastCall.inMilliseconds > _config.imageStreamTimeout.inMilliseconds) {
+          final errorMessage =
+              'image_stream_timeout: No frames received for ${timeSinceLastCall.inSeconds} seconds';
+          debugPrint(errorMessage);
+          _config.onCameraError?.call(
+            errorMessage,
+          );
+          _stopImageStreamWatchdog();
+        }
+      },
+    );
+  }
+
+  void _stopImageStreamWatchdog() {
+    _imageStreamWatchdog?.cancel();
+    _imageStreamWatchdog = null;
+    _lastImageStreamCall = null;
   }
 }
 

@@ -87,6 +87,9 @@ class QRCodeDartScanView extends StatefulWidget {
   /// Focus point for the camera preview
   final Offset? focusPoint;
 
+  /// Timeout for the image stream
+  final Duration imageStreamTimeout;
+
   const QRCodeDartScanView({
     Key? key,
     this.typeCamera = TypeCamera.back,
@@ -108,6 +111,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.videoBitrate,
     this.croppingStrategy,
     this.focusPoint,
+    this.imageStreamTimeout = const Duration(seconds: 2),
   }) : super(key: key);
 
   @override
@@ -194,6 +198,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
         videoBitrate: widget.videoBitrate,
         croppingStrategy: widget.croppingStrategy,
         focusPoint: widget.focusPoint,
+        imageStreamTimeout: widget.imageStreamTimeout,
       ),
     );
   }

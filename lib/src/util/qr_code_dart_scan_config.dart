@@ -15,6 +15,7 @@ class QRCodeDartScanConfig {
   final int? videoBitrate;
   final CroppingStrategy? croppingStrategy;
   final Offset? focusPoint;
+  final Duration imageStreamTimeout;
 
   QRCodeDartScanConfig({
     required this.formats,
@@ -30,5 +31,6 @@ class QRCodeDartScanConfig {
     this.videoBitrate,
     this.croppingStrategy,
     this.focusPoint,
+    this.imageStreamTimeout = const Duration(seconds: 2),
   });
 }
