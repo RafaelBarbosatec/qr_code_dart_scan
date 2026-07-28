@@ -12,35 +12,30 @@ abstract class LiminanceMapper {
     RotationType? rotationType,
     CropRect? cropRect,
   }) {
-    final e = planes.first;
-    int width = e.bytesPerRow;
-    int height = (e.bytes.length / width).round();
-    final total = planes
-        .map<double>((p) => (p.bytesPerPixel ?? 1).toDouble())
-        .reduce((value, element) => value + 1 / element)
-        .toInt();
-    Uint8List data = Uint8List(width * height * total);
-    int startIndex = 0;
-    for (var p in planes) {
-      List.copyRange(data, startIndex, p.bytes);
-      startIndex += width * height ~/ (p.bytesPerPixel ?? 1);
-    }
+    // Otimização: Para YUV420, apenas o Y plane (primeiro plane) contém
+    // a informação de luminância necessária para decodificar QR/barcodes.
+    // Não precisamos processar os planes U e V (crominância).
+    final yPlane = planes.first;
+    int width = yPlane.bytesPerRow;
+    int height = (yPlane.bytes.length / width).round();
+
+    // Usa diretamente os bytes do Y plane sem alocação extra
+    Uint8List data = yPlane.bytes;
 
     if (rotationType != null) {
+      // Só aloca novo buffer se rotação for necessária
       switch (rotationType) {
         case RotationType.clockwise:
-          Uint8List rotatedData = _rotateClockWise(width, height, data, multiplier: total);
+          data = _rotateClockWise(width, height, data);
           final temp = width;
           width = height;
           height = temp;
-          data = rotatedData;
           break;
         case RotationType.counterClockwise:
-          Uint8List rotatedData = _rotateCounterClockWise(width, height, data, multiplier: total);
+          data = _rotateCounterClockWise(width, height, data);
           final temp = width;
           width = height;
           height = temp;
-          data = rotatedData;
           break;
       }
     }
@@ -63,31 +58,65 @@ abstract class LiminanceMapper {
     return luminanceSource;
   }
 
+  /// Otimizado: Rotação anti-horária usando processamento por blocos
+  /// Melhor cache locality processando blocos de 32x32 pixels
   static Uint8List _rotateCounterClockWise(
     int width,
     int height,
-    Uint8List data, {
-    int multiplier = 1,
-  }) {
-    final rotatedData = Uint8List(width * height * multiplier);
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        rotatedData[x * height + height - y - 1] = data[y * width + x];
+    Uint8List data,
+  ) {
+    final rotatedData = Uint8List(width * height);
+    const blockSize = 32;
+
+    // Processa imagem em blocos para melhor uso de cache
+    for (int blockY = 0; blockY < height; blockY += blockSize) {
+      final blockHeight = (blockY + blockSize > height) ? height - blockY : blockSize;
+
+      for (int blockX = 0; blockX < width; blockX += blockSize) {
+        final blockWidth = (blockX + blockSize > width) ? width - blockX : blockSize;
+
+        // Processa pixels dentro do bloco
+        for (int y = 0; y < blockHeight; y++) {
+          final sourceY = blockY + y;
+          final sourceRowStart = sourceY * width + blockX;
+          final targetCol = height - sourceY - 1;
+
+          for (int x = 0; x < blockWidth; x++) {
+            rotatedData[(blockX + x) * height + targetCol] = data[sourceRowStart + x];
+          }
+        }
       }
     }
     return rotatedData;
   }
 
+  /// Otimizado: Rotação horária usando processamento por blocos
+  /// Melhor cache locality processando blocos de 32x32 pixels
   static Uint8List _rotateClockWise(
     int width,
     int height,
-    Uint8List data, {
-    int multiplier = 1,
-  }) {
-    final rotatedData = Uint8List(width * height * multiplier);
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        rotatedData[(width - x - 1) * height + y] = data[y * width + x];
+    Uint8List data,
+  ) {
+    final rotatedData = Uint8List(width * height);
+    const blockSize = 32;
+
+    // Processa imagem em blocos para melhor uso de cache
+    for (int blockY = 0; blockY < height; blockY += blockSize) {
+      final blockHeight = (blockY + blockSize > height) ? height - blockY : blockSize;
+
+      for (int blockX = 0; blockX < width; blockX += blockSize) {
+        final blockWidth = (blockX + blockSize > width) ? width - blockX : blockSize;
+
+        // Processa pixels dentro do bloco
+        for (int y = 0; y < blockHeight; y++) {
+          final sourceY = blockY + y;
+          final sourceRowStart = sourceY * width + blockX;
+
+          for (int x = 0; x < blockWidth; x++) {
+            final targetRow = (width - (blockX + x) - 1) * height;
+            rotatedData[targetRow + sourceY] = data[sourceRowStart + x];
+          }
+        }
       }
     }
     return rotatedData;

@@ -10,6 +10,7 @@ export 'package:qr_code_dart_decoder/src/camera/isolate_camera_decode.dart';
 export 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
+export 'package:qr_code_dart_decoder/src/util/blur_detector.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_background_yuv.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_strategy.dart';

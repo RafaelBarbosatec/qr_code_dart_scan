@@ -30,7 +30,8 @@ class _IsoPlanesMessage {
         croppingStrategy = null,
         result = null;
 
-  final List<Yuv420Planes>? data;
+  // Usa TransferableYuv420Planes para transferência eficiente entre isolates
+  final List<TransferableYuv420Planes>? data;
   final Result? result;
   final _IsoCommand cmd;
   final RotationType? rotation;
@@ -49,6 +50,10 @@ class IsolateCameraDecode {
   final List<Result?> _currentResults = [];
   bool _created = false;
   bool _paused = false;
+
+  /// Limite máximo de resultados armazenados para evitar memory leak.
+  /// Mantém apenas os últimos 10 resultados.
+  static const int _maxResultsLimit = 10;
 
   /// get current data of yuv Yuv420Planess
   List<Yuv420Planes> get currentMultiplier => _currentYuv420Planess;
@@ -120,10 +125,14 @@ class IsolateCameraDecode {
   }) {
     _currentYuv420Planess = yuv420Planess;
     _completer = Completer<Result?>();
+
+    // Converte para formato transferível (zero-copy)
+    final transferablePlanes = yuv420Planess.map((plane) => plane.toTransferable()).toList();
+
     _newIceSP.send(
       _IsoPlanesMessage(
         _IsoCommand.decode,
-        _currentYuv420Planess,
+        transferablePlanes,
         rotation,
         formats,
         croppingStrategy,
@@ -135,6 +144,12 @@ class IsolateCameraDecode {
 
   void _setCurrentResults(Result? result) {
     _currentResults.insert(0, result);
+
+    // Limita o tamanho da lista para evitar memory leak
+    if (_currentResults.length > _maxResultsLimit) {
+      _currentResults.removeLast();
+    }
+
     if (!(_completer?.isCompleted ?? true)) {
       if (result != null) {
         _completer?.complete(result);
@@ -165,7 +180,8 @@ Future<void> _decodeFromCamera(SendPort callerSP) async {
         if (goNext.isCompleted) {
           return;
         }
-        yuv420Planess = message.data;
+        // Converte de TransferableYuv420Planes de volta para Yuv420Planes
+        yuv420Planess = message.data?.map((transferable) => Yuv420Planes.fromTransferable(transferable)).toList();
         rotation = message.rotation;
         formats = message.formats;
         croppingStrategy = message.croppingStrategy;

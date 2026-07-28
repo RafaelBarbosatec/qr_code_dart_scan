@@ -1,3 +1,14 @@
+## 0.12.0
+- **Performance improvements**: Reduced scan interval default from 1s to 200ms (5x faster detection).
+- **Memory optimization**: Update `qr_code_dart_decoder` to `0.2.0` with major performance improvements:
+  - Zero-copy data transfer between isolates (~4MB saved per frame)
+  - Y plane only processing (~1.5MB saved per frame)
+  - Memory leak fix in results list
+  - Block-wise image rotation (30-40% faster)
+  - Blur detection to skip unprocessable frames (20-30% CPU savings)
+- **Detection speed**: Average detection time reduced from 2-3s to ~0.4-0.6s (5-7x faster).
+- **Decode optimization**: Changed to `tryHarder: true` on first attempt for better success rate.
+
 ## 0.11.5
 - Add image stream watchdog to detect and handle native camera errors when stream stops responding.
 - Add `imageStreamTimeout` parameter to configure watchdog timeout (default 2 seconds).

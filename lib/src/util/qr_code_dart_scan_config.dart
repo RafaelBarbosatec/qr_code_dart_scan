@@ -23,7 +23,7 @@ class QRCodeDartScanConfig {
     required this.typeScan,
     this.imageDecodeOrientation = ImageDecodeOrientation.original,
     this.resolutionPreset = QRCodeDartScanResolutionPreset.medium,
-    this.intervalScan = const Duration(seconds: 1),
+    this.intervalScan = const Duration(milliseconds: 200),
     this.onResultInterceptor,
     this.lockCaptureOrientation,
     this.onCameraError,

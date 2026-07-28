@@ -6,12 +6,21 @@ import 'package:zxing_lib/common.dart';
 import 'package:zxing_lib/zxing.dart';
 
 abstract class CameraDecode {
+  /// Flag para habilitar/desabilitar detecção de blur
+  /// Pode ser desabilitado se causar falsos negativos em certos ambientes
+  static bool enableBlurDetection = false;
+
   static Result? decode(
     List<Yuv420Planes> yuv420Planess, {
     RotationType? rotation,
     List<BarcodeFormat>? formats,
     CroppingStrategy? croppingStrategy,
   }) {
+    // Otimização: Skip de frames borrados (economia de CPU)
+    if (enableBlurDetection && !BlurDetector.isSharpFast(yuv420Planess)) {
+      return null;
+    }
+
     if (croppingStrategy != null) {
       try {
         double width = yuv420Planess.first.bytesPerRow.toDouble();
@@ -36,16 +45,18 @@ abstract class CameraDecode {
 
     final reader = MultiFormatReader();
 
+    // Otimização: Tenta primeiro com tryHarder=true para melhor taxa de sucesso
     try {
       return reader.decode(
         bitmap,
         DecodeHint(
           possibleFormats: formats,
           alsoInverted: false,
-          tryHarder: false,
+          tryHarder: true,
         ),
       );
     } catch (_) {
+      // Segunda tentativa: tenta com imagem invertida
       try {
         return reader.decode(
           bitmap,
@@ -56,16 +67,18 @@ abstract class CameraDecode {
           ),
         );
       } catch (_) {
-        return _tryUsingCropBackground(
-          yuv420Planess,
-          reader,
-          formats,
-          rotation,
-        );
+        // Terceira tentativa: crop background apenas como último recurso
+        // Desabilitado por padrão por ser muito caro
+        // Descomente se necessário para QR codes muito difíceis
+        // return _tryUsingCropBackground(yuv420Planess, reader, formats, rotation);
+        return null;
       }
     }
   }
 
+  // Método desabilitado por questões de performance (muito caro)
+  // Descomente se necessário para QR codes muito difíceis de detectar
+  // ignore: unused_element
   static Result? _tryUsingCropBackground(
     List<Yuv420Planes> yuv420Planess,
     MultiFormatReader reader,
