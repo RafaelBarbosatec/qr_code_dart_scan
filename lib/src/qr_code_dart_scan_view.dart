@@ -6,6 +6,7 @@ import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
 import 'package:qr_code_dart_scan/src/util/image_decode_orientation.dart';
 import 'package:qr_code_dart_scan/src/util/qr_code_dart_scan_resolution_preset.dart';
+import 'package:zxing_lib/src/result_point.dart';
 
 import 'decoder/qr_code_dart_scan_decoder.dart';
 import 'util/qr_code_dart_scan_config.dart';
@@ -118,11 +119,15 @@ class QRCodeDartScanView extends StatefulWidget {
   QRCodeDartScanViewState createState() => QRCodeDartScanViewState();
 }
 
-class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBindingObserver {
+class QRCodeDartScanViewState extends State<QRCodeDartScanView>
+    with WidgetsBindingObserver {
   late QRCodeDartScanController controller;
   bool initialized = false;
   bool _isControllerDisposed = false;
   Key _cameraKey = UniqueKey();
+  double _scale = 1.0;
+  Size _previewSize = Size.zero;
+  Size _cameraSize = Size.zero;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -244,6 +249,14 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
     // // to prevent scaling down, invert the value
     if (scale < 1) scale = 1 / scale;
 
+    // Store values for result points transformation
+    _scale = scale;
+    _previewSize = sizePreview;
+    _cameraSize = Size(
+      camera.previewSize!.height,
+      camera.previewSize!.width,
+    );
+
     return ClipRRect(
       child: SizedBox(
         key: _cameraKey,
@@ -259,7 +272,8 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
                 ),
               ),
             ),
-            if (controller.state.value.typeScan == TypeScan.takePicture) _buildButton(),
+            if (controller.state.value.typeScan == TypeScan.takePicture)
+              _buildButton(),
             widget.child ?? const SizedBox.shrink(),
           ],
         ),
@@ -278,8 +292,110 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView> with WidgetsBind
       });
     }
     if (state.result != null) {
-      widget.onCapture?.call(state.result!);
+     final result = Result(
+        state.result!.text,
+        state.result!.rawBytes,
+        _fixResultPoints(state.result!.resultPoints),
+        state.result!.barcodeFormat,
+        state.result!.timestamp,
+      );
+      widget.onCapture?.call(result);
     }
+  }
+
+  List<ResultPoint?>? _fixResultPoints(List<ResultPoint?>? resultPoints) {
+    if (resultPoints == null || resultPoints.isEmpty) {
+      return resultPoints;
+    }
+
+    if (_cameraSize == Size.zero || _previewSize == Size.zero) {
+      return resultPoints;
+    }
+
+    final cameraController = controller.cameraController;
+    if (cameraController == null || !cameraController.value.isInitialized) {
+      return resultPoints;
+    }
+
+    // Tamanho da câmera conforme reportado pelo hardware
+    final originalPreviewSize = cameraController.value.previewSize!;
+    final cameraWidth = originalPreviewSize.width;
+    final cameraHeight = originalPreviewSize.height;
+
+    // Detectar orientação da câmera e do preview
+    final cameraIsLandscape = cameraWidth > cameraHeight;
+    final previewIsLandscape = _previewSize.width > _previewSize.height;
+
+    // Precisamos rotacionar se as orientações são diferentes
+    final needsRotation = cameraIsLandscape != previewIsLandscape;
+
+    // Dimensões finais da imagem após rotação (se necessário)
+    double finalImageWidth, finalImageHeight;
+    if (needsRotation) {
+      // Após rotação 90°, largura e altura são invertidas
+      finalImageWidth = cameraHeight;
+      finalImageHeight = cameraWidth;
+    } else {
+      finalImageWidth = cameraWidth;
+      finalImageHeight = cameraHeight;
+    }
+
+    // Aplicar a mesma escala uniforme que é aplicada ao CameraPreview
+    final scaledImageWidth = finalImageWidth * _scale;
+    final scaledImageHeight = finalImageHeight * _scale;
+
+    // Calcular crop (parte que fica fora do preview)
+    final cropX = (scaledImageWidth - _previewSize.width) / 2;
+    final cropY = (scaledImageHeight - _previewSize.height) / 2;
+
+    // Transformar todos os pontos
+    final transformedPoints = <ResultPoint>[];
+    for (final point in resultPoints) {
+      if (point == null) continue;
+
+      double transformedX, transformedY;
+
+      if (needsRotation) {
+        // Rotação 90° horário: (x, y) → (height - y, x)
+        transformedX = cameraHeight - point.y;
+        transformedY = point.x;
+      } else {
+        // Sem rotação, usar coordenadas originais
+        transformedX = point.x;
+        transformedY = point.y;
+      }
+
+      // Aplicar escala uniforme e remover crop
+      final fixedX = (transformedX * _scale) - cropX;
+      final fixedY = (transformedY * _scale) - cropY;
+
+      transformedPoints.add(ResultPoint(fixedX, fixedY));
+    }
+
+    if (transformedPoints.isEmpty) {
+      return resultPoints;
+    }
+
+    // Calcular bounding box
+    double minX = transformedPoints.first.x;
+    double maxX = transformedPoints.first.x;
+    double minY = transformedPoints.first.y;
+    double maxY = transformedPoints.first.y;
+
+    for (final point in transformedPoints) {
+      if (point.x < minX) minX = point.x;
+      if (point.x > maxX) maxX = point.x;
+      if (point.y < minY) minY = point.y;
+      if (point.y > maxY) maxY = point.y;
+    }
+
+    // Retornar os 4 cantos do quadrilátero (bounding box)
+    return [
+      ResultPoint(minX, minY), // Top-left
+      ResultPoint(maxX, minY), // Top-right
+      ResultPoint(maxX, maxY), // Bottom-right
+      ResultPoint(minX, maxY), // Bottom-left
+    ];
   }
 }
 

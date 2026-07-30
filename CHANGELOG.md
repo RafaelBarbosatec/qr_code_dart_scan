@@ -1,3 +1,9 @@
+## 0.12.1
+- **Result points accuracy**: Fixed `resultPoints` coordinates to accurately match the QR code position in the camera preview.
+- **Dynamic rotation handling**: Automatically detects camera orientation (landscape/portrait) and applies the correct transformation.
+- **Bounding box generation**: Result points now always form a perfect quadrilateral (4 corners) regardless of the number of points detected.
+- **Example enhancement**: Added visual overlay in the example app to display detected QR code boundaries with lines and points.
+
 ## 0.12.0
 - **Performance improvements**: Reduced scan interval default from 1s to 200ms (5x faster detection).
 - **Memory optimization**: Update `qr_code_dart_decoder` to `0.2.0` with major performance improvements:
