@@ -85,42 +85,4 @@ abstract class CameraDecode {
       return null;
     }
   }
-
-  // Método desabilitado por questões de performance (muito caro)
-  // Descomente se necessário para QR codes muito difíceis de detectar
-  // ignore: unused_element
-  static Result? _tryUsingCropBackground(
-    List<Yuv420Planes> yuv420Planess,
-    MultiFormatReader reader,
-    List<BarcodeFormat>? formats,
-    RotationType? rotation,
-  ) {
-    final processor = CropBackgroundYuvProcessor();
-    final processed = processor.process(yuv420Planess);
-    if (processed == null) {
-      return null;
-    }
-
-    LuminanceSource source = LiminanceMapper.toLuminanceSource(
-      processed,
-      rotationType: rotation,
-    );
-
-    var bitmap = BinaryBitmap(
-      HybridBinarizer(source),
-    );
-
-    try {
-      return reader.decode(
-        bitmap,
-        DecodeHint(
-          possibleFormats: formats,
-          alsoInverted: true,
-          tryHarder: true,
-        ),
-      );
-    } catch (e) {
-      return null;
-    }
-  }
 }
