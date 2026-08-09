@@ -24,7 +24,8 @@ abstract class CameraDecode {
     if (croppingStrategy != null) {
       try {
         double width = yuv420Planess.first.bytesPerRow.toDouble();
-        double height = (yuv420Planess.first.bytes.length / width).round().toDouble();
+        double height =
+            (yuv420Planess.first.bytes.length / width).round().toDouble();
         yuv420Planess = CropYuv.cropYuv(
           yuv420Planess,
           croppingStrategy.getCropRect(width, height),
@@ -45,34 +46,43 @@ abstract class CameraDecode {
 
     final reader = MultiFormatReader();
 
-    // Otimização: Tenta primeiro com tryHarder=true para melhor taxa de sucesso
+    Result? result;
+
+    result = _try(
+      reader,
+      bitmap,
+      alsoInverted: false,
+      tryHarder: true,
+    );
+
+    result ??= _try(
+      reader,
+      bitmap,
+      alsoInverted: true,
+      tryHarder: true,
+    );
+
+    return result;
+  }
+
+  static Result? _try(
+    MultiFormatReader reader,
+    BinaryBitmap bitmap, {
+    List<BarcodeFormat>? formats,
+    bool alsoInverted = false,
+    bool tryHarder = false,
+  }) {
     try {
       return reader.decode(
         bitmap,
         DecodeHint(
           possibleFormats: formats,
-          alsoInverted: false,
-          tryHarder: true,
+          alsoInverted: alsoInverted,
+          tryHarder: tryHarder,
         ),
       );
     } catch (_) {
-      // Segunda tentativa: tenta com imagem invertida
-      try {
-        return reader.decode(
-          bitmap,
-          DecodeHint(
-            possibleFormats: formats,
-            alsoInverted: true,
-            tryHarder: true,
-          ),
-        );
-      } catch (_) {
-        // Terceira tentativa: crop background apenas como último recurso
-        // Desabilitado por padrão por ser muito caro
-        // Descomente se necessário para QR codes muito difíceis
-        // return _tryUsingCropBackground(yuv420Planess, reader, formats, rotation);
-        return null;
-      }
+      return null;
     }
   }
 
