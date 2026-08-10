@@ -32,7 +32,7 @@ class _IsoPlanesMessage {
 
   // Usa TransferableYuv420Planes para transferência eficiente entre isolates
   final List<TransferableYuv420Planes>? data;
-  final Result? result;
+  final ScanResult? result;
   final _IsoCommand cmd;
   final RotationType? rotation;
   final List<BarcodeFormat>? formats;
@@ -47,7 +47,7 @@ class IsolateCameraDecode {
   Capability? _capability;
 
   List<Yuv420Planes> _currentYuv420Planess = <Yuv420Planes>[];
-  final List<Result?> _currentResults = [];
+  final List<ScanResult?> _currentResults = [];
   bool _created = false;
   bool _paused = false;
 
@@ -65,7 +65,7 @@ class IsolateCameraDecode {
   bool get created => _created;
 
   /// get last result
-  List<Result?> get currentResults => _currentResults;
+  List<ScanResult?> get currentResults => _currentResults;
 
   Future<void> _createIsolate() async {
     _receivePort = ReceivePort();
@@ -114,17 +114,17 @@ class IsolateCameraDecode {
     _paused = !_paused;
   }
 
-  Completer<Result?>? _completer;
+  Completer<ScanResult?>? _completer;
 
   /// set a yuv Yuv420Planess to start decode
-  Future<Result?> setYuv420Planess(
+  Future<ScanResult?> setYuv420Planess(
     List<Yuv420Planes> yuv420Planess, {
     RotationType? rotation,
     List<BarcodeFormat>? formats,
     CroppingStrategy? croppingStrategy,
   }) {
     _currentYuv420Planess = yuv420Planess;
-    _completer = Completer<Result?>();
+    _completer = Completer<ScanResult?>();
 
     // Converte para formato transferível (zero-copy)
     final transferablePlanes = yuv420Planess.map((plane) => plane.toTransferable()).toList();
@@ -142,7 +142,7 @@ class IsolateCameraDecode {
     return _completer!.future;
   }
 
-  void _setCurrentResults(Result? result) {
+  void _setCurrentResults(ScanResult? result) {
     _currentResults.insert(0, result);
 
     // Limita o tamanho da lista para evitar memory leak

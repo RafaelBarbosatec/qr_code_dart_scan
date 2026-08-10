@@ -21,6 +21,8 @@ dev_dependencies:
 
 dependency_overrides:
   camera_android_camerax: 0.6.14
+  qr_code_dart_decoder:
+    path: ../packages/qr_code_dart_decoder
 
 
 

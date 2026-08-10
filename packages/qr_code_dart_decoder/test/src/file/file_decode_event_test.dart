@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   group('FileDecodeEvent', () {
     final testImage = Uint8List.fromList([1, 2, 3, 4]);
-    final testFormats = [BarcodeFormat.qrCode, BarcodeFormat.codabar];
+    final testFormats = [BarcodeFormat.qrCode, BarcodeFormat.code128];
 
     test('constructor creates instance with correct values', () {
       final event = FileDecodeEvent(
@@ -37,7 +37,7 @@ void main() {
         'image': testImage,
         'width': 100,
         'height': 200,
-        'formats': [BarcodeFormat.qrCode.index, BarcodeFormat.codabar.index],
+        'formats': [BarcodeFormat.qrCode.index, BarcodeFormat.code128.index],
         'rotation': RotationType.counterClockwise.name,
       };
 
@@ -47,7 +47,7 @@ void main() {
       expect(event.rotation, equals(RotationType.counterClockwise));
       expect(event.formats.length, equals(2));
       expect(event.formats[0], equals(BarcodeFormat.qrCode));
-      expect(event.formats[1], equals(BarcodeFormat.codabar));
+      expect(event.formats[1], equals(BarcodeFormat.code128));
       expect(event.width, equals(100));
       expect(event.height, equals(200));
     });
@@ -63,7 +63,7 @@ void main() {
       final map = event.toMap();
 
       expect(map['image'], equals(testImage));
-      expect(map['formats'], equals([BarcodeFormat.qrCode.index, BarcodeFormat.codabar.index]));
+      expect(map['formats'], equals([BarcodeFormat.qrCode.index, BarcodeFormat.code128.index]));
       expect(map['width'], equals(100));
       expect(map['height'], equals(200));
     });

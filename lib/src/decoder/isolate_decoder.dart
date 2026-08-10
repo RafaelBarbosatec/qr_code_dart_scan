@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
-// The decoder layer still speaks zxing types; `BarcodeFormat` is hidden here so
-// it keeps resolving to zxing's and not to the package's public one.
-import 'package:qr_code_dart_scan/qr_code_dart_scan.dart' hide BarcodeFormat;
+import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_code_dart_scan/src/decoder/global_functions.dart';
 
 class IsolateDecoder {
@@ -26,7 +24,7 @@ class IsolateDecoder {
     isolateController.terminate();
   }
 
-  Future<Result?> decodeFileImage(XFile file, {CropRect? cropRect}) async {
+  Future<ScanResult?> decodeFileImage(XFile file, {CropRect? cropRect}) async {
     final bytes = await file.readAsBytes();
     final image = await myDecodeImageFromList(bytes);
     final event = FileDecodeEvent(
@@ -40,7 +38,7 @@ class IsolateDecoder {
     return compute(FileDecode.decode, event.toMap());
   }
 
-  Future<Result?> decodeCameraImage(
+  Future<ScanResult?> decodeCameraImage(
     CameraImage image, {
     bool isInverted = false,
     ImageDecodeOrientation imageDecodeOrientation = ImageDecodeOrientation.original,

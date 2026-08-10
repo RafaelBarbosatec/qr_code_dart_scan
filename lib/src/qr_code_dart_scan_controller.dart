@@ -4,7 +4,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
-import 'package:qr_code_dart_scan/src/models/zxing_mapping.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
 
 import 'util/qr_code_dart_scan_config.dart';
@@ -197,7 +196,7 @@ class QRCodeDartScanController {
       );
       _codeDartScanDecoder?.dispose();
       _codeDartScanDecoder = QRCodeDartScanDecoder(
-        formats: config.formats.toZxing,
+        formats: config.formats,
       );
       _lastScan = _LastScan(
         date: DateTime.now().subtract(
@@ -317,8 +316,7 @@ class QRCodeDartScanController {
           croppingStrategy: _config?.croppingStrategy,
         );
         if (generation != _generation) return;
-        // Boundary with the decoder layer: zxing types stop here.
-        final result = decoded?.toScanResult;
+        final result = decoded;
         if (result != null) {
           final canNotify = _config?.onResultInterceptor?.call(_lastResult, result) ?? true;
           if (canNotify == true) {
@@ -437,10 +435,9 @@ class QRCodeDartScanController {
       final xFile = await session.controller.takePicture();
       if (generation != _generation) return;
 
-      final decoded = await _codeDartScanDecoder?.decodeFile(xFile);
+      final result = await _codeDartScanDecoder?.decodeFile(xFile);
       if (generation != _generation) return;
 
-      final result = decoded?.toScanResult;
       _lastResult = result;
       state.value = state.value.copyWith(
         result: result,

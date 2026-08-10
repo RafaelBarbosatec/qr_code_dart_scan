@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:qr_code_dart_decoder/src/models/barcode_format.dart';
 import 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
 import 'package:qr_code_dart_decoder/src/util/rotation_type.dart';
-import 'package:zxing_lib/zxing.dart';
 
 ///
 /// Created by

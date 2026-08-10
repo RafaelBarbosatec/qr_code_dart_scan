@@ -20,7 +20,7 @@ void main() {
       final result = await decoder.decodeFile(bytes);
       expect(result, isNotNull);
       expect(result?.text, testResult);
-      expect(result?.barcodeFormat, BarcodeFormat.qrCode);
+      expect(result?.format, BarcodeFormat.qrCode);
     });
 
     test('decodeFile: should not find ', () async {
@@ -39,7 +39,7 @@ void main() {
       final result = await decoder.decodeFile(bytes);
       expect(result, isNotNull);
       expect(result?.text, isNotEmpty);
-      expect(result?.barcodeFormat, BarcodeFormat.qrCode);
+      expect(result?.format, BarcodeFormat.qrCode);
     });
 
     test('decodeFile qrcode without border black background', () async {
@@ -48,7 +48,7 @@ void main() {
       final result = await decoder.decodeFile(bytes);
       expect(result, isNotNull);
       expect(result?.text, isNotEmpty);
-      expect(result?.barcodeFormat, BarcodeFormat.qrCode);
+      expect(result?.format, BarcodeFormat.qrCode);
     });
 
     test('decodeFile qrcode without border black background2', () async {
@@ -57,7 +57,7 @@ void main() {
       final result = await decoder.decodeFile(bytes);
       expect(result, isNotNull);
       expect(result?.text, isNotEmpty);
-      expect(result?.barcodeFormat, BarcodeFormat.qrCode);
+      expect(result?.format, BarcodeFormat.qrCode);
     });
 
     test('decodeCameraImage', () async {
@@ -77,7 +77,7 @@ void main() {
       );
       expect(result, isNotNull);
       expect(result?.text, isNotNull);
-      expect(result?.barcodeFormat, BarcodeFormat.qrCode);
+      expect(result?.format, BarcodeFormat.qrCode);
     });
 
     test('decodeCameraImage: should not find', () async {
@@ -108,7 +108,7 @@ void main() {
       final result = await decoder.decodeFile(bytes);
       expect(result, isNotNull);
       expect(result?.text, '00004000000000000060000000000000000000000000');
-      expect(result?.barcodeFormat, BarcodeFormat.itf);
+      expect(result?.format, BarcodeFormat.itf);
     });
 
     test('decodeBoleto rotated', () async {
@@ -118,7 +118,7 @@ void main() {
       final result = await decoder.decodeFile(bytes, rotate: RotationType.counterClockwise);
       expect(result, isNotNull);
       expect(result?.text, '00004000000000000060000000000000000000000000');
-      expect(result?.barcodeFormat, BarcodeFormat.itf);
+      expect(result?.format, BarcodeFormat.itf);
     });
   });
 }

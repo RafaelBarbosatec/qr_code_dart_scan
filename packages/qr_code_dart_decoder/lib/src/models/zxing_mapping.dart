@@ -1,5 +1,5 @@
+import 'dart:math';
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:zxing_lib/zxing.dart' as zxing;
 
@@ -99,12 +99,12 @@ extension ZxingResultMapping on zxing.Result {
     );
   }
 
-  static List<Offset> _cornersOf(List<zxing.ResultPoint?>? points) {
-    if (points == null || points.isEmpty) return const <Offset>[];
-    final corners = <Offset>[];
+  static List<Point<double>> _cornersOf(List<zxing.ResultPoint?>? points) {
+    if (points == null || points.isEmpty) return const <Point<double>>[];
+    final corners = <Point<double>>[];
     for (final point in points) {
       if (point == null) continue;
-      corners.add(Offset(point.x, point.y));
+      corners.add(Point<double>(point.x, point.y));
     }
     return corners;
   }

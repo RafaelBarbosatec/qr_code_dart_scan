@@ -1,5 +1,5 @@
+import 'dart:math';
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'barcode_format.dart';
 
@@ -14,7 +14,7 @@ class ScanResult {
     required this.format,
     required this.timestamp,
     this.rawBytes,
-    this.corners = const <Offset>[],
+    this.corners = const <Point<double>>[],
   });
 
   /// Text encoded in the barcode.
@@ -29,21 +29,23 @@ class ScanResult {
   /// Raw bytes encoded by the barcode, when the format provides them.
   final Uint8List? rawBytes;
 
-  /// Corners of the barcode in camera preview coordinates.
+  /// Corners of the barcode in the decoded image coordinate space.
   ///
   /// When not empty this is the bounding quadrilateral of the barcode, in
-  /// order: top-left, top-right, bottom-right, bottom-left. Use it to draw an
-  /// overlay on top of [QRCodeDartScanView].
+  /// order: top-left, top-right, bottom-right, bottom-left.
+  ///
+  /// This package is pure Dart, so these are `dart:math` points; Flutter apps
+  /// get `toOffset`/`toOffsets` from `package:qr_code_dart_scan`.
   ///
   /// Empty when the decoder did not report any point.
-  final List<Offset> corners;
+  final List<Point<double>> corners;
 
   ScanResult copyWith({
     String? text,
     BarcodeFormat? format,
     DateTime? timestamp,
     Uint8List? rawBytes,
-    List<Offset>? corners,
+    List<Point<double>>? corners,
   }) {
     return ScanResult(
       text: text ?? this.text,

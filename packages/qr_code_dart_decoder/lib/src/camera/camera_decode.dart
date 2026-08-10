@@ -1,16 +1,17 @@
 import 'dart:developer';
 
 import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
+import 'package:qr_code_dart_decoder/src/models/zxing_mapping.dart';
 import 'package:qr_code_dart_decoder/src/util/liminance_mapper.dart';
 import 'package:zxing_lib/common.dart';
-import 'package:zxing_lib/zxing.dart';
+import 'package:zxing_lib/zxing.dart' hide BarcodeFormat;
 
 abstract class CameraDecode {
   /// Flag para habilitar/desabilitar detecção de blur
   /// Pode ser desabilitado se causar falsos negativos em certos ambientes
   static bool enableBlurDetection = false;
 
-  static Result? decode(
+  static ScanResult? decode(
     List<Yuv420Planes> yuv420Planess, {
     RotationType? rotation,
     List<BarcodeFormat>? formats,
@@ -51,6 +52,7 @@ abstract class CameraDecode {
     result = _try(
       reader,
       bitmap,
+      formats: formats,
       alsoInverted: false,
       tryHarder: true,
     );
@@ -58,11 +60,12 @@ abstract class CameraDecode {
     result ??= _try(
       reader,
       bitmap,
+      formats: formats,
       alsoInverted: true,
       tryHarder: true,
     );
 
-    return result;
+    return result?.toScanResult;
   }
 
   static Result? _try(
@@ -76,7 +79,7 @@ abstract class CameraDecode {
       return reader.decode(
         bitmap,
         DecodeHint(
-          possibleFormats: formats,
+          possibleFormats: formats?.toZxing,
           alsoInverted: alsoInverted,
           tryHarder: tryHarder,
         ),

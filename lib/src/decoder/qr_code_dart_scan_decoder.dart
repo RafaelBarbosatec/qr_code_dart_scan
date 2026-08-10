@@ -47,7 +47,7 @@ class QRCodeDartScanDecoder {
     )..start();
   }
 
-  Future<Result?> decodeCameraImage(
+  Future<ScanResult?> decodeCameraImage(
     CameraImage image, {
     ImageDecodeOrientation imageDecodeOrientation = ImageDecodeOrientation.original,
     CroppingStrategy? croppingStrategy,
@@ -60,7 +60,7 @@ class QRCodeDartScanDecoder {
     );
   }
 
-  Future<Result?> decodeFile(
+  Future<ScanResult?> decodeFile(
     XFile file, {
     CropRect? cropRect,
   }) async {

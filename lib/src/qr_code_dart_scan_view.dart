@@ -1,9 +1,10 @@
+import 'dart:math';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart' show CroppingStrategy;
-import 'package:qr_code_dart_scan/src/models/barcode_format.dart';
-import 'package:qr_code_dart_scan/src/models/scan_result.dart';
+import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart'
+    show BarcodeFormat, CroppingStrategy, ScanResult;
 import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
 import 'package:qr_code_dart_scan/src/util/image_decode_orientation.dart';
@@ -330,7 +331,7 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   }
 
   /// Maps decoder corners (camera image space) to preview widget space.
-  List<Offset> _fixCorners(List<Offset> corners) {
+  List<Point<double>> _fixCorners(List<Point<double>> corners) {
     if (corners.isEmpty) {
       return corners;
     }
@@ -376,25 +377,25 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     final cropY = (scaledImageHeight - _previewSize.height) / 2;
 
     // Transformar todos os pontos
-    final transformedPoints = <Offset>[];
+    final transformedPoints = <Point<double>>[];
     for (final point in corners) {
       double transformedX, transformedY;
 
       if (needsRotation) {
         // Rotação 90° horário: (x, y) → (height - y, x)
-        transformedX = cameraHeight - point.dy;
-        transformedY = point.dx;
+        transformedX = cameraHeight - point.y;
+        transformedY = point.x;
       } else {
         // Sem rotação, usar coordenadas originais
-        transformedX = point.dx;
-        transformedY = point.dy;
+        transformedX = point.x;
+        transformedY = point.y;
       }
 
       // Aplicar escala uniforme e remover crop
       final fixedX = (transformedX * _scale) - cropX;
       final fixedY = (transformedY * _scale) - cropY;
 
-      transformedPoints.add(Offset(fixedX, fixedY));
+      transformedPoints.add(Point<double>(fixedX, fixedY));
     }
 
     if (transformedPoints.isEmpty) {
@@ -402,24 +403,24 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     }
 
     // Calcular bounding box
-    double minX = transformedPoints.first.dx;
-    double maxX = transformedPoints.first.dx;
-    double minY = transformedPoints.first.dy;
-    double maxY = transformedPoints.first.dy;
+    double minX = transformedPoints.first.x;
+    double maxX = transformedPoints.first.x;
+    double minY = transformedPoints.first.y;
+    double maxY = transformedPoints.first.y;
 
     for (final point in transformedPoints) {
-      if (point.dx < minX) minX = point.dx;
-      if (point.dx > maxX) maxX = point.dx;
-      if (point.dy < minY) minY = point.dy;
-      if (point.dy > maxY) maxY = point.dy;
+      if (point.x < minX) minX = point.x;
+      if (point.x > maxX) maxX = point.x;
+      if (point.y < minY) minY = point.y;
+      if (point.y > maxY) maxY = point.y;
     }
 
     // Retornar os 4 cantos do quadrilátero (bounding box)
     return [
-      Offset(minX, minY), // Top-left
-      Offset(maxX, minY), // Top-right
-      Offset(maxX, maxY), // Bottom-right
-      Offset(minX, maxY), // Bottom-left
+      Point<double>(minX, minY), // Top-left
+      Point<double>(maxX, minY), // Top-right
+      Point<double>(maxX, maxY), // Bottom-right
+      Point<double>(minX, maxY), // Bottom-left
     ];
   }
 }

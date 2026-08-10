@@ -1,12 +1,14 @@
 import 'dart:typed_data';
 
 import 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
+import 'package:qr_code_dart_decoder/src/models/scan_result.dart';
+import 'package:qr_code_dart_decoder/src/models/zxing_mapping.dart';
 import 'package:qr_code_dart_decoder/src/util/liminance_mapper.dart';
 import 'package:zxing_lib/common.dart';
-import 'package:zxing_lib/zxing.dart';
+import 'package:zxing_lib/zxing.dart' hide BarcodeFormat;
 
 abstract class FileDecode {
-  static Future<Result?> decode(Map<dynamic, dynamic> map) async {
+  static Future<ScanResult?> decode(Map<dynamic, dynamic> map) async {
     final FileDecodeEvent event = FileDecodeEvent.fromMap(map);
 
     final imageBytes = Uint8List.view(event.image.buffer);
@@ -25,25 +27,31 @@ abstract class FileDecode {
 
     final reader = MultiFormatReader();
 
+    final possibleFormats = event.formats.toZxing;
+
     try {
-      return reader.decode(
-        bitmap,
-        DecodeHint(
-          possibleFormats: event.formats,
-          alsoInverted: false,
-          tryHarder: false,
-        ),
-      );
+      return reader
+          .decode(
+            bitmap,
+            DecodeHint(
+              possibleFormats: possibleFormats,
+              alsoInverted: false,
+              tryHarder: false,
+            ),
+          )
+          .toScanResult;
     } on NotFoundException catch (_) {
       try {
-        return reader.decode(
-          bitmap,
-          DecodeHint(
-            possibleFormats: event.formats,
-            alsoInverted: true,
-            tryHarder: true,
-          ),
-        );
+        return reader
+            .decode(
+              bitmap,
+              DecodeHint(
+                possibleFormats: possibleFormats,
+                alsoInverted: true,
+                tryHarder: true,
+              ),
+            )
+            .toScanResult;
       } catch (_) {
         return null;
       }

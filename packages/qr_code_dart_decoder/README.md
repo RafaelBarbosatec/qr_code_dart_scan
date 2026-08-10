@@ -70,6 +70,22 @@ Future<void> decodeQrFromCamera(CamperaImage image) async {
 }
 ```
 
+## Result
+
+Both `decodeFile` and `decodeCameraImage` return a `ScanResult?` — `null` when nothing was decoded. `zxing_lib` is an implementation detail and never appears in the public API, so your app does not need a dependency on it.
+
+```dart
+class ScanResult {
+  final String text;              // Text encoded in the barcode
+  final BarcodeFormat format;     // Format that was decoded
+  final DateTime timestamp;       // When it was decoded
+  final Uint8List? rawBytes;      // Raw bytes, when the format provides them
+  final List<Point<double>> corners; // Bounding quadrilateral, empty if unknown
+}
+```
+
+`corners` uses `dart:math`'s `Point` so this package stays pure Dart. In Flutter, `package:qr_code_dart_scan` provides `toOffset`/`toOffsets` to bridge them to `Offset`.
+
 ## Camera Stream Processing
 
 For real-time barcode detection from camera streams, the package provides:

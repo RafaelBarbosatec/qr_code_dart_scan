@@ -1,3 +1,37 @@
+## 0.3.0
+
+### Breaking Changes
+
+* `zxing_lib` is no longer part of the public API. The package now owns its models, so consuming apps never need a `zxing_lib` dependency:
+  * `decodeFile` and `decodeCameraImage` return `ScanResult?` instead of `zxing_lib`'s `Result?`.
+  * `BarcodeFormat` is now this package's own enum, exposing only the formats that are actually supported (`aztec`, `code39`, `code93`, `code128`, `dataMatrix`, `ean8`, `ean13`, `itf`, `pdf417`, `qrCode`). Unsupported formats are a compile error instead of a runtime exception.
+  * `export 'package:zxing_lib/zxing.dart' show BarcodeFormat, Result` was removed from the barrel.
+* `FileDecode.decode`, `CameraDecode.decode` and `IsolateCameraDecode.setYuv420Planess` return `ScanResult?`; `FileDecodeEvent.formats` and `IsolateCameraDecode.currentResults` use the new types as well.
+
+### Features
+
+* Added `ScanResult` with `text`, `format`, `timestamp`, `rawBytes` and `corners`.
+  * `corners` is a `List<Point<double>>` (`dart:math`), keeping the package pure Dart. Flutter apps can bridge it to `Offset` with `toOffset`/`toOffsets` from `package:qr_code_dart_scan`.
+  * `ScanResult` keeps identity equality on purpose, so repeated scans of the same barcode still notify.
+
+### Bug Fixes
+
+* `CameraDecode.decode` now honours the `formats` it is given. It accepted the argument but never forwarded it to the reader, so camera decoding was unrestricted and could return a barcode in a format the caller had not asked for.
+
+### Migration
+
+```dart
+// Before
+final Result? result = await decoder.decodeFile(bytes);
+result?.barcodeFormat; // zxing_lib BarcodeFormat
+result?.resultPoints;  // List<ResultPoint?>?
+
+// After
+final ScanResult? result = await decoder.decodeFile(bytes);
+result?.format;  // qr_code_dart_decoder BarcodeFormat
+result?.corners; // List<Point<double>>, never null
+```
+
 ## 0.2.0
 
 ### Performance Improvements

@@ -1,3 +1,25 @@
+## 0.14.0
+
+### Breaking: the models moved to `qr_code_dart_decoder`
+
+`ScanResult` and `BarcodeFormat` are now owned by `qr_code_dart_decoder` (0.3.0) and re-exported here, so both packages speak the same types and `zxing_lib` is gone from this package's dependencies. Importing from `package:qr_code_dart_scan/qr_code_dart_scan.dart` keeps working unchanged.
+
+- **`ScanResult.corners` is now `List<Point<double>>`** (`dart:math`) instead of `List<Offset>`. The decoder is a pure Dart package and cannot depend on `dart:ui`. New `toOffset`/`toOffsets` extensions bridge them:
+
+  ```dart
+  // before
+  CustomPaint(painter: MyPainter(result.corners));            // List<Offset>
+
+  // now
+  CustomPaint(painter: MyPainter(result.corners.toOffsets));  // List<Offset>
+  ```
+
+- **`QRCodeDartScanDecoder` no longer speaks `zxing_lib`.** `decodeCameraImage` and `decodeFile` return `ScanResult?` instead of `Result?`, completing the migration started in 0.13.0.
+
+### Bug fix (from `qr_code_dart_decoder` 0.3.0)
+
+- Camera decoding now honours the `formats` you pass to `QRCodeDartScanView`/`QRCodeDartScanDecoder`. The format list was accepted but never reached the reader, so live scanning could return a barcode in a format you had not asked for. If you were relying on that leak, widen `formats` explicitly.
+
 ## 0.13.0
 
 ### Breaking: `zxing_lib` no longer leaks into the scanner API

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 
@@ -138,12 +140,16 @@ class LiveDecodePageState extends State<LiveDecodePage> {
 }
 
 class QRCodePointsPainter extends CustomPainter {
-  final List<Offset> points;
+  final List<Point<double>> corners;
 
-  QRCodePointsPainter(this.points);
+  QRCodePointsPainter(this.corners);
 
   @override
   void paint(Canvas canvas, Size size) {
+    // `ScanResult.corners` comes from the pure-Dart decoder, so it has to be
+    // bridged to `Offset` before painting.
+    final points = corners.toOffsets;
+
     final paint = Paint()
       ..color = Colors.red
       ..strokeWidth = 3
@@ -181,7 +187,7 @@ class QRCodePointsPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(QRCodePointsPainter oldDelegate) {
-    return oldDelegate.points != points;
+    return oldDelegate.corners != corners;
   }
 }
 

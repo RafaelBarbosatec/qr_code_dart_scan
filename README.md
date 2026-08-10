@@ -121,7 +121,9 @@ dependency_overrides:
           // do anything with result
           // result.text      -> String
           // result.format    -> BarcodeFormat
-          // result.corners   -> List<Offset>, in camera preview coordinates
+          // result.corners   -> List<Point<double>>, in camera preview
+          //                     coordinates. Use `result.corners.toOffsets`
+          //                     to paint them.
           // result.rawBytes  -> Uint8List?
           // result.timestamp -> DateTime
         },

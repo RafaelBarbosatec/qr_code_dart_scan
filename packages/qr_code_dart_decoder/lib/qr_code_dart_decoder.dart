@@ -10,6 +10,8 @@ export 'package:qr_code_dart_decoder/src/camera/isolate_camera_decode.dart';
 export 'package:qr_code_dart_decoder/src/camera/yuv420_planes.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode.dart';
 export 'package:qr_code_dart_decoder/src/file/file_decode_event.dart';
+export 'package:qr_code_dart_decoder/src/models/barcode_format.dart';
+export 'package:qr_code_dart_decoder/src/models/scan_result.dart';
 export 'package:qr_code_dart_decoder/src/util/blur_detector.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_background_yuv.dart';
 export 'package:qr_code_dart_decoder/src/util/crop_rect.dart';
@@ -19,7 +21,6 @@ export 'package:qr_code_dart_decoder/src/util/pre_processors/enhanced_quality_pr
 export 'package:qr_code_dart_decoder/src/util/pre_processors/image_pre_processor.dart';
 export 'package:qr_code_dart_decoder/src/util/pre_processors/yuv_pre_processor.dart';
 export 'package:qr_code_dart_decoder/src/util/rotation_type.dart';
-export 'package:zxing_lib/zxing.dart' show BarcodeFormat, Result;
 
 /// A Calculator.
 class QrCodeDartDecoder {
@@ -41,7 +42,7 @@ class QrCodeDartDecoder {
     this.formats = acceptedFormats,
   });
 
-  Future<Result?> decodeFile(
+  Future<ScanResult?> decodeFile(
     Uint8List bytes, {
     RotationType? rotate,
     CropRect? cropRect,
@@ -71,7 +72,7 @@ class QrCodeDartDecoder {
     return result;
   }
 
-  Future<Result?> decodeCameraImage(
+  Future<ScanResult?> decodeCameraImage(
     List<Yuv420Planes> yuv420Planes, {
     bool isInverted = false,
     RotationType? rotate,
@@ -86,7 +87,7 @@ class QrCodeDartDecoder {
     );
   }
 
-  Future<Result?> _tryUsingImageProcessor(
+  Future<ScanResult?> _tryUsingImageProcessor(
     Image i,
     FileDecodeEvent e,
     ImagePreProcessor preImageProcessor,
