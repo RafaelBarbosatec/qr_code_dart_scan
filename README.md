@@ -117,15 +117,13 @@ dependency_overrides:
         // croppingStrategy: CroppingStrategy.cropCenterSquare(
         //   squareSizeFactor: 0.7,
         // ),
-        onCapture: (Result result) {
+        onCapture: (ScanResult result) {
           // do anything with result
-          // result.text
-          // result.rawBytes
-          // result.resultPoints
-          // result.format
-          // result.numBits
-          // result.resultMetadata
-          // result.time
+          // result.text      -> String
+          // result.format    -> BarcodeFormat
+          // result.corners   -> List<Offset>, in camera preview coordinates
+          // result.rawBytes  -> Uint8List?
+          // result.timestamp -> DateTime
         },
       ),
     );

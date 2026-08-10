@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
-import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
+// The decoder layer still speaks zxing types; `BarcodeFormat` is hidden here so
+// it keeps resolving to zxing's and not to the package's public one.
+import 'package:qr_code_dart_scan/qr_code_dart_scan.dart' hide BarcodeFormat;
 import 'package:qr_code_dart_scan/src/decoder/global_functions.dart';
 
 class IsolateDecoder {

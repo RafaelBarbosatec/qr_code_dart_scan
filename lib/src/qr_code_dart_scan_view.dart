@@ -1,14 +1,14 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart';
+import 'package:qr_code_dart_decoder/qr_code_dart_decoder.dart' show CroppingStrategy;
+import 'package:qr_code_dart_scan/src/models/barcode_format.dart';
+import 'package:qr_code_dart_scan/src/models/scan_result.dart';
 import 'package:qr_code_dart_scan/src/qr_code_dart_scan_controller.dart';
 import 'package:qr_code_dart_scan/src/util/extensions.dart';
 import 'package:qr_code_dart_scan/src/util/image_decode_orientation.dart';
 import 'package:qr_code_dart_scan/src/util/qr_code_dart_scan_resolution_preset.dart';
-import 'package:zxing_lib/src/result_point.dart';
 
-import 'decoder/qr_code_dart_scan_decoder.dart';
 import 'util/qr_code_dart_scan_config.dart';
 
 ///
@@ -36,11 +36,11 @@ typedef TakePictureButtonBuilder = Widget Function(
 class QRCodeDartScanView extends StatefulWidget {
   final TypeCamera typeCamera;
   final TypeScan typeScan;
-  final ValueChanged<Result>? onCapture;
+  final ValueChanged<ScanResult>? onCapture;
 
-  /// Use to limit a specific format
-  /// If null use all accepted formats
-  /// List of barcode formats to scan for. If null or empty, uses all accepted formats
+  /// Barcode formats to scan for. Defaults to every supported format.
+  ///
+  /// Narrowing this down makes decoding faster.
   final List<BarcodeFormat> formats;
 
   /// Controller to manage the QR code scanning functionality
@@ -98,7 +98,7 @@ class QRCodeDartScanView extends StatefulWidget {
     this.onCapture,
     this.resolutionPreset = QRCodeDartScanResolutionPreset.medium,
     this.controller,
-    this.formats = QRCodeDartScanDecoder.acceptedFormats,
+    this.formats = BarcodeFormat.values,
     this.child,
     this.takePictureButtonBuilder,
     this.widthPreview,
@@ -121,9 +121,17 @@ class QRCodeDartScanView extends StatefulWidget {
 
 class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     with WidgetsBindingObserver {
-  late QRCodeDartScanController controller;
+  late final QRCodeDartScanController controller;
   bool initialized = false;
-  bool _isControllerDisposed = false;
+
+  /// Whether the camera *should* be running. Kept separate from [initialized]
+  /// (which only reflects the controller state) so that a start/stop pair that
+  /// happens faster than the async camera setup does not leave the camera on.
+  bool _cameraRunning = false;
+
+  /// Whether the camera has yet to be started for the first time by this state.
+  bool _firstStart = true;
+
   Key _cameraKey = UniqueKey();
   double _scale = 1.0;
   Size _previewSize = Size.zero;
@@ -131,50 +139,55 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final cameraController = controller.cameraController;
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return;
-    }
-    if (state == AppLifecycleState.inactive && !_isControllerDisposed) {
-      _isControllerDisposed = true;
-      stopCamera();
-    } else if (state == AppLifecycleState.resumed) {
-      _isControllerDisposed = false;
-      _initController();
-    }
     super.didChangeAppLifecycleState(state);
+    if (!mounted) return;
+    if (state == AppLifecycleState.resumed) {
+      startCamera();
+    } else if (state == AppLifecycleState.inactive) {
+      stopCamera();
+    }
   }
 
   void stopCamera() {
-    setState(() {
-      controller.state.removeListener(_onStateListener);
-      controller.dispose();
+    if (!_cameraRunning) {
+      return;
+    }
+    _cameraRunning = false;
+    if (mounted) {
+      setState(() {
+        initialized = false;
+      });
+    } else {
       initialized = false;
-    });
+    }
+    controller.dispose();
   }
 
   void startCamera() {
-    if (initialized) {
+    if (_cameraRunning) {
       return;
     }
+    _cameraRunning = true;
     _initController();
   }
 
   @override
   void initState() {
     super.initState();
+    controller = widget.controller ?? QRCodeDartScanController();
+    controller.state.addListener(_onStateListener);
     WidgetsBinding.instance.addObserver(this);
     startCamera();
   }
 
   @override
   void dispose() {
-    super.dispose();
     WidgetsBinding.instance.removeObserver(this);
     controller.state.removeListener(_onStateListener);
-    controller.dispose();
-    _isControllerDisposed = true;
+    _cameraRunning = false;
     initialized = false;
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -185,27 +198,40 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     );
   }
 
-  void _initController() async {
-    controller = widget.controller ?? QRCodeDartScanController();
-    controller.state.addListener(_onStateListener);
-    await controller.config(
-      QRCodeDartScanConfig(
-        formats: widget.formats,
-        typeCamera: widget.typeCamera,
-        typeScan: widget.typeScan,
-        imageDecodeOrientation: widget.imageDecodeOrientation,
-        resolutionPreset: widget.resolutionPreset,
-        intervalScan: widget.intervalScan,
-        onResultInterceptor: widget.onResultInterceptor,
-        lockCaptureOrientation: widget.lockCaptureOrientation,
-        onCameraError: widget.onCameraError,
-        fps: widget.fps,
-        videoBitrate: widget.videoBitrate,
-        croppingStrategy: widget.croppingStrategy,
-        focusPoint: widget.focusPoint,
-        imageStreamTimeout: widget.imageStreamTimeout,
-      ),
-    );
+  Future<void> _initController() async {
+    // The widget may have been unmounted (or paused again) while the previous
+    // teardown was still running.
+    if (!mounted || !_cameraRunning) return;
+    // A fresh mount starts a new scanning session, so a `stopScan()` left over
+    // on an app-owned controller must not survive it. Later restarts (app
+    // lifecycle, startCamera/stopCamera) do preserve it.
+    final keepScanPaused = !_firstStart;
+    _firstStart = false;
+    try {
+      await controller.config(
+        QRCodeDartScanConfig(
+          formats: widget.formats,
+          typeCamera: widget.typeCamera,
+          typeScan: widget.typeScan,
+          imageDecodeOrientation: widget.imageDecodeOrientation,
+          resolutionPreset: widget.resolutionPreset,
+          intervalScan: widget.intervalScan,
+          onResultInterceptor: widget.onResultInterceptor,
+          lockCaptureOrientation: widget.lockCaptureOrientation,
+          onCameraError: widget.onCameraError,
+          fps: widget.fps,
+          videoBitrate: widget.videoBitrate,
+          croppingStrategy: widget.croppingStrategy,
+          focusPoint: widget.focusPoint,
+          imageStreamTimeout: widget.imageStreamTimeout,
+        ),
+        keepScanPaused: keepScanPaused,
+      );
+    } catch (e) {
+      debugPrint('Error initializing camera: $e');
+      if (!mounted) return;
+      widget.onCameraError?.call(e is CameraException ? e.code : e.toString());
+    }
   }
 
   Widget _buildButton() {
@@ -282,39 +308,40 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
   }
 
   void _onStateListener() {
+    if (!mounted) return;
     final state = controller.state.value;
     if (state.initialized != initialized) {
       postFrame(() {
+        final shouldBeInitialized =
+            _cameraRunning && controller.state.value.initialized;
+        if (shouldBeInitialized == initialized) return;
         setState(() {
           _cameraKey = Key(controller.state.value.typeCamera.toString());
-          initialized = controller.state.value.initialized;
+          initialized = shouldBeInitialized;
         });
       });
     }
-    if (state.result != null) {
-     final result = Result(
-        state.result!.text,
-        state.result!.rawBytes,
-        _fixResultPoints(state.result!.resultPoints),
-        state.result!.barcodeFormat,
-        state.result!.timestamp,
+    final result = state.result;
+    if (result != null) {
+      widget.onCapture?.call(
+        result.copyWith(corners: _fixCorners(result.corners)),
       );
-      widget.onCapture?.call(result);
     }
   }
 
-  List<ResultPoint?>? _fixResultPoints(List<ResultPoint?>? resultPoints) {
-    if (resultPoints == null || resultPoints.isEmpty) {
-      return resultPoints;
+  /// Maps decoder corners (camera image space) to preview widget space.
+  List<Offset> _fixCorners(List<Offset> corners) {
+    if (corners.isEmpty) {
+      return corners;
     }
 
     if (_cameraSize == Size.zero || _previewSize == Size.zero) {
-      return resultPoints;
+      return corners;
     }
 
     final cameraController = controller.cameraController;
     if (cameraController == null || !cameraController.value.isInitialized) {
-      return resultPoints;
+      return corners;
     }
 
     // Tamanho da câmera conforme reportado pelo hardware
@@ -349,52 +376,50 @@ class QRCodeDartScanViewState extends State<QRCodeDartScanView>
     final cropY = (scaledImageHeight - _previewSize.height) / 2;
 
     // Transformar todos os pontos
-    final transformedPoints = <ResultPoint>[];
-    for (final point in resultPoints) {
-      if (point == null) continue;
-
+    final transformedPoints = <Offset>[];
+    for (final point in corners) {
       double transformedX, transformedY;
 
       if (needsRotation) {
         // Rotação 90° horário: (x, y) → (height - y, x)
-        transformedX = cameraHeight - point.y;
-        transformedY = point.x;
+        transformedX = cameraHeight - point.dy;
+        transformedY = point.dx;
       } else {
         // Sem rotação, usar coordenadas originais
-        transformedX = point.x;
-        transformedY = point.y;
+        transformedX = point.dx;
+        transformedY = point.dy;
       }
 
       // Aplicar escala uniforme e remover crop
       final fixedX = (transformedX * _scale) - cropX;
       final fixedY = (transformedY * _scale) - cropY;
 
-      transformedPoints.add(ResultPoint(fixedX, fixedY));
+      transformedPoints.add(Offset(fixedX, fixedY));
     }
 
     if (transformedPoints.isEmpty) {
-      return resultPoints;
+      return corners;
     }
 
     // Calcular bounding box
-    double minX = transformedPoints.first.x;
-    double maxX = transformedPoints.first.x;
-    double minY = transformedPoints.first.y;
-    double maxY = transformedPoints.first.y;
+    double minX = transformedPoints.first.dx;
+    double maxX = transformedPoints.first.dx;
+    double minY = transformedPoints.first.dy;
+    double maxY = transformedPoints.first.dy;
 
     for (final point in transformedPoints) {
-      if (point.x < minX) minX = point.x;
-      if (point.x > maxX) maxX = point.x;
-      if (point.y < minY) minY = point.y;
-      if (point.y > maxY) maxY = point.y;
+      if (point.dx < minX) minX = point.dx;
+      if (point.dx > maxX) maxX = point.dx;
+      if (point.dy < minY) minY = point.dy;
+      if (point.dy > maxY) maxY = point.dy;
     }
 
     // Retornar os 4 cantos do quadrilátero (bounding box)
     return [
-      ResultPoint(minX, minY), // Top-left
-      ResultPoint(maxX, minY), // Top-right
-      ResultPoint(maxX, maxY), // Bottom-right
-      ResultPoint(minX, maxY), // Bottom-left
+      Offset(minX, minY), // Top-left
+      Offset(maxX, minY), // Top-right
+      Offset(maxX, maxY), // Bottom-right
+      Offset(minX, maxY), // Bottom-left
     ];
   }
 }
@@ -458,6 +483,6 @@ class _ButtonTakePicture extends StatelessWidget {
 
 // If return true the newResult is passed in 'onCapture'
 typedef OnResultInterceptorCallback = bool Function(
-  Result? oldREsult,
-  Result newResult,
+  ScanResult? oldResult,
+  ScanResult newResult,
 );

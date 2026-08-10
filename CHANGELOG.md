@@ -1,3 +1,35 @@
+## 0.13.0
+
+### Breaking: `zxing_lib` no longer leaks into the scanner API
+
+`onCapture`, `onResultInterceptor` and `formats` now use the package's own types, so apps do not need a `zxing_lib` dependency to consume them.
+
+| before (`zxing_lib`) | now |
+| --- | --- |
+| `Result` | `ScanResult` |
+| `BarcodeFormat` | `BarcodeFormat` (own enum, only the 10 supported formats) |
+| `result.barcodeFormat` | `result.format` |
+| `result.resultPoints` (`List<ResultPoint?>?`) | `result.corners` (`List<Offset>`, never null) |
+| `result.timestamp` (`int` millis) | `result.timestamp` (`DateTime`) |
+| `result.rawBytes` (`List<int>?`) | `result.rawBytes` (`Uint8List?`) |
+
+- `result.numBits` and `result.resultMetadata` were dropped; nothing in the package used them.
+- Passing an unsupported format is now a compile error instead of a runtime `Exception`.
+- `ScanResult` keeps identity equality on purpose, so scanning the same code twice still notifies.
+- The low-level `QRCodeDartScanDecoder` still speaks `zxing_lib` types; only the scanner layer was migrated.
+
+## 0.12.2
+- **Lifecycle race fix**: Fixed `CameraException(Disposed CameraController, startImageStream() was called on a disposed CameraController.)` raised when the app was paused/resumed (or the scanner was popped) while the camera initialization was still in flight.
+  - Camera setup/teardown is now serialized and guarded by a generation token: an initialization that gets invalidated aborts at its next `await` and disposes the camera it created, instead of continuing against a dead controller.
+  - `CameraController.value.isInitialized` stays `true` after `dispose()`, so the package now tracks the disposed state itself rather than relying on that flag.
+- **Camera leak fix**: An aborted or replaced initialization no longer leaves a native camera session open (also fixes leaks on `changeCamera`).
+- **Paused scan is preserved across the app lifecycle**: if `stopScan()` was called and the user minimizes and reopens the app, the camera preview is restored but the image stream is *not* restarted. Use `startScan()` (or `changeTypeScan(TypeScan.live)`) to resume, and the new `isScanPaused` getter to query it. Mounting the view again resets it, so a reused controller never comes back mute; `config()` takes a new `keepScanPaused` flag for the lifecycle case.
+- `QRCodeDartScanController.cameraController` now returns `null` instead of a disposed instance, and a new `isInitialized` getter was added.
+- The controller can be safely reused after `dispose()`: calling `config()` again re-arms it.
+- The view now registers its state listener only once instead of on every resume, and no longer calls `setState` after being unmounted.
+- Fixed `changeTypeScan(TypeScan.live)` never restarting the image stream.
+- Errors from `availableCameras()`, `takePicture()` and `setFocusPoint()` are now caught and reported through `onCameraError` instead of escaping to the zone. `startImageStream()` failures are the deliberate exception: they are reported through `onCameraError` **and** re-surfaced to the zone, so they keep reaching crash reporting.
+
 ## 0.12.1
 - **Result points accuracy**: Fixed `resultPoints` coordinates to accurately match the QR code position in the camera preview.
 - **Dynamic rotation handling**: Automatically detects camera orientation (landscape/portrait) and applies the correct transformation.

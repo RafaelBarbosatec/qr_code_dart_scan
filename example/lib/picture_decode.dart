@@ -26,14 +26,14 @@ class PictureDecode extends StatefulWidget {
 }
 
 class _PictureDecodeState extends State<PictureDecode> {
-  Result? currentResult;
+  ScanResult? currentResult;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: QRCodeDartScanView(
         typeScan: TypeScan.takePicture,
-        onCapture: (Result result) {
+        onCapture: (ScanResult result) {
           setState(() {
             currentResult = result;
           });
@@ -52,7 +52,7 @@ class _PictureDecodeState extends State<PictureDecode> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Text: ${currentResult?.text ?? 'Not found'}'),
-                Text('Format: ${currentResult?.barcodeFormat ?? 'Not found'}'),
+                Text('Format: ${currentResult?.format ?? 'Not found'}'),
               ],
             ),
           ),
